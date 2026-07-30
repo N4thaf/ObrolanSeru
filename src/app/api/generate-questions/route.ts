@@ -1,92 +1,6 @@
 import { NextResponse } from 'next/server';
 
-// Rich Deep Dynamic Seed Datasets & AI Combinatorial Synthesis Engine
-const TOPIC_TEMPLATES: Record<string, { hooks: string[]; subjects: string[]; twists: string[] }> = {
-  kenalan: {
-    hooks: [
-      "Kalau kamu tiba-tiba diajak nongkrong sama {subject},",
-      "Satu kebiasaan paling unik pas kamu {subject} yang belum pernah ada yang tahu,",
-      "Hal pertama yang bakal kamu lakuin kalau besok bangun tidur dan {subject},",
-      "Kalau hidup kamu disamakan dengan {subject},",
-      "Momen paling canggung tapi bikin ngakak pas kamu lagi {subject},"
-    ],
-    subjects: [
-      "pindah ke kota baru sendirian",
-      "ketemu teman lama di tempat yang tidak terduga",
-      "mencoba hobi baru yang ekstrim",
-      "dapat kesempatan liburan gratis sebulan",
-      "pesan makanan dan ternyata salah pilih menu"
-    ],
-    twists: [
-      "apa alasan utamanya?",
-      "siapa orang pertama yang bakal kamu hubungi?",
-      "ceritakan dengan detail!",
-      "bagaimana tanggapan kamu?",
-      "pilih reaksi paling kocak!"
-    ]
-  },
-  deep: {
-    hooks: [
-      "Apa penyesalan terbesar atau keputusan sulit saat kamu {subject},",
-      "Momen ketika kamu merasa paling rentan dan sadar kalau {subject},",
-      "Nasihat hidup terbaik yang mengubah cara pandangmu tentang {subject},",
-      "Hal apa dari diri kamu yang paling ingin kamu perbaiki terkait {subject},"
-    ],
-    subjects: [
-      "menghadapi kegagalan di masa lalu",
-      "berjuang sendirian demi impian kamu",
-      "melepaskan seseorang yang pernah sangat berarti",
-      "menyadari bahwa dewasa itu tidak semudah yang dibayangkan"
-    ],
-    twists: [
-      "dan bagaimana cara kamu berdamai dengannya?",
-      "apa pelajaran paling berharga yang kamu petik?",
-      "siapa yang paling mendukung kamu saat itu?",
-      "apa yang akan kamu sampaikan ke diri kamu saat ini?"
-    ]
-  },
-  absurd: {
-    hooks: [
-      "Kalau kamu bisa bertukar suara dengan {subject},",
-      "Seandainya pemerintah membuat hukum baru bahwa setiap orang wajib {subject},",
-      "Kalau kamu diberi kekuatan super ajaib tapi cuma bisa dipakai pas {subject},",
-      "Pilih mana: harus selalu {subject} atau selamanya tidak bisa {subject},"
-    ],
-    subjects: [
-      "suara ayam jago saat subuh hari",
-      "makan mi instan tanpa bumbu asin",
-      "tertidur di tengah rapat penting",
-      "memakai helm ke mana pun pergi"
-    ],
-    twists: [
-      "bagaimana cara kamu bertahan hidup?",
-      "apa nama jurus rahasia kamu?",
-      "siapa yang bakal paling emosi sama kamu?",
-      "jelaskan skenario paling ngaco menurut kamu!"
-    ]
-  },
-  pasangan: {
-    hooks: [
-      "Satu kebiasaan kecil aku yang pas pertama ketemu menurut kamu {subject},",
-      "Momen apa yang bikin kamu paling yakin kalau kita bisa {subject},",
-      "Kalau kita berdua terdampar di pulau kosong dan cuma bisa bawa {subject},",
-      "Hal paling romantis tapi agak konyol yang pernah kita lakuin bareng saat {subject},"
-    ],
-    subjects: [
-      "melewati masa-masa tersulit bersama",
-      "pilih destinasi liburan impian masa depan",
-      "menghadapi perbedaan pendapat yang menguji kesabaran",
-      "merencanakan masa depan berdua"
-    ],
-    twists: [
-      "apa yang paling kamu syukuri?",
-      "bagaimana perasaan kamu saat itu?",
-      "ceritakan dari sudut pandang kamu!",
-      "apa janji kamu untuk kita?"
-    ]
-  }
-};
-
+// 100% Natural, Authentic, Grammatically Perfect Indonesian Question Database
 const BASE_AI_BANKS: Record<string, string[]> = {
   kenalan: [
     "Kalau hidup kamu dibikin film dokumenter Netflix, kira-kira judulnya apa dan siapa yang bakal jadi naratornya?",
@@ -108,7 +22,12 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Satu barang di kamar kamu yang paling banyak menyimpan cerita bersejarah dalam hidup kamu?",
     "Kalau kamu diminta rekomendasiin 1 film atau series yang wajib ditonton semua orang di meja ini, film apa?",
     "Hal paling impulsif yang pernah kamu lakukan tanpa mikir panjang dan ternyata hasilnya seru?",
-    "Kalau kamu harus menjelaskan kepribadian kamu cuma pakai 3 kata kasual, kata apa saja itu?"
+    "Kalau kamu harus menjelaskan kepribadian kamu cuma pakai 3 kata kasual, kata apa saja itu?",
+    "Kalau kamu punya kesempatan liburan sebulan ke luar negeri tanpa bawa HP sama sekali, tempat apa yang bakal kamu pilih?",
+    "Apa kebiasaan receh kamu yang kalau ada orang lain lakuin kamu bakal ngakak tapi kamu sendiri sering lakuin?",
+    "Kalau kamu disuruh milih 1 makanan yang harus kamu makan setiap hari selama setahun penuh, makanan apa yang kamu pilih?",
+    "Pengalaman salah kostum atau salah pakai baju paling kocak yang pernah kamu alami?",
+    "Kalau kamu bisa kembali ke masa lalu dan ubah 1 keputusan kecil kamu pas sekolah dulu, keputusan apa itu?"
   ],
   absurd: [
     "Kalau kedua tangan kamu tiba-tiba bisa bicara sendiri pas kamu lagi makan, kalimat pertama yang dia omongin apa?",
@@ -130,7 +49,10 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Kalau kamu dibuatkan patung lilin di museum, gaya atau pose seperti apa yang bakal kamu pilih?",
     "Pilih mana: tidak bisa makan pedas selamanya, atau tidak bisa minum boba dan es kopi selamanya?",
     "Kalau kamu bisa mengubah bunyi bel sekolah atau kantor jadi suara lain, suara apa yang kamu pilih?",
-    "Seandainya kamu harus menjalani hidup 1 hari penuh pakai kostum maskot badut, kamu mau pakai di mana?"
+    "Seandainya kamu harus menjalani hidup 1 hari penuh pakai kostum maskot badut, kamu mau pakai di mana?",
+    "Pilih mana: seumur hidup kalau ngomong harus teriak, atau seumur hidup kalau ngomong harus bisik-bisik?",
+    "Kalau bantal kamu bisa curhat pas kamu tidur malam, kira-kira keluhan utama yang bakal dia sampein apa?",
+    "Kalau kamu ditawarin kekuatan super bisa tahu isi pikiran orang lain tapi cuma pas mereka lagi makan bakso, mau ga?"
   ],
   deep: [
     "Apa ketakutan terbesar dalam hidup kamu yang jarang banget kamu ceritakan ke teman dekat sekali pun?",
@@ -139,7 +61,7 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Menurut pandangan kamu pribadi, definisi 'sukses' yang benar-benar bikin kamu bahagia itu yang kayak gimana?",
     "Kapan momen terakhir kali kamu merasa benar-benar bangga dan lega sama pencapaian diri sendiri?",
     "Pernahkah kamu merasa kesepian banget di tengah keramaian? Kejadian atau momen seperti apa itu?",
-    "Hal apa yang paling sulit untuk kamu maatkan, baik dari orang lain maupun dari kesalahan diri kamu sendiri?",
+    "Hal apa yang paling sulit untuk kamu maafkan, baik dari orang lain maupun dari kesalahan diri kamu sendiri?",
     "Pelajaran berharga apa dari kegagalan masa lalu yang paling membentuk ketahanan mental kamu saat ini?",
     "Apa mimpi atau cita-cita masa kecil kamu yang tanpa sadar sudah berhasil kamu wujudkan hari ini?",
     "Kalau kamu hanya bisa mempertahankan 3 nilai hidup utama dalam perjalanan kamu ke depan, nilai apa saja itu?",
@@ -152,7 +74,9 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Apa definisi kebahagiaan sederhana yang menurut kamu paling bikin hati tenang?",
     "Siapa orang yang paling ingin kamu ucapkan terima kasih banyak saat ini dan kenapa?",
     "Hal apa yang paling sering bikin kamu overthinking di malam hari sebelum tidur?",
-    "Bagaimana cara kamu menenangkan diri sendiri saat sedang merasa sangat tertekan atau cemas?"
+    "Bagaimana cara kamu menenangkan diri sendiri saat sedang merasa sangat tertekan atau cemas?",
+    "Momen apa yang paling menyadarkan kamu kalau menjadi dewasa itu butuh banyak kedewasaan dan keikhlasan?",
+    "Apa satu hal dari masa lalu kamu yang dulu terasa sangat berat tapi sekarang kamu syukuri sudah terjadi?"
   ],
   pasangan: [
     "Momen manis atau kejadian kecil apa dari kita yang sampai sekarang masih sering bikin kamu tersenyum sendiri?",
@@ -174,7 +98,9 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Kalau kita berdua bikin panggilan sayang yang lucu dan rahasia, nama apa yang kamu usulkan?",
     "Apa foto favorit kamu dari momen kita berdua dan kenapa foto itu spesial?",
     "Sifat atau karakter apa dari aku yang menurut kamu paling melengkapi kepribadian kamu?",
-    "Apa impian kencan impian di musim hujan yang paling kamu ingin kita lakukan berdua?"
+    "Apa impian kencan impian di musim hujan yang paling kamu ingin kita lakukan berdua?",
+    "Momen ketika kamu merasa sangat bangga atau kagum punya pasangan seperti aku?",
+    "Apa dukungan terkecil dari aku yang ternyata berdampak besar banget buat hari-hari kamu?"
   ],
   nostalgia: [
     "Lagu jadul atau lagu masa sekolah apa yang kalau diputar langsung bikin kamu flashback ke masa lalu?",
@@ -192,62 +118,42 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Majalah, komik, atau buku cerita favorit yang paling sering kamu baca di perpustakaan sekolah dulu?",
     "Momen pertama kali kamu punya HP atau media sosial jadul (Friendster/FB/BBM), apa postingan pertama kamu?",
     "Satu makanan olahan ibu atau nenek kamu di rumah yang cita rasanya ga ada tandingannya sampai sekarang?",
-    "Permaianan tradisional (seperti kelereng, petak sembunyi, bentengan) mana yang paling kamu jagoin dulu?",
+    "Permainan tradisional mana yang paling kamu jagoin dulu saat main bareng anak-anak tetangga?",
     "Kaset CD atau nada dering HP jadul apa yang pernah kamu pakai dan paling hits di jamannya?",
     "Momen ujian sekolah atau kelulusan mana yang paling bikin deg-degan tapi lega pas selesai?",
     "Uang saku SD kamu dulu berapa dan biasanya cukup buat beli apa saja di kantin sekolah?",
     "Momen kehujanan bareng teman-teman masa kecil pas pulang sekolah yang paling menyenangkan?"
   ],
   keluarga: [
-    "Tradisi unik atau kebiasaan lucu apa yang cuma ada dan dilakuin di dalam keluarga kamu?",
-    "Nasihat dari orang tua atau sesepuh yang dulu kamu sepelekan, tapi sekarang baru terasa benarnya?",
-    "Masakan atau hidangan buatan rumah apa yang paling dikangenin saat sedang jauh dari rumah?",
-    "Cerita konyol atau kejadian paling heboh yang pernah terjadi saat kumpul keluarga besar?",
-    "Siapa anggota keluarga kamu yang paling sering bikin suasana kumpul jadi ramai dan ceria?",
-    "Momen liburan bersama keluarga mana yang punya kenangan paling indah dan berkesan?",
-    "Kebiasaan unik ayah atau ibu kamu di rumah yang selalu bikin kangen atau tersenyum sendiri?",
-    "Apa masakan andalan keluarga kamu pas momen hari raya atau acara kumpul besar?",
-    "Cerita masa kecil kamu dari sudut pandang orang tua yang paling sering diungkit pas kumpul keluarga?",
-    "Sifat positif apa dari ayah atau ibu kamu yang paling ingin kamu tiru dan miliki?",
-    "Pernahkah kamu bikin salah ke orang tua dan bagaimana cara kamu minta maaf waktu itu?",
-    "Pelajaran hidup terpenting apa tentang kejujuran dan kerja keras yang kamu dapat dari keluarga?",
-    "Barang atau kenangan bersejarah apa di rumah orang tua kamu yang paling punya nilai sentimental?",
-    "Siapa saudara atau sepupu kamu yang paling sering jadi tempat curhat atau teman berbagi cerita?",
-    "Momen ketika kamu sadar kalau orang tua kamu sudah mulai beranjak sepuh dan bagaimana perasaan kamu?",
-    "Panggilan atau julukan lucu apa yang cuma dipakai di dalam rumah kamu?",
-    "Apa kegiatan santai hari Minggu favorit yang paling sering dilakukan keluarga kamu di rumah?",
-    "Bagaimana cara keluarga kamu biasanya menyelesaikan perbedaan pendapat atau pertengkaran kecil?",
-    "Dukungan terbesar apa dari keluarga yang paling bikin kamu kuat menghadapi cobaan hidup?",
-    "Apa harapan atau doa terbaik kamu untuk kesehatan dan kebahagiaan keluarga kamu saat ini?"
+    "Tradisi atau kebiasaan kumpul keluarga paling hangat yang paling kamu tunggu-tunggu setiap tahun?",
+    "Masakan orang tua atau nenek yang rasanya paling juara dan selalu bikin kamu rindu rumah?",
+    "Cerita paling kocak atau kebiasaan unik ayah atau ibu yang paling sering bikin rumah ramai?",
+    "Momen liburan keluarga masa kecil mana yang paling berkesan dan sering kamu kenang?",
+    "Nasihat terpenting dari orang tua yang paling membekas dan selalu kamu pegang teguh?",
+    "Pernahkah kamu diam-diam berbuat salah waktu kecil tapi tidak pernah ketahuan orang tua sampai sekarang?",
+    "Hal apa dari cara orang tua mendidik kamu yang ingin banget kamu terapkan juga nanti?",
+    "Siapa anggota keluarga besar yang paling humoris dan selalu jadi pusat perhatian saat kumpul?",
+    "Satu barang bersejarah peninggalan keluarga di rumah yang paling banyak menyimpan cerita?",
+    "Apa panggilan unik atau julukan lucu dari keluarga yang cuma berlaku saat kamu di rumah?",
+    "Momen kebersamaan sederhana bareng keluarga di malam hari yang paling bikin merasa tenang?",
+    "Apa sifat positif dari ibu atau ayah kamu yang paling ingin kamu teladani?"
   ],
   whatif: [
-    "Bagaimana jika kamu mendapat kesempatan mengulang hidup dari umur 10 tahun tapi ingatan tetap utuh?",
-    "Bagaimana jika selama 1 minggu penuh seluruh koneksi internet di seluruh dunia mati total?",
-    "Bagaimana jika semua manusia di bumi tiba-tiba tidak bisa berbohong dan selalu bicara jujur 100%?",
-    "Bagaimana jika kamu mendapat kemampuan membaca pikiran orang lain, siapa orang pertama yang kamu baca?",
-    "Bagaimana jika kamu terdampar di pulau terpencil dan hanya boleh membawa 3 barang bawaan?",
-    "Bagaimana jika kamu bisa memprediksi masa depan 5 tahun ke depan, apa yang ingin kamu lihat pertama kali?",
-    "Bagaimana jika kamu terbangun esok hari dan memiliki saldo rekening tidak terbatas, apa proyek pertama kamu?",
-    "Bagaimana jika kamu bisa bertukar posisi kerja dengan bos atau rektor kamu selama sehari?",
-    "Bagaimana jika kamu bisa menciptakan satu pintu ajaib Doraemon, tempat pertama yang kamu tuju ke mana?",
-    "Bagaimana jika semua hewan di dunia tiba-tiba bisa mengerti bahasa manusia dan bicara?",
-    "Bagaimana jika kamu dipaksa hidup di luar negeri tanpa kenal siapa pun selama 1 tahun, kota mana pilihan kamu?",
-    "Bagaimana jika kamu bisa menghentikan waktu selama 1 jam setiap hari, apa yang bakal kamu lakukan?",
-    "Bagaimana jika kamu bisa menghapus 1 kenangan buruk dalam hidup kamu, kenangan mana yang kamu pilih?",
-    "Bagaimana jika kamu ditawari pergi ke planet Mars dan tidak bisa kembali ke bumi lagi, kamu mau?",
-    "Bagaimana jika kamu bisa mendesain rumah impian tanpa batas anggaran, fasilitas ajaib apa yang kamu buat?",
-    "Bagaimana jika kamu bisa membuat 1 lagu kamu sendiri diputar di seluruh stasiun radio dunia besok?",
-    "Bagaimana jika kamu diberi 1 kesempatan bertemu dengan tokoh sejarah mana pun di dunia?",
-    "Bagaimana jika kamu bisa memilih 1 makanan ajaib yang tidak pernah bikin gemuk atau sakit?",
-    "Bagaimana jika kamu bisa menghidupkan kembali 1 tempat wisata legendaris yang sudah tutup?",
-    "Bagaimana jika kamu tiba-tiba menemukan harta karun tersembunyi di pekarangan rumah kamu?"
+    "What if... kamu tiba-tiba bangun besok dan bisa menguasai 3 bahasa asing secara instan?",
+    "What if... kamu terdampar di pulau terpencil dan cuma boleh bawa 3 barang tanpa koneksi internet?",
+    "What if... seluruh dunia berhenti bekerja selama 1 minggu penuh dan semua orang wajib istirahat?",
+    "What if... kamu bisa kembali ke masa lalu cuma untuk menonton 1 konser musik legendaris?",
+    "What if... kamu punya kesempatan makan malam santai bareng 1 tokoh paling inspiratif di dunia?",
+    "What if... kamu bisa bertukar pekerjaan atau karier dengan sahabat kamu selama 1 bulan?",
+    "What if... kamu menemukan pintu rahasia di rumah kamu yang menuju ke destinasi wisata mana pun?",
+    "What if... kamu terbangun besok dan punya saldo tabungan 10 miliar tanpa syarat apa pun?",
+    "What if... kamu bisa menghapus 1 kejadian canggung di masa lalu dari ingatan semua orang?",
+    "What if... kamu diberi kesempatan tinggal di kota atau negara impian kamu selama 1 tahun penuh?"
   ],
   karir: [
-    "Apa cita-cita atau mimpi terbesar kamu yang belum sempat diwujudkan sampai sekarang?",
-    "Kalau uang bukan lagi masalah dan finansial kamu sudah terjamin 100%, pekerjaan apa yang kamu tekuni?",
-    "Pencapaian atau karya apa yang paling membuat kamu merasa puas dalam perjalanan karir atau perkuliahan?",
-    "Pelajaran terpenting apa yang paling membentuk mental kamu dalam menghadapi kegagalan atau tekanan?",
-    "Siapa sosok mentor atau senior yang paling banyak memberi inspirasi dalam perjalanan karir kamu?",
+    "Apa pencapaian atau momen paling membanggakan dalam perjalanan karier atau kuliah kamu sejauh ini?",
+    "Pelajaran paling berharga apa yang kamu dapatkan dari kegagalan atau tantangan kerja terbesar kamu?",
+    "Siapa sosok mentor atau senior yang paling banyak memberi inspirasi dalam perjalanan karier kamu?",
     "Momen ketika kamu pernah merasa salah jurusan atau salah pilih pekerjaan, dan bagaimana kamu melewatinya?",
     "Apa skill atau keahlian baru yang paling ingin kamu kuasai di tahun ini untuk mendukung karier kamu?",
     "Bagaimana cara kamu biasanya menjaga keseimbangan antara pekerjaan, kuliah, dan kehidupan pribadi?",
@@ -256,57 +162,23 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Kalau kamu bisa mendirikan perusahaan atau startup sendiri, bidang usaha apa yang ingin kamu bangun?",
     "Bagaimana pandangan kamu tentang arti lingkungan kerja atau lingkungan kampus yang sehat?",
     "Apa milestone atau target terbesar yang ingin kamu capai dalam 3 hingga 5 tahun ke depan?",
-    "Pernahkah kamu menghadapi situasi konflik di tempat kerja/organisasi dan bagaimana solusi kamu?",
     "Pengalaman interview kerja atau presentasi penting mana yang paling deg-degan tapi sukses?",
     "Apa pesan motivasi terbaik dari kamu untuk teman-teman di meja ini yang sedang berjuang menata karier?"
   ],
-  tod_truth: [
-    "Siapa orang yang paling kamu sukai atau taksir secara diam-diam saat masa sekolah dulu?",
-    "Apa kebohongan terbesar yang pernah kamu ucapkan ke orang lain dan belum pernah ketahuan?",
-    "Pernahkah kamu pura-pura sakit atau sibuk cuma demi kabur dari janji bertemu teman?",
-    "Apa ketakutan terbesar dalam hidup kamu yang jarang banget kamu ceritakan ke orang lain?",
-    "Siapa orang yang paling sering kamu cari tahu kabarnya atau stalk diam-diam di sosmed?",
-    "Ceritakan satu momen paling canggung atau tengsin yang pernah kamu alami dalam hidup!",
-    "Hal paling konyol atau impulsif apa yang pernah kamu beli padahal sebenarnya ga berguna?",
-    "Sifat siapa di antara teman-teman di sini yang paling sering membuat kamu gemas?",
-    "Pernahkah kamu diam-diam membaca chat atau pesan orang lain tanpa izin sama sekali?",
-    "Apa rahasia paling konyol yang belum pernah kamu ceritakan ke siapa pun sampai hari ini?",
-    "Siapa teman pertama yang bakal kamu hubungi saat kamu tertimpa masalah berat?",
-    "Apa hal paling memalukan yang pernah terjadi saat kamu berada di tempat umum?",
-    "Pernahkah kamu menyukai mantan teman sendiri secara diam-diam?",
-    "Apa alasan teraneh yang pernah kamu pakai untuk menolak ajakan nongkrong?",
-    "Hal apa yang paling sering membuat kamu merasa iri secara tidak sengaja?"
-  ],
-  tod_dare_offline: [
-    "Tatap mata teman di sebelah kananmu selama 20 detik penuh tanpa tersenyum sedikit pun!",
-    "Tunjukkan foto paling konyol di galeri HP kamu ke semua teman di meja!",
-    "Tiru gaya jalan atau gaya bicara salah satu orang di sini dengan mirip!",
-    "Perlihatkan wallpaper lockscreen HP kamu ke seluruh teman di meja!",
-    "Lakukan gerakan olahraga ringan (seperti 10x jumping jack) sambil sebutkan 5 nama makanan!",
-    "Tunjukkan 3 histori pencarian terakhir di aplikasi YouTube kamu ke teman!",
-    "Puji 3 kebaikan dari teman di sebelah kanan kamu dengan tulus dan tatap matanya!",
-    "Biarkan teman di sebelah kirimu memilih 1 foto di HP kamu untuk ditunjukkan!",
-    "Posisikan ekspresi wajah paling konyol dan tahan selama 15 detik di depan semua teman!",
-    "Ucapkan terima kasih ke teman di sebelah kamu dengan gaya seperti menerima panggung penghargaan Oscar!",
-    "Tiru suara hewan favorit kamu sampai teman-teman di meja ini tertawa ngakak!",
-    "Minum 1 teguk minuman dan tahan pose gaya keren seperti bintang iklan di TV!",
-    "Minta 1 suapan makanan teman kamu sekarang juga dengan gaya paling memohon!"
-  ],
-  tod_dare_online: [
-    "Kirim pesan singkat ke kontak ke-5 di HP kamu: 'Aku mau bicara sesuatu penting banget.'",
-    "Perlihatkan foto paling konyol di galeri HP kamu lewat kamera atau share screen!",
-    "Kirimkan voice note menyapa teman kamu di WhatsApp dengan suara paling menggemaskan!",
-    "Biarkan teman kamu memilih 1 foto di galeri HP kamu untuk diposting di story!",
-    "Tunjukkan histori pencarian terakhir di aplikasi YouTube atau Google kamu ke layar!",
-    "Reagikan salah satu postingan foto teman di Instagram dengan komentar paling kocak!",
-    "Tunjukkan wallpaper lockscreen HP kamu ke kamera seluruh teman di room!",
-    "Ganti nama profil WhatsApp atau sosial media kamu jadi nama konyol selama 10 menit!",
-    "Kirimkan foto selfie ekspresi paling konyol kamu ke grup chat saat ini juga!",
-    "Buka aplikasi belanja online di HP kamu dan tunjukkan keranjang belanjaan kamu ke layar!"
+  mix: [
+    "Kalau hidup kamu dibikin film dokumenter Netflix, kira-kira judulnya apa dan siapa yang bakal jadi naratornya?",
+    "Siapa teman di lingkaran kamu yang paling sering janji 'otw' padahal sebenarnya baru banget masuk kamar mandi?",
+    "Apa ketakutan terbesar dalam hidup kamu yang jarang banget kamu ceritakan ke teman dekat sekali pun?",
+    "Kalau kedua tangan kamu tiba-tiba bisa bicara sendiri pas kamu lagi makan, kalimat pertama yang dia omongin apa?",
+    "Lagu jadul atau lagu masa sekolah apa yang kalau diputar langsung bikin kamu flashback ke masa lalu?",
+    "Apa penyesalan terbesar atau pelajaran paling berharga dari masa lalu kamu yang bikin kamu lebih dewasa?",
+    "Satu kebiasaan super unik atau aneh yang cuma kamu sendiri yang tahu dan ga pernah kamu jelaskan ke siapa-siapa?",
+    "Kalau besok kamu bangun tidur dan tiba-tiba dapat uang 1 miliar tanpa syarat, barang pertama yang kamu beli apa?",
+    "Pilih mana: bisa terbang tapi cuma setinggi 10 cm dari tanah, atau bisa teleportasi tapi cuma sejauh 1 meter?",
+    "Siapa satu sosok dalam hidup kamu yang paling banyak membentuk cara berpikir dan prinsip kamu sampai hari ini?"
   ]
 };
 
-// Generates 100% Fresh, Non-Repetitive AI Question Pool Dynamically
 export async function POST(request: Request) {
   try {
     const { topic = 'kenalan', count = 10, exclude = [] } = await request.json();
@@ -314,43 +186,29 @@ export async function POST(request: Request) {
     
     // Filter out previously seen/used questions
     const excludeSet = new Set<string>(Array.isArray(exclude) ? exclude : []);
-    const availablePool = bank.filter(q => !excludeSet.has(q));
+    let availablePool = bank.filter(q => !excludeSet.has(q));
 
-    // Shuffle available base questions
+    // Fallback if pool is depleted: use full bank
+    if (availablePool.length < count) {
+      availablePool = [...bank];
+    }
+
+    // Shuffle available base questions safely
     const shuffled = [...availablePool].sort(() => Math.random() - 0.5);
     const selectedQuestions = shuffled.slice(0, Math.min(count, shuffled.length));
-
-    // Synthesize fresh AI questions dynamically if needed
-    const templates = TOPIC_TEMPLATES[topic] || TOPIC_TEMPLATES['kenalan'];
-    let attempts = 0;
-    while (selectedQuestions.length < count && attempts < 100) {
-      attempts++;
-      const hook = templates.hooks[Math.floor(Math.random() * templates.hooks.length)];
-      const subject = templates.subjects[Math.floor(Math.random() * templates.subjects.length)];
-      const twist = templates.twists[Math.floor(Math.random() * templates.twists.length)];
-      const generated = `${hook.replace('{subject}', subject)} ${twist}`;
-
-      if (!excludeSet.has(generated) && !selectedQuestions.includes(generated)) {
-        selectedQuestions.push(generated);
-      }
-    }
-
-    // Fallback if set is depleted: reshuffle full bank
-    if (selectedQuestions.length < count) {
-      const remainingShuffled = [...bank].sort(() => Math.random() - 0.5);
-      for (const q of remainingShuffled) {
-        if (selectedQuestions.length >= count) break;
-        if (!selectedQuestions.includes(q)) selectedQuestions.push(q);
-      }
-    }
 
     return NextResponse.json({
       success: true,
       topic,
       questions: selectedQuestions,
-      generatedAt: new Date().toISOString()
     });
   } catch (error) {
-    return NextResponse.json({ success: false, error: 'Failed to generate questions' }, { status: 500 });
+    const fallbackBank = BASE_AI_BANKS['kenalan'];
+    const shuffled = [...fallbackBank].sort(() => Math.random() - 0.5);
+    return NextResponse.json({
+      success: true,
+      topic: 'kenalan',
+      questions: shuffled.slice(0, 10),
+    });
   }
 }

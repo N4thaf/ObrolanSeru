@@ -13,6 +13,13 @@ export const metadata: Metadata = {
   title: "ObrolanSeru — Game Kartu & Truth or Dare",
   description: "Game kartu pertanyaan dan truth or dare seru bareng teman, pasangan, atau keluarga. Main offline atau online bareng!",
   keywords: ["game kartu", "truth or dare", "icebreaker", "deep talk", "kenalan"],
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

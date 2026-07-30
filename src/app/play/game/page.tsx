@@ -869,12 +869,50 @@ function OfflineGame() {
   const [roundQuestions, setRoundQuestions] = useState<string[]>([]);
   const [allQuestions, setAllQuestions] = useState<string[]>([]);
 
+  // Poll room questions & round state for room players
+  useEffect(() => {
+    if (!roomCode) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/room?code=${roomCode}`);
+        const data = await res.json();
+        if (data.success && data.room && data.room.gameState) {
+          const gs = data.room.gameState;
+          if (Array.isArray(gs.roundQuestions) && gs.roundQuestions.length > 0 && JSON.stringify(gs.roundQuestions) !== JSON.stringify(roundQuestions)) {
+            setRoundQuestions(gs.roundQuestions);
+          }
+          if (Array.isArray(gs.allQuestions) && gs.allQuestions.length > 0 && JSON.stringify(gs.allQuestions) !== JSON.stringify(allQuestions)) {
+            setAllQuestions(gs.allQuestions);
+          }
+          if (gs.currentRound !== undefined && gs.currentRound !== currentRound) {
+            setCurrentRound(gs.currentRound);
+          }
+        }
+      } catch (e) {}
+    }, 500);
+    return () => clearInterval(interval);
+  }, [roomCode, currentRound, roundQuestions, allQuestions]);
+
   useEffect(() => {
     async function loadFreshAIQuestions() {
       // Force clear any stale questions stored in sessionStorage from previous builds
       try {
         sessionStorage.removeItem('obrolan_seen_questions');
       } catch (e) {}
+
+      // If playing in an online room, check if room already has questions broadcasted
+      if (roomCode) {
+        try {
+          const roomRes = await fetch(`/api/room?code=${roomCode}`);
+          const roomData = await roomRes.json();
+          if (roomData.success && roomData.room?.gameState?.roundQuestions) {
+            const gs = roomData.room.gameState;
+            setRoundQuestions(gs.roundQuestions);
+            if (gs.allQuestions) setAllQuestions(gs.allQuestions);
+            return;
+          }
+        } catch (e) {}
+      }
 
       const BAD_PHRASES = [
         "diajak nongkrong sama",
@@ -897,6 +935,8 @@ function OfflineGame() {
         console.warn("sessionStorage read error:", e);
       }
 
+      let selectedQuestions: string[] = [];
+
       try {
         const res = await fetch('/api/generate-questions', {
           method: 'POST',
@@ -907,14 +947,7 @@ function OfflineGame() {
         if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
           const pool: string[] = cleanPool(shuffle(data.questions as string[]));
           if (pool.length >= playerNames.length) {
-            setAllQuestions(pool);
-            setRoundQuestions(pool.slice(0, playerNames.length));
-
-            try {
-              const updatedSeen = Array.from(new Set([...seen, ...pool]));
-              sessionStorage.setItem('obrolan_seen_questions', JSON.stringify(updatedSeen));
-            } catch (e) {}
-            return;
+            selectedQuestions = pool;
           }
         }
       } catch (e) {
@@ -922,22 +955,59 @@ function OfflineGame() {
       }
 
       // Fallback if API fails
-      const bank = cleanPool(QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan']);
-      const pool: string[] = [];
-      while (pool.length < totalNeeded) pool.push(...shuffle(bank));
-      const selected = pool.slice(0, totalNeeded);
-      setAllQuestions(selected);
-      setRoundQuestions(selected.slice(0, playerNames.length));
+      if (selectedQuestions.length < totalNeeded) {
+        const bank = cleanPool(QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan']);
+        const pool: string[] = [];
+        while (pool.length < totalNeeded) pool.push(...shuffle(bank));
+        selectedQuestions = pool.slice(0, totalNeeded);
+      }
+
+      const firstRoundQs = selectedQuestions.slice(0, playerNames.length);
+      setAllQuestions(selectedQuestions);
+      setRoundQuestions(firstRoundQs);
+
+      // Broadcast questions to room so ALL devices get 100% identical questions!
+      if (roomCode) {
+        try {
+          await fetch('/api/room', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              code: roomCode,
+              gameState: {
+                allQuestions: selectedQuestions,
+                roundQuestions: firstRoundQs,
+                currentRound: 1
+              }
+            })
+          });
+        } catch (e) {}
+      }
     }
 
     loadFreshAIQuestions();
-  }, [topic, totalRounds, playerNames.length]);
+  }, [topic, totalRounds, playerNames.length, roomCode]);
 
   const handleNextRound = () => {
     const next = currentRound + 1;
     setCurrentRound(next);
     const start = (next - 1) * playerNames.length;
-    setRoundQuestions(allQuestions.slice(start, start + playerNames.length));
+    const nextRoundQs = allQuestions.slice(start, start + playerNames.length);
+    setRoundQuestions(nextRoundQs);
+
+    if (roomCode) {
+      fetch('/api/room', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: roomCode,
+          gameState: {
+            currentRound: next,
+            roundQuestions: nextRoundQs
+          }
+        })
+      });
+    }
   };
 
   const handleReset = () => router.push('/play/offline');

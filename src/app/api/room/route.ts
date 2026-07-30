@@ -59,7 +59,7 @@ export async function POST(req: Request) {
       players: Array.from(new Set([...(existing.players || []), ...(players || [])])),
       status: status || existing.status || "lobby",
       updatedAt: Date.now(),
-      gameState: gameState || existing.gameState,
+      gameState: { ...(existing.gameState || {}), ...(gameState || {}) },
     };
 
     rooms[cleanCode] = updatedRoom;

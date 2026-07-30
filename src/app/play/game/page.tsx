@@ -622,7 +622,7 @@ function SpinnerWheelFlow({
       const res = await fetch('/api/generate-questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: type === 'truth' ? 'tod_truth' : 'tod_dare', count: 1, exclude: seen })
+        body: JSON.stringify({ topic: type === 'truth' ? 'tod_truth' : (todType === 'jarakjauh' ? 'tod_dare_online' : 'tod_dare_offline'), count: 1, exclude: seen })
       });
       const data = await res.json();
       if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {

@@ -79,7 +79,7 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Apa satu hal dari masa lalu kamu yang dulu terasa sangat berat tapi sekarang kamu syukuri sudah terjadi?"
   ],
   pasangan: [
-    "Momen manis atau kejadian kecil apa dari kita yang sampai sekarang masih sering bikin kamu tersenyum sendiri?",
+    "Momen manis atau kejadian kecil apa dari kita yang sampai sekarang masih sering bikin kamu tersynchron sendiri?",
     "Satu kebiasaan kecil aku yang diam-diam menurut kamu lucu atau malah bikin kangen kalau lagi jauh?",
     "Apa hal pertama yang bikin kamu yakin buat buka hati dan mendekat ke aku dulu?",
     "Kalau kita punya waktu luang 3 hari bebas tanpa beban pekerjaan, kamu paling ingin kita liburan ke mana?",
@@ -176,6 +176,50 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Kalau besok kamu bangun tidur dan tiba-tiba dapat uang 1 miliar tanpa syarat, barang pertama yang kamu beli apa?",
     "Pilih mana: bisa terbang tapi cuma setinggi 10 cm dari tanah, atau bisa teleportasi tapi cuma sejauh 1 meter?",
     "Siapa satu sosok dalam hidup kamu yang paling banyak membentuk cara berpikir dan prinsip kamu sampai hari ini?"
+  ],
+  tod_truth: [
+    "Siapa orang yang paling kamu sukai atau taksir secara diam-diam saat masa sekolah dulu?",
+    "Apa kebohongan terbesar yang pernah kamu ucapkan ke orang lain dan belum pernah ketahuan?",
+    "Pernahkah kamu pura-pura sakit atau sibuk cuma demi kabur dari janji bertemu teman?",
+    "Apa ketakutan terbesar dalam hidup kamu yang jarang banget kamu ceritakan ke orang lain?",
+    "Siapa orang yang paling sering kamu cari tahu kabarnya atau stalk diam-diam di sosmed?",
+    "Ceritakan satu momen paling canggung atau tengsin yang pernah kamu alami dalam hidup!",
+    "Hal paling konyol atau impulsif apa yang pernah kamu beli padahal sebenarnya ga berguna?",
+    "Sifat siapa di antara teman-teman di sini yang paling sering membuat kamu gemas?",
+    "Pernahkah kamu diam-diam membaca chat atau pesan orang lain tanpa izin sama sekali?",
+    "Apa rahasia paling konyol yang belum pernah kamu ceritakan ke siapa pun sampai hari ini?",
+    "Siapa teman pertama yang bakal kamu hubungi saat kamu tertimpa masalah berat?",
+    "Apa hal paling memalukan yang pernah terjadi saat kamu berada di tempat umum?",
+    "Pernahkah kamu menyukai mantan teman sendiri secara diam-diam?",
+    "Apa alasan teraneh yang pernah kamu pakai untuk menolak ajakan nongkrong?",
+    "Hal apa yang paling sering membuat kamu merasa iri secara tidak sengaja?"
+  ],
+  tod_dare_offline: [
+    "Tatap mata teman di sebelah kananmu selama 20 detik penuh tanpa tersenyum sedikit pun!",
+    "Tunjukkan foto paling konyol di galeri HP kamu ke semua teman di meja!",
+    "Tiru gaya jalan atau gaya bicara salah satu orang di sini dengan mirip!",
+    "Perlihatkan wallpaper lockscreen HP kamu ke seluruh teman di meja!",
+    "Lakukan gerakan olahraga ringan (seperti 10x jumping jack) sambil sebutkan 5 nama makanan!",
+    "Tunjukkan 3 histori pencarian terakhir di aplikasi YouTube kamu ke teman!",
+    "Puji 3 kebaikan dari teman di sebelah kanan kamu dengan tulus dan tatap matanya!",
+    "Biarkan teman di sebelah kirimu memilih 1 foto di HP kamu untuk ditunjukkan!",
+    "Posisikan ekspresi wajah paling konyol dan tahan selama 15 detik di depan semua teman!",
+    "Ucapkan terima kasih ke teman di sebelah kamu dengan gaya seperti menerima panggung penghargaan Oscar!",
+    "Tiru suara hewan favorit kamu sampai teman-teman di meja ini tertawa ngakak!",
+    "Minum 1 teguk minuman dan tahan pose gaya keren seperti bintang iklan di TV!",
+    "Minta 1 suapan makanan teman kamu sekarang juga dengan gaya paling memohon!"
+  ],
+  tod_dare_online: [
+    "Kirim pesan singkat ke kontak ke-5 di HP kamu: 'Aku mau bicara sesuatu penting banget.'",
+    "Perlihatkan foto paling konyol di galeri HP kamu lewat kamera atau share screen!",
+    "Kirimkan voice note menyapa teman kamu di WhatsApp dengan suara paling menggemaskan!",
+    "Biarkan teman kamu memilih 1 foto di galeri HP kamu untuk diposting di story!",
+    "Tunjukkan histori pencarian terakhir di aplikasi YouTube atau Google kamu ke layar!",
+    "Reagikan salah satu postingan foto teman di Instagram dengan komentar paling kocak!",
+    "Tunjukkan wallpaper lockscreen HP kamu ke kamera seluruh teman di room!",
+    "Ganti nama profil WhatsApp atau sosial media kamu jadi nama konyol selama 10 menit!",
+    "Kirimkan foto selfie ekspresi paling konyol kamu ke grup chat saat ini juga!",
+    "Buka aplikasi belanja online di HP kamu dan tunjukkan keranjang belanjaan kamu ke layar!"
   ]
 };
 

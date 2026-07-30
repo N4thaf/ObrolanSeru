@@ -138,11 +138,11 @@ export default function Home() {
               <span>Main Offline</span>
             </Link>
 
-            <button onClick={() => setShowOnline(true)}
+            <Link href="/play/online"
               className="px-7 py-3.5 rounded-2xl font-bold text-sm text-[#257180] bg-[#FAF3E0] border border-[#257180]/20 hover:bg-[#f2e6cb] transition shadow-sm text-center flex items-center justify-center gap-2 cursor-pointer">
               <Users className="w-4 h-4 text-[#257180]" />
-              <span>Main Online</span>
-            </button>
+              <span>Main Online (Room Code)</span>
+            </Link>
           </div>
         </div>
 

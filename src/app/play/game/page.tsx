@@ -847,7 +847,7 @@ function OfflineGame() {
   const activeName = playerNames[activePlayerIndex] || `Pemain ${activePlayerIndex + 1}`;
 
   return (
-    <div className="h-screen max-h-screen overflow-hidden flex flex-col justify-between relative bg-[#F2E5BF] text-[#257180] font-sans">
+    <div className="min-h-screen w-full flex flex-col justify-between relative bg-[#F2E5BF] text-[#257180] font-sans pb-4 overflow-y-auto">
       <Navbar
         title={navTitle}
         round={currentRound}

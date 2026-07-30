@@ -117,8 +117,14 @@ export default function Home() {
         
         {/* Left Column: Headline & Call To Action */}
         <div className="space-y-5 text-center lg:text-left">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-[#257180] leading-[1.1]">
-            Ubah Suasana Kumpul Jadi <span className="text-[#FD8B51] underline decoration-wavy decoration-[#FD8B51]/40">Lebih Seru</span>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-[#257180] leading-[1.15]">
+            Ubah Suasana Kumpul Jadi{" "}
+            <span className="relative inline-block text-[#FD8B51]">
+              Lebih Seru
+              <svg className="absolute left-0 -bottom-2 w-full h-3 text-[#FD8B51]/50 overflow-visible pointer-events-none" viewBox="0 0 120 12" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round">
+                <path d="M 2 6 Q 15 1, 28 6 T 54 6 T 80 6 T 106 6 T 118 6" />
+              </svg>
+            </span>
           </h1>
 
           <p className="text-sm sm:text-base font-medium leading-relaxed text-[#257180]/80 max-w-md">

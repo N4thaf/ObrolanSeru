@@ -668,85 +668,67 @@ function SpinnerWheelFlow({
         </div>
       )}
 
-      {/* PHASE 2: Choice between TRUTH or DARE (Ultra-Classy Luxury Playing Cards) */}
+      {/* PHASE 2: Choice between TRUTH or DARE (Clean Minimalist Warm Cards) */}
       {todPhase === 'choice' && (
-        <div className="text-center space-y-6 animate-pop-in max-w-xl w-full px-4 my-auto">
+        <div className="text-center space-y-6 animate-pop-in max-w-lg w-full px-4 my-auto">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#FD8B51]/15 text-[#CB6040] text-[11px] font-black tracking-widest uppercase border border-[#FD8B51]/30">
-              ✦ GILIRAN TANTANGAN ✦
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#257180] tracking-tight pt-1">
+            <span className="text-xs font-bold text-[#257180]/60 uppercase tracking-widest">
+              GILIRAN TANTANGAN
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#257180] tracking-tight">
               {selectedName}, Pilih Mana?
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:gap-7 pt-2">
-            {/* TRUTH Card (Luxury Sunset Warm Playing Card) */}
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 pt-1">
+            {/* TRUTH Card */}
             <button onClick={() => handlePickChoice('truth')}
-              className="relative h-88 sm:h-96 rounded-[32px] p-6 sm:p-7 flex flex-col items-center justify-between border-[3.5px] border-[#FAF3E0] shadow-2xl hover:-translate-y-2 hover:shadow-orange-950/25 active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden group select-none"
-              style={{ background: "linear-gradient(160deg, #FD8B51 0%, #E0753C 50%, #CB6040 100%)" }}>
-              
-              {/* Fine Linen Double Border */}
-              <div className="absolute inset-3.5 rounded-[22px] border border-[#FAF3E0]/40 pointer-events-none" />
+              className="relative h-80 sm:h-88 rounded-[28px] p-6 flex flex-col items-center justify-between border-2 border-[#FAF3E0]/40 shadow-xl hover:-translate-y-1.5 hover:shadow-2xl active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden group select-none"
+              style={{ background: "linear-gradient(160deg, #FD8B51 0%, #CB6040 100%)" }}>
               
               {/* Corner Suits Top */}
-              <div className="w-full flex justify-between text-xs font-serif text-[#FAF3E0]/70 z-10">
+              <div className="w-full flex justify-between text-[11px] font-bold text-[#FAF3E0]/40">
                 <span>♥</span><span>♠</span>
               </div>
 
-              {/* Center Monogram & Title */}
-              <div className="text-center my-auto z-10 space-y-1">
-                <div className="text-4xl sm:text-5xl font-black italic tracking-widest text-[#FAF3E0] font-serif drop-shadow-md">
+              {/* Center Title */}
+              <div className="text-center my-auto space-y-1">
+                <div className="text-3xl sm:text-4xl font-black tracking-widest text-[#FAF3E0]">
                   TRUTH
                 </div>
-                <div className="text-xs sm:text-sm font-medium text-[#FAF3E0]/90 tracking-wider">
+                <div className="text-xs sm:text-sm font-semibold text-[#FAF3E0]/85">
                   Jawab Jujur
                 </div>
               </div>
 
-              {/* Bottom Classy Action Button */}
-              <div className="w-full py-3 rounded-2xl bg-[#FAF3E0] text-[#257180] font-black text-xs tracking-wider shadow-lg group-hover:bg-[#257180] group-hover:text-[#FAF3E0] transition-all z-10 flex items-center justify-center gap-1.5">
-                <span>Pilih TRUTH</span>
-                <span>✦</span>
-              </div>
-
               {/* Corner Suits Bottom */}
-              <div className="w-full flex justify-between text-xs font-serif text-[#FAF3E0]/70 z-10 mt-1">
+              <div className="w-full flex justify-between text-[11px] font-bold text-[#FAF3E0]/40">
                 <span>♦</span><span>♣</span>
               </div>
             </button>
 
-            {/* DARE Card (Luxury Terracotta Playing Card) */}
+            {/* DARE Card */}
             <button onClick={() => handlePickChoice('dare')}
-              className="relative h-88 sm:h-96 rounded-[32px] p-6 sm:p-7 flex flex-col items-center justify-between border-[3.5px] border-[#FAF3E0] shadow-2xl hover:-translate-y-2 hover:shadow-orange-950/25 active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden group select-none"
-              style={{ background: "linear-gradient(160deg, #CB6040 0%, #A8492D 50%, #8A3720 100%)" }}>
-              
-              {/* Fine Linen Double Border */}
-              <div className="absolute inset-3.5 rounded-[22px] border border-[#FAF3E0]/40 pointer-events-none" />
+              className="relative h-80 sm:h-88 rounded-[28px] p-6 flex flex-col items-center justify-between border-2 border-[#FAF3E0]/40 shadow-xl hover:-translate-y-1.5 hover:shadow-2xl active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden group select-none"
+              style={{ background: "linear-gradient(160deg, #CB6040 0%, #8A3720 100%)" }}>
               
               {/* Corner Suits Top */}
-              <div className="w-full flex justify-between text-xs font-serif text-[#FAF3E0]/70 z-10">
+              <div className="w-full flex justify-between text-[11px] font-bold text-[#FAF3E0]/40">
                 <span>♦</span><span>♣</span>
               </div>
 
-              {/* Center Monogram & Title */}
-              <div className="text-center my-auto z-10 space-y-1">
-                <div className="text-4xl sm:text-5xl font-black italic tracking-widest text-[#FAF3E0] font-serif drop-shadow-md">
+              {/* Center Title */}
+              <div className="text-center my-auto space-y-1">
+                <div className="text-3xl sm:text-4xl font-black tracking-widest text-[#FAF3E0]">
                   DARE
                 </div>
-                <div className="text-xs sm:text-sm font-medium text-[#FAF3E0]/90 tracking-wider">
+                <div className="text-xs sm:text-sm font-semibold text-[#FAF3E0]/85">
                   Lakukan Tantangan
                 </div>
               </div>
 
-              {/* Bottom Classy Action Button */}
-              <div className="w-full py-3 rounded-2xl bg-[#FAF3E0] text-[#257180] font-black text-xs tracking-wider shadow-lg group-hover:bg-[#257180] group-hover:text-[#FAF3E0] transition-all z-10 flex items-center justify-center gap-1.5">
-                <span>Pilih DARE</span>
-                <span>🔥</span>
-              </div>
-
               {/* Corner Suits Bottom */}
-              <div className="w-full flex justify-between text-xs font-serif text-[#FAF3E0]/70 z-10 mt-1">
+              <div className="w-full flex justify-between text-[11px] font-bold text-[#FAF3E0]/40">
                 <span>♥</span><span>♠</span>
               </div>
             </button>
@@ -754,31 +736,24 @@ function SpinnerWheelFlow({
         </div>
       )}
 
-      {/* PHASE 3: Reveal Truth / Dare Luxury Playing Card Modal */}
+      {/* PHASE 3: Reveal Truth / Dare Minimalist Card Modal */}
       {todPhase === 'reveal' && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-4 bg-[#257180]/60 backdrop-blur-md">
-          
-          {/* Long Portrait Luxury Playing Card */}
-          <div className="relative w-[340px] sm:w-[390px] h-[520px] sm:h-[560px] rounded-[36px] overflow-hidden p-8 flex flex-col items-center justify-between transition-all duration-300 animate-pop-in shadow-2xl select-none"
-            style={{
-              background: chosenType === 'truth' ? "linear-gradient(160deg, #FD8B51 0%, #E0753C 50%, #CB6040 100%)" : "linear-gradient(160deg, #CB6040 0%, #A8492D 50%, #8A3720 100%)",
-              border: "3.5px solid #FAF3E0"
-            }}>
+          <div className="bg-[#FAF3E0] rounded-[36px] p-7 sm:p-9 w-[340px] sm:w-[390px] h-[490px] sm:h-[530px] border-2 border-[#FD8B51]/30 shadow-2xl flex flex-col justify-between items-center text-center animate-pop-in select-none">
             
-            {/* Fine Linen Double Border */}
-            <div className="absolute inset-3.5 rounded-[26px] border border-[#FAF3E0]/40 pointer-events-none z-10" />
-
-            {/* Header */}
-            <div className="relative z-10 w-full flex items-center justify-between text-[#FAF3E0]/90 text-xs font-black">
-              <span className="font-serif italic tracking-widest text-sm">{chosenType === 'truth' ? 'TRUTH' : 'DARE'}</span>
-              <span className="px-3.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#FAF3E0]/20 text-[#FAF3E0]">
+            {/* Header Badges */}
+            <div className="w-full flex items-center justify-between">
+              <div className="px-3.5 py-1.5 rounded-full bg-[#FD8B51] text-white text-[11px] font-extrabold uppercase tracking-wider shadow-sm">
+                Tantangan {chosenType === 'truth' ? 'TRUTH' : 'DARE'}
+              </div>
+              <div className="px-3.5 py-1.5 rounded-full bg-[#257180]/15 text-[#257180] text-[11px] font-extrabold">
                 {selectedName}
-              </span>
+              </div>
             </div>
 
-            {/* Question / Challenge Box (Warm Cream Container) */}
-            <div className="relative z-10 my-auto text-center w-full px-6 py-8 rounded-[28px] bg-[#FAF3E0] shadow-2xl border-2 border-[#FD8B51]/30">
-              <p className="text-base sm:text-lg font-black text-[#257180] leading-relaxed tracking-tight">
+            {/* Inner Content Box */}
+            <div className="w-full flex-1 my-4 bg-[#F2E5BF]/80 rounded-[28px] border border-[#257180]/15 p-6 flex flex-col justify-center items-center shadow-inner relative overflow-hidden">
+              <p className="text-base sm:text-lg font-extrabold text-[#257180] leading-relaxed max-w-xs">
                 "{todContent}"
               </p>
             </div>
@@ -786,9 +761,9 @@ function SpinnerWheelFlow({
             {/* Action Button */}
             <button
               onClick={handleNextSpin}
-              className="relative z-20 w-full py-4 rounded-2xl font-black text-sm text-[#257180] bg-[#FAF3E0] hover:bg-[#257180] hover:text-[#FAF3E0] transition-all shadow-xl cursor-pointer flex items-center justify-center gap-2">
-              <span>Tantangan Selesai · Putar Lagi</span>
-              <span>→</span>
+              className="w-full py-4 rounded-2xl font-black text-sm text-white shadow-xl hover:scale-[1.02] active:scale-95 transition cursor-pointer"
+              style={{ background: "linear-gradient(135deg, #FD8B51 0%, #CB6040 100%)" }}>
+              Tantangan Selesai · Putar Lagi →
             </button>
           </div>
         </div>

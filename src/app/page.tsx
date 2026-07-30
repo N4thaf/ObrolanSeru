@@ -119,10 +119,10 @@ export default function Home() {
         <div className="space-y-5 text-center lg:text-left">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-[#257180] leading-[1.15]">
             Ubah Suasana Kumpul Jadi{" "}
-            <span className="relative inline-block text-[#FD8B51]">
+            <span className="relative inline-block text-[#FD8B51] pb-2">
               Lebih Seru
-              <svg className="absolute left-0 -bottom-2 w-full h-3 text-[#FD8B51]/50 overflow-visible pointer-events-none" viewBox="0 0 120 12" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round">
-                <path d="M 2 6 Q 15 1, 28 6 T 54 6 T 80 6 T 106 6 T 118 6" />
+              <svg className="absolute left-0 -bottom-1 w-full h-3.5 text-[#FD8B51]/60 pointer-events-none" viewBox="0 0 100 16" preserveAspectRatio="none" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round">
+                <path d="M 0 8 Q 12.5 1, 25 8 T 50 8 T 75 8 T 100 8" />
               </svg>
             </span>
           </h1>

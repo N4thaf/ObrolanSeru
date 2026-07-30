@@ -22,7 +22,8 @@ export default function RoomPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const code = (params.code as string) || "OS-882";
+  const rawCode = (params.code as string) || "OS361";
+  const code = rawCode.replace(/-/g, "").toUpperCase();
   const isHostParam = searchParams.get("isHost") === "true";
   const nameParam = searchParams.get("name") || "";
   const initialMode = (searchParams.get("mode") as 'pertanyaan' | 'tod') || 'pertanyaan';

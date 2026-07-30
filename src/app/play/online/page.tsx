@@ -190,13 +190,13 @@ export default function OnlineRoomSetup() {
 
               {/* Room Code Input */}
               <div className="space-y-2">
-                <label className="text-xs font-black text-[#257180] uppercase tracking-wider block">Kode Room (Contoh: OS-882)</label>
+                <label className="text-xs font-black text-[#257180] uppercase tracking-wider block">Kode Room (Contoh: OS091)</label>
                 <input
                   type="text"
                   required
-                  placeholder="OS-882"
+                  placeholder="OS091"
                   value={joinCode}
-                  onChange={(e) => setJoinCode(e.target.value)}
+                  onChange={(e) => setJoinCode(e.target.value.replace(/-/g, "").toUpperCase())}
                   className="w-full px-4 py-3.5 rounded-2xl bg-[#F2E5BF] border-2 border-[#257180]/20 font-black text-center text-lg uppercase tracking-widest text-[#257180] placeholder-[#257180]/30 focus:outline-none focus:border-[#FD8B51] transition"
                 />
               </div>

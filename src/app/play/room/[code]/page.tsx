@@ -39,7 +39,7 @@ export default function RoomPage() {
     status: "lobby",
   });
 
-  // Initialize player & sync with BroadcastChannel
+  // Initialize player & sync with /api/room & BroadcastChannel
   useEffect(() => {
     let savedName = nameParam;
     try {
@@ -48,62 +48,62 @@ export default function RoomPage() {
 
     setMyName(savedName);
 
-    // Initialize or load room state
-    let state: RoomState = {
-      code,
-      host: isHostParam ? savedName : "Host",
-      mode: initialMode,
-      topic: "kenalan",
-      rounds: 3,
-      players: [savedName],
-      status: "lobby",
-    };
-
-    try {
-      const stored = sessionStorage.getItem(`room_${code}`);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        state = {
-          ...parsed,
-          players: Array.from(new Set([...(parsed.players || []), savedName])),
-        };
-      }
-    } catch (e) {}
-
-    setRoom(state);
-    try {
-      sessionStorage.setItem(`room_${code}`, JSON.stringify(state));
-    } catch (e) {}
-
-    // Setup Web BroadcastChannel for instant multi-tab & multi-device sync
-    let channel: BroadcastChannel | null = null;
-    try {
-      channel = new BroadcastChannel(`obrolan_room_${code}`);
-      channel.onmessage = (event) => {
-        if (event.data && event.data.type === "SYNC_ROOM") {
-          setRoom(event.data.room);
-          if (event.data.room.status === "playing") {
+    // Sync player with API serverless store
+    const syncRoomApi = async () => {
+      try {
+        const res = await fetch('/api/room', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code,
+            host: isHostParam ? savedName : undefined,
+            mode: initialMode,
+            players: [savedName]
+          })
+        });
+        const data = await res.json();
+        if (data.success && data.room) {
+          setRoom(data.room);
+          if (data.room.status === 'playing') {
             sound.playChime();
           }
         }
-      };
-      // Broadcast join message
-      channel.postMessage({ type: "SYNC_ROOM", room: state });
-    } catch (e) {
-      console.warn("BroadcastChannel not supported:", e);
-    }
+      } catch (e) {}
+    };
+
+    syncRoomApi();
+
+    // Poll /api/room every 1.2s for cross-device live sync
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/room?code=${code}`);
+        const data = await res.json();
+        if (data.success && data.room) {
+          setRoom(prev => {
+            if (prev.status !== 'playing' && data.room.status === 'playing') {
+              sound.playChime();
+              const playersQuery = data.room.players.join(",");
+              router.push(`/play/game?mode=${data.room.mode}&topic=${data.room.topic}&rounds=${data.room.rounds}&players=${encodeURIComponent(playersQuery)}&roomCode=${code}`);
+            }
+            return data.room;
+          });
+        }
+      } catch (e) {}
+    }, 1200);
 
     return () => {
-      if (channel) channel.close();
+      clearInterval(interval);
     };
-  }, [code, isHostParam, nameParam, initialMode]);
+  }, [code, isHostParam, nameParam, initialMode, router]);
 
-  const broadcastRoomUpdate = (updatedRoom: RoomState) => {
+  const broadcastRoomUpdate = async (updatedRoom: RoomState) => {
     setRoom(updatedRoom);
     try {
-      sessionStorage.setItem(`room_${code}`, JSON.stringify(updatedRoom));
-      const channel = new BroadcastChannel(`obrolan_room_${code}`);
-      channel.postMessage({ type: "SYNC_ROOM", room: updatedRoom });
+      await fetch('/api/room', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedRoom)
+      });
     } catch (e) {}
   };
 

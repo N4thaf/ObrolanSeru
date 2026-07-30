@@ -19,33 +19,40 @@ export default function OnlineRoomSetup() {
   const [joinCode, setJoinCode] = useState("");
   const [playerName, setPlayerName] = useState("");
 
-  const handleCreateRoom = (e: React.FormEvent) => {
+  const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!hostName.trim()) return;
     sound.playClick();
 
-    // Generate random 6-character room code (e.g. OS-882)
-    const randomCode = `OS-${Math.floor(100 + Math.random() * 900)}`;
+    // Generate random 5-character room code without hyphen (e.g. OS091)
+    const num = Math.floor(10 + Math.random() * 90);
+    const num2 = Math.floor(1 + Math.random() * 9);
+    const randomCode = `OS0${num2}${num}`.slice(0, 5);
     
-    // Store initial host data in room state
+    // Store host data in serverless API & session
     const roomState = {
       code: randomCode,
       host: hostName.trim(),
       mode: selectedMode,
+      topic: "kenalan",
+      rounds: 3,
       players: [hostName.trim()],
-      status: 'lobby', // 'lobby' | 'playing'
-      createdAt: Date.now()
+      status: 'lobby'
     };
 
     try {
-      sessionStorage.setItem(`room_${randomCode}`, JSON.stringify(roomState));
+      await fetch('/api/room', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(roomState)
+      });
       sessionStorage.setItem(`my_name`, hostName.trim());
     } catch (err) {}
 
     router.push(`/play/room/${randomCode}?isHost=true&mode=${selectedMode}`);
   };
 
-  const handleJoinRoom = (e: React.FormEvent) => {
+  const handleJoinRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!joinCode.trim() || !playerName.trim()) return;
     sound.playClick();
@@ -53,6 +60,14 @@ export default function OnlineRoomSetup() {
     const formattedCode = joinCode.trim().toUpperCase();
 
     try {
+      await fetch('/api/room', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: formattedCode,
+          players: [playerName.trim()]
+        })
+      });
       sessionStorage.setItem(`my_name`, playerName.trim());
     } catch (err) {}
 

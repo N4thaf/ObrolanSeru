@@ -575,28 +575,26 @@ function SpinnerWheelFlow({
       {todPhase === 'spin' && (
         <div className="flex flex-col items-center gap-5 w-full my-auto animate-pop-in">
           
-          {/* Wheel Assembly Container */}
-          <div className="relative flex flex-col items-center justify-center pt-5 pb-2">
+          {/* Bulletproof Responsive Wheel Assembly Container */}
+          <div className="relative flex flex-col items-center justify-center w-full max-w-[290px] sm:max-w-[370px] mx-auto select-none pt-4 pb-1">
             
-            {/* Real-Life Top Downward Pointer Stopper Pin (12 o'clock) */}
+            {/* Top Downward Pointer Stopper Pin (12 o'clock) */}
             <div className="absolute top-0 z-30 flex flex-col items-center">
-              {/* Golden Stopper Knob */}
-              <div className="w-5 h-5 rounded-full bg-[#FD8B51] border-2 border-[#FAF3E0] shadow-md -mb-1" />
-              {/* Downward Pointer Arrow */}
+              <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#FD8B51] border-2 border-[#FAF3E0] shadow-md -mb-1" />
               <div style={{
                 width: 0, height: 0,
-                borderLeft: "15px solid transparent",
-                borderRight: "15px solid transparent",
-                borderTop: `28px solid ${C.teal}`,
-                filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.3))"
+                borderLeft: "13px solid transparent",
+                borderRight: "13px solid transparent",
+                borderTop: `25px solid ${C.teal}`,
+                filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.35))"
               }} />
             </div>
 
             {/* Vertical Pillar Stand Behind Wheel */}
-            <div className="absolute bottom-2 w-8 h-48 bg-gradient-to-b from-[#257180] via-[#1d5966] to-[#257180] border-2 border-[#FAF3E0]/30 rounded-lg shadow-xl z-0" />
+            <div className="absolute inset-y-3 w-7 bg-gradient-to-b from-[#257180] via-[#1d5966] to-[#257180] border-2 border-[#FAF3E0]/30 rounded-lg shadow-xl z-0" />
 
-            {/* Rotating Wheel Frame */}
-            <div className="relative z-10 w-[310px] h-[310px] sm:w-[380px] sm:h-[380px]">
+            {/* Rotating Wheel Frame (100% Responsive Aspect Square) */}
+            <div className="relative z-10 w-full aspect-square">
               <svg viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`} className="w-full h-full filter drop-shadow-2xl"
                 style={{
                   display: "block",
@@ -632,8 +630,8 @@ function SpinnerWheelFlow({
             </div>
 
             {/* Solid Heavy Base Stand at Bottom */}
-            <div className="z-20 w-44 h-8 bg-gradient-to-r from-[#257180] via-[#1d5966] to-[#257180] rounded-t-2xl border-t-2 border-[#FAF3E0]/40 shadow-xl flex items-center justify-center -mt-3">
-              <div className="w-24 h-1.5 bg-[#FD8B51] rounded-full opacity-80" />
+            <div className="relative z-20 w-40 sm:w-44 h-7 bg-gradient-to-r from-[#257180] via-[#1d5966] to-[#257180] rounded-t-2xl border-t-2 border-[#FAF3E0]/40 shadow-xl flex items-center justify-center -mt-3.5">
+              <div className="w-20 sm:w-24 h-1.5 bg-[#FD8B51] rounded-full opacity-80" />
             </div>
           </div>
 

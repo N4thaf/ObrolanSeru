@@ -575,11 +575,11 @@ function SpinnerWheelFlow({
       {todPhase === 'spin' && (
         <div className="flex flex-col items-center gap-5 w-full my-auto animate-pop-in">
           
-          {/* Clean Circular Roulette Wheel Container */}
-          <div className="relative flex flex-col items-center justify-center w-full max-w-[300px] sm:max-w-[370px] mx-auto select-none pt-6 pb-2">
+          {/* Wheel Assembly Container */}
+          <div className="relative flex flex-col items-center justify-center w-full max-w-[290px] sm:max-w-[370px] mx-auto select-none pt-4 pb-1">
             
-            {/* Top Downward Pointer Stopper Pin (12 o'clock) */}
-            <div className="absolute top-1.5 z-30 flex flex-col items-center">
+            {/* Top Downward Pointer Stopper Pin (Static 12 o'clock) */}
+            <div className="absolute top-0 z-30 flex flex-col items-center">
               <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#FD8B51] border-2 border-[#FAF3E0] shadow-md -mb-1" />
               <div style={{
                 width: 0, height: 0,
@@ -590,14 +590,17 @@ function SpinnerWheelFlow({
               }} />
             </div>
 
-            {/* Rotating Wheel Frame (Clean Circular Wheel Only) */}
+            {/* Vertical Pillar Stand Behind Wheel (Static) */}
+            <div className="absolute inset-y-3 w-7 bg-gradient-to-b from-[#257180] via-[#1d5966] to-[#257180] border-2 border-[#FAF3E0]/30 rounded-lg shadow-xl z-0" />
+
+            {/* Rotating Wheel Frame (Spins 100% on Central Axle Poros) */}
             <div className="relative z-10 w-full aspect-square">
-              <svg viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`} className="w-full h-full filter drop-shadow-2xl"
+              <svg viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`} className="w-full h-full filter drop-shadow-2xl overflow-visible"
                 style={{
                   display: "block",
                   transition: spinning ? "transform 3.8s cubic-bezier(0.12, 0.85, 0.15, 1)" : "none",
                   transform: `rotate(${rotation}deg)`,
-                  transformOrigin: `${cx}px ${cy}px`,
+                  transformOrigin: "center center",
                 }}>
                 
                 {/* Outer Wooden/Metallic Rim */}
@@ -624,6 +627,11 @@ function SpinnerWheelFlow({
                 <circle cx={cx} cy={cy} r={24} fill="#257180" />
                 <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fill="#FAF3E0" fontSize={15} fontWeight="900">✦</text>
               </svg>
+            </div>
+
+            {/* Solid Heavy Base Stand at Bottom (Static) */}
+            <div className="relative z-20 w-40 sm:w-44 h-7 bg-gradient-to-r from-[#257180] via-[#1d5966] to-[#257180] rounded-t-2xl border-t-2 border-[#FAF3E0]/40 shadow-xl flex items-center justify-center -mt-3.5">
+              <div className="w-20 sm:w-24 h-1.5 bg-[#FD8B51] rounded-full opacity-80" />
             </div>
           </div>
 

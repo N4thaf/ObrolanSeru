@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Play, Users, ShoppingBag, X, Coins, ShieldCheck, Check, Crown, HelpCircle, Share2, LogOut, User, FileText, Info, BookOpen, Lock, MessageSquare } from "lucide-react";
+import { BrandLogo } from "./components/BrandLogo";
 
 /* Official User Color Palette */
 const C = {
@@ -71,14 +72,10 @@ export default function Home() {
       <header className="w-full max-w-5xl mx-auto px-4 pt-4 sm:pt-6 z-20">
         <div className="bg-[#FAF3E0] border-2 border-[#257180]/15 rounded-full px-5 py-2.5 shadow-sm flex items-center justify-between">
           
-          {/* Logo & Brand (3 Stacked Cards Graphic Logo) */}
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="relative w-8 h-8 flex items-center justify-center select-none flex-shrink-0">
-              <div className="absolute w-4.5 h-6.5 rounded-md bg-[#257180] border border-[#FAF3E0] -rotate-12 -translate-x-1 flex items-center justify-center text-[8px] font-black text-[#FAF3E0]">?</div>
-              <div className="absolute w-4.5 h-6.5 rounded-md bg-[#CB6040] border border-[#FAF3E0] rotate-12 translate-x-1 flex items-center justify-center text-[8px] font-black text-[#FAF3E0]">♥</div>
-              <div className="absolute w-5 h-7 rounded-md bg-gradient-to-br from-[#FD8B51] to-[#CB6040] border-[1.5px] border-[#FAF3E0] shadow-md z-10 flex items-center justify-center text-[9px] font-black text-white">OS</div>
-            </div>
-            <span className="font-extrabold text-lg tracking-tight text-[#257180] hidden sm:inline">ObrolanSeru</span>
+          {/* Logo & Brand (3 Dynamic Fan Cards Logo) */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <BrandLogo />
+            <span className="font-extrabold text-xl tracking-tight text-[#257180] hidden sm:inline group-hover:text-[#FD8B51] transition-colors">ObrolanSeru</span>
           </Link>
 
           {/* User Status Bar & Toko */}

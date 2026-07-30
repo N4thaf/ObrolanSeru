@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Check, Clock, Calendar, Crown, ShieldCheck } from "lucide-react";
+import { BrandLogo } from "../components/BrandLogo";
 
 /* Official User Color Palette (Warm Sunset & Deep Teal - Zero Cold White - Zero Emojis) */
 const C = {
@@ -103,11 +104,9 @@ export default function StorePage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
 
-            {/* 3 Stacked Cards Logo Icon */}
-            <div className="relative w-8 h-8 flex items-center justify-center select-none flex-shrink-0 hidden sm:flex">
-              <div className="absolute w-4.5 h-6.5 rounded-md bg-[#257180] border border-[#FAF3E0] -rotate-12 -translate-x-1 flex items-center justify-center text-[8px] font-black text-[#FAF3E0]">?</div>
-              <div className="absolute w-4.5 h-6.5 rounded-md bg-[#CB6040] border border-[#FAF3E0] rotate-12 translate-x-1 flex items-center justify-center text-[8px] font-black text-[#FAF3E0]">♥</div>
-              <div className="absolute w-5 h-7 rounded-md bg-gradient-to-br from-[#FD8B51] to-[#CB6040] border-[1.5px] border-[#FAF3E0] shadow-md z-10 flex items-center justify-center text-[9px] font-black text-white">OS</div>
+            {/* 3 Dynamic Fan Cards Logo */}
+            <div className="hidden sm:block">
+              <BrandLogo />
             </div>
 
             <div>

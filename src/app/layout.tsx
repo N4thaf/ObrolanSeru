@@ -15,11 +15,10 @@ export const metadata: Metadata = {
   keywords: ["game kartu", "truth or dare", "icebreaker", "deep talk", "kenalan"],
   icons: {
     icon: [
-      { url: "/icon.svg?v=2", type: "image/svg+xml" },
-      { url: "/favicon.ico?v=2" },
+      { url: "/icon.svg?v=3", type: "image/svg+xml" },
     ],
-    shortcut: "/icon.svg?v=2",
-    apple: "/apple-touch-icon.png?v=2",
+    shortcut: "/icon.svg?v=3",
+    apple: "/apple-touch-icon.png?v=3",
   },
 };
 

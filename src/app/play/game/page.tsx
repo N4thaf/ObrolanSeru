@@ -1,8 +1,5 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
@@ -823,6 +820,11 @@ function OfflineGame() {
 
   useEffect(() => {
     async function loadFreshAIQuestions() {
+      // Force clear any stale questions stored in sessionStorage from previous builds
+      try {
+        sessionStorage.removeItem('obrolan_seen_questions');
+      } catch (e) {}
+
       const BAD_PHRASES = [
         "diajak nongkrong sama",
         "disamakan dengan",

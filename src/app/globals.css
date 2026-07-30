@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  --color-teal:       #257180;
+  --color-sand:       #F2E5BF;
+  --color-linen:      #FAF3E0;
+  --color-orange:     #FD8B51;
+  --color-rust:       #CB6040;
+  --font-sans: "Nunito", system-ui, sans-serif;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  body {
+    background-color: #F2E5BF;
+    background-image: 
+      radial-gradient(circle at 12% 15%, rgba(253, 139, 81, 0.18) 0%, transparent 45%),
+      radial-gradient(circle at 88% 85%, rgba(203, 96, 64, 0.16) 0%, transparent 50%),
+      radial-gradient(circle at 50% 40%, rgba(37, 113, 128, 0.12) 0%, transparent 55%);
+    background-attachment: fixed;
+    color: #257180;
+    font-family: var(--font-nunito, Nunito, sans-serif);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3, h4 { font-weight: 800; letter-spacing: -0.02em; }
+}
+
+@layer utilities {
+  .perspective-1000 { perspective: 1000px; }
+  .preserve-3d      { transform-style: preserve-3d; }
+  .backface-hidden  { backface-visibility: hidden; }
+}
+
+/* ── Card Float & Fan Animations ─────────────────────────────────────────── */
+@keyframes card1 {
+  0%, 100% { transform: rotate(-16deg) translateX(-65px) translateY(6px); }
+  50%       { transform: rotate(-12deg) translateX(-65px) translateY(-14px); }
+}
+@keyframes card2 {
+  0%, 100% { transform: rotate(14deg) translateX(65px) translateY(4px); }
+  50%       { transform: rotate(10deg) translateX(65px) translateY(-16px); }
+}
+@keyframes card3 {
+  0%, 100% { transform: rotate(-2deg) translateY(0px); }
+  50%       { transform: rotate(0deg) translateY(-18px); }
+}
+.card-anim-1 { animation: card1 4s ease-in-out infinite; animation-fill-mode: both; }
+.card-anim-2 { animation: card2 3.4s ease-in-out infinite 0.5s; animation-fill-mode: both; }
+.card-anim-3 { animation: card3 3.6s ease-in-out infinite 1.0s; animation-fill-mode: both; }
+
+/* ── Smooth Advance Spring & Pop Animations ─────────────────────────────── */
+@keyframes popIn {
+  0% { transform: scale(0.85) translateY(20px); opacity: 0; }
+  60% { transform: scale(1.02) translateY(-4px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes shrinkOut {
+  0% { transform: scale(1) translateY(0); opacity: 1; max-width: 220px; width: 185px; }
+  60% { transform: scale(0.5) translateY(-15px); opacity: 0.3; }
+  100% { transform: scale(0) translateY(-30px); opacity: 0; max-width: 0px; width: 0px; margin: 0; padding: 0; }
+}
+
+@keyframes cardFlipPop {
+  0% { transform: perspective(1200px) rotateY(-90deg) scale(0.65); opacity: 0; }
+  65% { transform: perspective(1200px) rotateY(10deg) scale(1.04); opacity: 1; }
+  100% { transform: perspective(1200px) rotateY(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 25px rgba(253, 139, 81, 0.25); }
+  50% { box-shadow: 0 0 45px rgba(253, 139, 81, 0.55); }
+}
+
+.animate-pop-in { animation: popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.animate-shrink-out { animation: shrinkOut 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.animate-card-flip-pop { animation: cardFlipPop 0.52s cubic-bezier(0.34, 1.45, 0.64, 1) forwards; }
+.animate-pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }

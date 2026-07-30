@@ -125,8 +125,28 @@ export default function RoomPage() {
 
   const handleStartGame = () => {
     sound.playChime();
+    const initialDismissed = new Array(room.players.length).fill(false);
     const updated: RoomState = { ...room, status: "playing" };
-    broadcastRoomUpdate(updated);
+
+    // Broadcast room start AND reset clean game state
+    fetch('/api/room', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...updated,
+        gameState: {
+          activeModalIndex: null,
+          dismissed: initialDismissed,
+          activePlayerIndex: 0,
+          todPhase: 'spin',
+          landedIndex: null,
+          chosenType: null,
+          todContent: ''
+        }
+      })
+    });
+
+    setRoom(updated);
 
     // Redirect to actual game board with room sync params
     const playersQuery = updated.players.join(",");

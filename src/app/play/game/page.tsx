@@ -216,9 +216,17 @@ function AllCardsDisplay({
   const allDone = dismissed.every(Boolean);
 
   useEffect(() => {
-    setDismissed(new Array(playerCount).fill(false));
+    const initialDismissed = new Array(playerCount).fill(false);
+    setDismissed(initialDismissed);
     setActiveModalIndex(null);
-  }, [round, playerCount]);
+
+    if (roomCode) {
+      sendCardRoomSync({
+        activeModalIndex: null,
+        dismissed: initialDismissed
+      });
+    }
+  }, [round, playerCount, roomCode]);
 
   // Helper to send real-time card state to /api/room
   const sendCardRoomSync = async (patch: any) => {

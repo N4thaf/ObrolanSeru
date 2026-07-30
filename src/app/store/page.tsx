@@ -102,6 +102,14 @@ export default function StorePage() {
               className="w-10 h-10 rounded-xl bg-[#F2E5BF] border border-[#257180]/20 text-[#257180] flex items-center justify-center hover:bg-[#ebdcae] transition cursor-pointer">
               <ArrowLeft className="w-5 h-5" />
             </Link>
+
+            {/* 3 Stacked Cards Logo Icon */}
+            <div className="relative w-8 h-8 flex items-center justify-center select-none flex-shrink-0 hidden sm:flex">
+              <div className="absolute w-4.5 h-6.5 rounded-md bg-[#257180] border border-[#FAF3E0] -rotate-12 -translate-x-1 flex items-center justify-center text-[8px] font-black text-[#FAF3E0]">?</div>
+              <div className="absolute w-4.5 h-6.5 rounded-md bg-[#CB6040] border border-[#FAF3E0] rotate-12 translate-x-1 flex items-center justify-center text-[8px] font-black text-[#FAF3E0]">♥</div>
+              <div className="absolute w-5 h-7 rounded-md bg-gradient-to-br from-[#FD8B51] to-[#CB6040] border-[1.5px] border-[#FAF3E0] shadow-md z-10 flex items-center justify-center text-[9px] font-black text-white">OS</div>
+            </div>
+
             <div>
               <h1 className="font-black text-xl text-[#257180] tracking-tight leading-none">Pass ObrolanSeru</h1>
               <p className="text-xs font-bold text-[#257180]/70 mt-1">Pilih durasi pass akses sesuai kebutuhan kumpul kamu</p>

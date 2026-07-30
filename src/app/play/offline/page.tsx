@@ -299,19 +299,40 @@ export default function OfflineSetup() {
               </div>
 
               {/* Editable Player Names Input List */}
-              <div className="space-y-2.5 max-h-[250px] overflow-y-auto pr-1">
-                {playerNames.map((name, i) => (
-                  <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#F2E5BF]/60 border border-[#257180]/15">
-                    <User className="w-4 h-4 text-[#257180]/60 flex-shrink-0" />
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => handleNameChange(i, e.target.value)}
-                      placeholder={`Nama Pemain ${i + 1}`}
-                      className="w-full bg-transparent text-sm font-bold text-[#257180] outline-none placeholder-[#257180]/40"
-                    />
-                  </div>
-                ))}
+              <div className="space-y-3 max-h-[260px] overflow-y-auto pr-1">
+                {playerNames.map((name, i) => {
+                  const isDefault = !name || name === `Pemain ${i + 1}`;
+                  return (
+                    <div
+                      key={i}
+                      className={`flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl border transition-all duration-200 cursor-text ${
+                        isDefault
+                          ? 'bg-[#F2E5BF]/50 border-[#257180]/20 hover:border-[#257180]/40'
+                          : 'bg-[#FAF3E0] border-[#257180] shadow-sm'
+                      } focus-within:border-[#257180] focus-within:ring-2 focus-within:ring-[#257180]/20 focus-within:bg-[#FAF3E0]`}>
+                      
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <User className={`w-4 h-4 flex-shrink-0 ${isDefault ? 'text-[#257180]/40' : 'text-[#257180]'}`} />
+                        <input
+                          type="text"
+                          value={name}
+                          onChange={(e) => handleNameChange(i, e.target.value)}
+                          placeholder={`Ketik nama Pemain ${i + 1}...`}
+                          className={`w-full bg-transparent text-sm outline-none transition-all ${
+                            isDefault
+                              ? 'font-medium text-[#257180]/50 italic placeholder:text-[#257180]/35'
+                              : 'font-extrabold text-[#257180]'
+                          }`}
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-1 text-[11px] font-bold text-[#257180]/50 select-none flex-shrink-0">
+                        <span>✎</span>
+                        <span className="hidden sm:inline">Ubah</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               <button onClick={goNext}

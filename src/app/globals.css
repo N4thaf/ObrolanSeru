@@ -49,7 +49,7 @@
 .card-anim-2 { animation: card2 3.4s ease-in-out infinite 0.5s; animation-fill-mode: both; }
 .card-anim-3 { animation: card3 3.6s ease-in-out infinite 1.0s; animation-fill-mode: both; }
 
-/* ── Smooth Advance Spring & Pop Animations ─────────────────────────────── */
+/* ── Smooth Advance Spring & 3D Flip Animations ─────────────────────────── */
 @keyframes popIn {
   0% { transform: scale(0.85) translateY(20px); opacity: 0; }
   60% { transform: scale(1.02) translateY(-4px); opacity: 1; }
@@ -62,10 +62,16 @@
   100% { transform: scale(0) translateY(-30px); opacity: 0; max-width: 0px; width: 0px; margin: 0; padding: 0; }
 }
 
-@keyframes cardFlipPop {
-  0% { transform: perspective(1200px) rotateY(-90deg) scale(0.65); opacity: 0; }
-  65% { transform: perspective(1200px) rotateY(10deg) scale(1.04); opacity: 1; }
-  100% { transform: perspective(1200px) rotateY(0deg) scale(1); opacity: 1; }
+@keyframes cardFlipOpen {
+  0% { transform: perspective(1200px) rotateY(-90deg) scale(0.7) translateY(-30px); opacity: 0; filter: blur(4px); }
+  65% { transform: perspective(1200px) rotateY(8deg) scale(1.03) translateY(0); opacity: 1; filter: blur(0px); }
+  100% { transform: perspective(1200px) rotateY(0deg) scale(1) translateY(0); opacity: 1; filter: blur(0px); }
+}
+
+@keyframes cardFlipClose {
+  0% { transform: perspective(1200px) rotateY(0deg) scale(1) translateY(0); opacity: 1; filter: blur(0px); }
+  40% { transform: perspective(1200px) rotateY(45deg) scale(0.85) translateY(15px); opacity: 0.8; }
+  100% { transform: perspective(1200px) rotateY(90deg) scale(0.55) translateY(60px); opacity: 0; filter: blur(6px); }
 }
 
 @keyframes pulseGlow {
@@ -75,5 +81,6 @@
 
 .animate-pop-in { animation: popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 .animate-shrink-out { animation: shrinkOut 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-.animate-card-flip-pop { animation: cardFlipPop 0.52s cubic-bezier(0.34, 1.45, 0.64, 1) forwards; }
+.animate-card-flip-pop { animation: cardFlipOpen 0.5s cubic-bezier(0.34, 1.45, 0.64, 1) forwards; }
+.animate-card-flip-close { animation: cardFlipClose 0.42s cubic-bezier(0.4, 0, 0.8, 0) forwards; }
 .animate-pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }

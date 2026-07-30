@@ -383,7 +383,7 @@ function AllCardsDisplay({
       {/* ── CARD REVEAL QUESTION MODAL ──────────────────────────────────── */}
       {activeModalIndex !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#257180]/65 backdrop-blur-md">
-          <div className={`relative bg-[#FAF3E0] rounded-[36px] p-7 sm:p-9 w-[340px] sm:w-[390px] h-[520px] sm:h-[560px] border-4 border-[#FD8B51] shadow-2xl flex flex-col justify-between items-center text-center transition-all duration-300 ${isClosingModal ? 'scale-90 opacity-0' : 'animate-pop-in'}`}>
+          <div className={`relative bg-[#FAF3E0] rounded-[36px] p-7 sm:p-9 w-[340px] sm:w-[390px] h-[520px] sm:h-[560px] border-4 border-[#FD8B51] shadow-2xl flex flex-col justify-between items-center text-center ${isClosingModal ? 'animate-card-flip-close' : 'animate-card-flip-pop'}`}>
             
             {/* Header Card Badges */}
             <div className="w-full flex items-center justify-between">

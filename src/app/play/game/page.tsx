@@ -220,10 +220,54 @@ function AllCardsDisplay({
     setActiveModalIndex(null);
   }, [round, playerCount]);
 
+  // Helper to send real-time card state to /api/room
+  const sendCardRoomSync = async (patch: any) => {
+    if (!roomCode) return;
+    try {
+      await fetch('/api/room', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: roomCode,
+          gameState: patch
+        })
+      });
+    } catch (e) {}
+  };
+
+  // Poll room state every 500ms for instant cross-device card flips & dismissals
+  useEffect(() => {
+    if (!roomCode) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/room?code=${roomCode}`);
+        const data = await res.json();
+        if (data.success && data.room && data.room.gameState) {
+          const gs = data.room.gameState;
+          if (gs.activeModalIndex !== undefined && gs.activeModalIndex !== activeModalIndex) {
+            setActiveModalIndex(gs.activeModalIndex);
+          }
+          if (Array.isArray(gs.dismissed) && JSON.stringify(gs.dismissed) !== JSON.stringify(dismissed)) {
+            setDismissed(gs.dismissed);
+          }
+          if (gs.activePlayerIndex !== undefined && gs.activePlayerIndex !== activePlayerIndex) {
+            setActivePlayerIndex(gs.activePlayerIndex);
+          }
+        }
+      } catch (e) {}
+    }, 500);
+    return () => clearInterval(interval);
+  }, [roomCode, activeModalIndex, dismissed, activePlayerIndex, setActivePlayerIndex]);
+
   const handleOpenCard = (index: number) => {
     if (dismissed[index]) return;
     sound.playFlip();
     setActiveModalIndex(index);
+    sendCardRoomSync({
+      activeModalIndex: index,
+      dismissed,
+      activePlayerIndex
+    });
   };
 
   const handleLanjut = () => {
@@ -233,16 +277,23 @@ function AllCardsDisplay({
 
     setTimeout(() => {
       const targetIdx = activeModalIndex;
-      setDismissed(prev => {
-        const next = [...prev];
-        next[targetIdx] = true;
-        if (next.every(Boolean)) setTimeout(() => sound.playChime(), 150);
-        return next;
-      });
+      const nextDismissed = [...dismissed];
+      nextDismissed[targetIdx] = true;
+      setDismissed(nextDismissed);
 
-      setActivePlayerIndex(prev => (prev + 1) % playerCount);
+      if (nextDismissed.every(Boolean)) setTimeout(() => sound.playChime(), 150);
+
+      const nextActivePlayer = (activePlayerIndex + 1) % playerCount;
+      setActivePlayerIndex(nextActivePlayer);
       setActiveModalIndex(null);
       setIsClosingModal(false);
+
+      // Sync dismissal & modal close across all playing devices
+      sendCardRoomSync({
+        activeModalIndex: null,
+        dismissed: nextDismissed,
+        activePlayerIndex: nextActivePlayer
+      });
     }, 280);
   };
 
@@ -475,7 +526,7 @@ function SpinnerWheelFlow({
           if (gs.todContent !== undefined) setTodContent(gs.todContent);
         }
       } catch (e) {}
-    }, 1200);
+    }, 500);
     return () => clearInterval(interval);
   }, [roomCode, rotation]);
 

@@ -196,11 +196,13 @@ function GameCard({
 
 /* ── All Cards Display & Spotlight 3D Flip Question Modal ────────────────── */
 function AllCardsDisplay({
-  playerNames, questions, onRoundComplete, round, totalRounds, activePlayerIndex, setActivePlayerIndex
+  playerNames, questions, onRoundComplete, round, totalRounds,
+  activePlayerIndex, setActivePlayerIndex, roomCode
 }: {
   playerNames: string[]; questions: string[];
   onRoundComplete: () => void; round: number; totalRounds: number;
   activePlayerIndex: number; setActivePlayerIndex: React.Dispatch<React.SetStateAction<number>>;
+  roomCode?: string;
 }) {
   const playerCount = playerNames.length;
   const [dismissed, setDismissed] = useState<boolean[]>(new Array(playerCount).fill(false));
@@ -371,72 +373,53 @@ function AllCardsDisplay({
         )}
       </div>
 
-      {/* ── SLEEK LONG PORTRAIT PLAYING CARD SPOTLIGHT MODAL ─────────────── */}
+      {/* ── CARD REVEAL QUESTION MODAL ──────────────────────────────────── */}
       {activeModalIndex !== null && (
-        <div className={`fixed inset-0 z-50 flex flex-col items-center justify-center px-4 bg-[#257180]/50 backdrop-blur-md transition-opacity duration-300 ${isClosingModal ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-
-          {/* Long Portrait Rectangular Card */}
-          {(() => {
-            const cardBg = CARD_COLORS[activeModalIndex % CARD_COLORS.length];
-            return (
-              <div className={`relative w-[320px] sm:w-[360px] h-[500px] sm:h-[540px] rounded-[32px] overflow-hidden p-7 flex flex-col items-center justify-between transition-all duration-300 ${isClosingModal ? 'scale-90 opacity-0' : 'animate-card-flip-pop'}`}
-                style={{
-                  background: cardBg,
-                  border: "3.5px solid #F2E5BF",
-                  boxShadow: "0 35px 90px rgba(0,0,0,0.38)"
-                }}>
-
-                {/* Card Top Header */}
-                <div className="relative z-10 w-full flex items-center justify-between text-[#F2E5BF]/80 text-xs font-black">
-                  <div className="flex items-center gap-1.5">
-                    <span>♥</span>
-                    <span className="text-xs font-bold text-[#F2E5BF]">Pertanyaan untuk {activeName}</span>
-                  </div>
-                  <span>♦</span>
-                </div>
-
-                {/* Question Container Box (Warm Sand - ZERO COLD WHITE) */}
-                <div className="relative z-10 my-auto text-center w-full px-6 py-9 rounded-3xl bg-[#F2E5BF] shadow-xl border-2 border-[#FD8B51]/40">
-                  <p className="text-xl sm:text-2xl font-black text-[#257180] leading-relaxed tracking-tight">
-                    {questions[activeModalIndex] || "Siapa teman yang paling sering janji 'otw' padahal baru banget bangun tidur?"}
-                  </p>
-                </div>
-
-                {/* Card Bottom Footer */}
-                <div className="relative z-10 w-full flex items-center justify-between text-xs font-black text-[#F2E5BF]/90">
-                  <span>ObrolanSeru</span>
-                  <span>✦</span>
-                </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#257180]/65 backdrop-blur-md">
+          <div className={`relative bg-[#FAF3E0] rounded-[36px] p-7 sm:p-9 w-[340px] sm:w-[390px] h-[520px] sm:h-[560px] border-4 border-[#FD8B51] shadow-2xl flex flex-col justify-between items-center text-center transition-all duration-300 ${isClosingModal ? 'scale-90 opacity-0' : 'animate-pop-in'}`}>
+            
+            {/* Header Card Badges */}
+            <div className="w-full flex items-center justify-between">
+              <div className="px-3.5 py-1.5 rounded-full bg-[#257180] text-[#FAF3E0] text-[11px] font-black tracking-wider uppercase shadow-sm">
+                Kartu Giliran #{activeModalIndex + 1}
               </div>
-            );
-          })()}
+              <div className="px-3.5 py-1.5 rounded-full bg-[#FD8B51]/15 text-[#CB6040] text-[11px] font-black shadow-sm">
+                Giliran: {playerNames[activeModalIndex] || `Pemain ${activeModalIndex + 1}`}
+              </div>
+            </div>
 
-          {/* Action Button */}
-          <button
-            onClick={handleLanjut}
-            className="mt-6 px-10 py-4 rounded-2xl font-black text-base text-white flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition cursor-pointer z-50"
-            style={{
-              background: "linear-gradient(135deg, #FD8B51 0%, #CB6040 100%)",
-              boxShadow: "0 10px 30px rgba(253, 139, 81, 0.4)"
-            }}>
-            <span>Pemain Selanjutnya</span>
-            <Check className="w-5 h-5 stroke-[3]" />
-          </button>
+            {/* Inner Luxury Card Content Frame */}
+            <div className="w-full flex-1 my-4 bg-[#F2E5BF]/80 rounded-[28px] border-2 border-[#257180]/15 p-6 flex flex-col justify-center items-center shadow-inner relative overflow-hidden">
+              <div className="absolute top-3 left-3 text-xs font-bold text-[#257180]/40">✦ ObrolanSeru</div>
+              <div className="absolute bottom-3 right-3 text-xs font-bold text-[#257180]/40">✦</div>
+              
+              <p className="text-base sm:text-lg font-black text-[#257180] leading-relaxed max-w-xs">
+                "{questions[activeModalIndex] || "Ceritakan satu momen paling berkesan dalam hidup kamu!"}"
+              </p>
+            </div>
+
+            {/* Footer Action Button */}
+            <button
+              onClick={handleLanjut}
+              className="w-full py-4 rounded-2xl font-black text-sm text-white shadow-xl hover:scale-[1.02] active:scale-95 transition cursor-pointer"
+              style={{ background: "linear-gradient(135deg, #257180 0%, #1d5966 100%)" }}>
+              Sudah Dijawab · Lanjut →
+            </button>
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-/* ── REAL-LIFE ROULETTE WHEEL WITH PILLAR STAND & TOP POINTER STOPPER ─────── */
 function SpinnerWheelFlow({
-  playerNames, todType, onRoundComplete
+  playerNames, todType, onFinish, roomCode
 }: {
-  playerNames: string[]; todType: string; onRoundComplete: () => void;
+  playerNames: string[]; todType: string; onFinish: () => void; roomCode?: string;
 }) {
   const playerCount = playerNames.length;
-  const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
+  const [rotation, setRotation] = useState(0);
   const [landedIndex, setLandedIndex] = useState<number | null>(null);
   const [todPhase, setTodPhase] = useState<'spin'|'choice'|'reveal'>('spin');
   const [chosenType, setChosenType] = useState<'truth'|'dare'|null>(null);
@@ -444,12 +427,45 @@ function SpinnerWheelFlow({
 
   const sliceColors = [C.orange, C.teal, C.rust, "#E8A246", "#D97736", C.orange];
   
-  // Vector-perfect SVG viewBox 400x400
   const VIEWBOX_SIZE = 400;
   const cx = 200;
   const cy = 200;
   const wheelRadius = 170;
   const sliceDeg = 360 / playerCount;
+
+  // Poll room roulette state every 1.2s if roomCode is active
+  useEffect(() => {
+    if (!roomCode) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/room?code=${roomCode}`);
+        const data = await res.json();
+        if (data.success && data.room && data.room.gameState) {
+          const gs = data.room.gameState;
+          if (gs.rotation !== undefined && gs.rotation !== rotation) setRotation(gs.rotation);
+          if (gs.todPhase !== undefined) setTodPhase(gs.todPhase);
+          if (gs.landedIndex !== undefined) setLandedIndex(gs.landedIndex);
+          if (gs.chosenType !== undefined) setChosenType(gs.chosenType);
+          if (gs.todContent !== undefined) setTodContent(gs.todContent);
+        }
+      } catch (e) {}
+    }, 1200);
+    return () => clearInterval(interval);
+  }, [roomCode, rotation]);
+
+  const sendRouletteSync = async (nextGS: any) => {
+    if (!roomCode) return;
+    try {
+      await fetch('/api/room', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: roomCode,
+          gameState: nextGS
+        })
+      });
+    } catch (e) {}
+  };
 
   const spin = () => {
     if (spinning) return;
@@ -457,28 +473,21 @@ function SpinnerWheelFlow({
     setSpinning(true);
     sound.playFlip();
 
-    // 1. Pick a random player target index
     const target = Math.floor(Math.random() * playerCount);
-    
-    // 2. Add an organic random offset inside the slice (between -30% and +30% of slice width)
     const offsetInSlice = (Math.random() * 0.6 - 0.3) * sliceDeg;
-    
-    // 3. Center angle of target slice relative to top (12 o'clock)
     const sliceCenterAngle = target * sliceDeg + sliceDeg / 2 + offsetInSlice;
-    
-    // 4. Calculate exact clockwise rotation needed to bring target center under top pointer
     const delta = (360 - (sliceCenterAngle % 360) + 360) % 360;
-    
-    // 5. Add 5 full extra rotations (1800 deg) for spin excitement
     const baseRot = Math.ceil(rotation / 360) * 360;
     const newRot = baseRot + 1800 + delta;
     
     setRotation(newRot);
+    sendRouletteSync({ rotation: newRot, todPhase: 'spin', landedIndex: null });
 
     setTimeout(() => {
       setSpinning(false);
       setLandedIndex(target);
       sound.playChime();
+      sendRouletteSync({ rotation: newRot, todPhase: 'spin', landedIndex: target });
     }, 3800);
   };
 
@@ -486,66 +495,65 @@ function SpinnerWheelFlow({
     sound.playFlip();
     setChosenType(type);
 
-    const topicKey = type === 'truth'
-      ? 'tod_truth'
-      : (todType === 'jarakjauh' ? 'tod_dare_online' : 'tod_dare_offline');
-
     let seen: string[] = [];
     try {
-      const stored = sessionStorage.getItem('obrolan_seen_tod');
-      if (stored) seen = JSON.parse(stored);
+        const stored = sessionStorage.getItem('obrolan_seen_tod');
+        if (stored) seen = JSON.parse(stored);
     } catch (e) {}
 
     try {
       const res = await fetch('/api/generate-questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: topicKey, count: 1, exclude: seen })
+        body: JSON.stringify({ topic: type === 'truth' ? 'tod_truth' : 'tod_dare', count: 1, exclude: seen })
       });
       const data = await res.json();
       if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
         const item = data.questions[0];
         setTodContent(item);
         setTodPhase('reveal');
+        sendRouletteSync({ todPhase: 'reveal', chosenType: type, todContent: item });
         try {
-          sessionStorage.setItem('obrolan_seen_tod', JSON.stringify([...seen, item]));
+          const updatedSeen = Array.from(new Set([...seen, item]));
+          sessionStorage.setItem('obrolan_seen_tod', JSON.stringify(updatedSeen));
         } catch (e) {}
         return;
       }
-    } catch (e) {
-      console.warn("Falling back to local TOD bank:", e);
-    }
+    } catch (e) {}
 
     const fallbackBank = type === 'truth'
       ? TOD_TRUTH
       : (todType === 'jarakjauh' ? TOD_DARE_ONLINE : TOD_DARE_OFFLINE);
-    const randomItem = fallbackBank[Math.floor(Math.random() * fallbackBank.length)];
-    setTodContent(randomItem);
+    const item = fallbackBank[Math.floor(Math.random() * fallbackBank.length)];
+    setTodContent(item);
     setTodPhase('reveal');
+    sendRouletteSync({ todPhase: 'reveal', chosenType: type, todContent: item });
   };
 
-  const handleNextTurn = () => {
+  const handleNextSpin = () => {
     sound.playClick();
     setTodPhase('spin');
     setLandedIndex(null);
     setChosenType(null);
+    setTodContent('');
+    sendRouletteSync({ todPhase: 'spin', landedIndex: null, chosenType: null, todContent: '' });
   };
 
-  // Generate vector slices + brass rivets inside exact SVG math
   const slices = Array.from({ length: playerCount }).map((_, i) => {
-    const startDeg = i * sliceDeg - 90;
-    const endDeg = (i + 1) * sliceDeg - 90;
-    const toRad = (d: number) => d * Math.PI / 180;
-    const x1 = cx + wheelRadius * Math.cos(toRad(startDeg));
-    const y1 = cy + wheelRadius * Math.sin(toRad(startDeg));
-    const x2 = cx + wheelRadius * Math.cos(toRad(endDeg));
-    const y2 = cy + wheelRadius * Math.sin(toRad(endDeg));
+    const startAngle = (i * sliceDeg - 90) * Math.PI / 180;
+    const endAngle = ((i + 1) * sliceDeg - 90) * Math.PI / 180;
+
+    const x1 = cx + wheelRadius * Math.cos(startAngle);
+    const y1 = cy + wheelRadius * Math.sin(startAngle);
+    const x2 = cx + wheelRadius * Math.cos(endAngle);
+    const y2 = cy + wheelRadius * Math.sin(endAngle);
+
     const largeArc = sliceDeg > 180 ? 1 : 0;
-    const midDeg = (i + 0.5) * sliceDeg - 90;
-    const textR = wheelRadius * 0.62;
-    const tx = cx + textR * Math.cos(toRad(midDeg));
-    const ty = cy + textR * Math.sin(toRad(midDeg));
-    const textAngle = midDeg + 90;
+    const midAngle = (i * sliceDeg + sliceDeg / 2 - 90) * Math.PI / 180;
+    const textRadius = wheelRadius * 0.65;
+    const tx = cx + textRadius * Math.cos(midAngle);
+    const ty = cy + textRadius * Math.sin(midAngle);
+    const textAngle = i * sliceDeg + sliceDeg / 2;
 
     return {
       path: `M ${cx} ${cy} L ${x1} ${y1} A ${wheelRadius} ${wheelRadius} 0 ${largeArc} 1 ${x2} ${y2} Z`,
@@ -555,7 +563,6 @@ function SpinnerWheelFlow({
     };
   });
 
-  // Brass studs evenly placed along outer rim inside SVG
   const studCount = Math.max(12, playerCount * 2);
   const studs = Array.from({ length: studCount }).map((_, idx) => {
     const angle = (idx * (360 / studCount) - 90) * Math.PI / 180;
@@ -571,11 +578,11 @@ function SpinnerWheelFlow({
   return (
     <div className="flex flex-col items-center justify-center w-full my-auto">
       
-      {/* PHASE 1: Real-Life Roulette Wheel with Stand & Top Stopper Pin */}
+      {/* PHASE 1: Real-Life Roulette Wheel with Static Stand & Rotating Inner Wheel */}
       {todPhase === 'spin' && (
         <div className="flex flex-col items-center gap-5 w-full my-auto animate-pop-in">
           
-          {/* Wheel Assembly Container */}
+          {/* Wheel Assembly Container (Outer Frame & Stand STAY 100% STILL) */}
           <div className="relative flex flex-col items-center justify-center w-full max-w-[290px] sm:max-w-[370px] mx-auto select-none pt-4 pb-1">
             
             {/* Top Downward Pointer Stopper Pin (Static 12 o'clock) */}
@@ -593,39 +600,40 @@ function SpinnerWheelFlow({
             {/* Vertical Pillar Stand Behind Wheel (Static) */}
             <div className="absolute inset-y-3 w-7 bg-gradient-to-b from-[#257180] via-[#1d5966] to-[#257180] border-2 border-[#FAF3E0]/30 rounded-lg shadow-xl z-0" />
 
-            {/* Rotating Wheel Frame (Spins 100% on Central Axle Poros) */}
+            {/* Wheel SVG Frame (Outer Container Static, ONLY Inner Group Rotates) */}
             <div className="relative z-10 w-full aspect-square">
-              <svg viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`} className="w-full h-full filter drop-shadow-2xl overflow-visible"
-                style={{
-                  display: "block",
+              <svg viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`} className="w-full h-full filter drop-shadow-2xl overflow-visible">
+                
+                {/* ONLY THIS INNER GROUP ROTATES ON POROS (200px, 200px) */}
+                <g style={{
                   transition: spinning ? "transform 3.8s cubic-bezier(0.12, 0.85, 0.15, 1)" : "none",
                   transform: `rotate(${rotation}deg)`,
-                  transformOrigin: "center center",
+                  transformOrigin: "200px 200px",
                 }}>
-                
-                {/* Outer Wooden/Metallic Rim */}
-                <circle cx={cx} cy={cy} r={192} fill="#FAF3E0" stroke="#CB6040" strokeWidth={6} />
-                <circle cx={cx} cy={cy} r={185} fill="#FAF3E0" stroke="#FD8B51" strokeWidth={10} />
+                  {/* Outer Wooden/Metallic Rim */}
+                  <circle cx={cx} cy={cy} r={192} fill="#FAF3E0" stroke="#CB6040" strokeWidth={6} />
+                  <circle cx={cx} cy={cy} r={185} fill="#FAF3E0" stroke="#FD8B51" strokeWidth={10} />
 
-                {/* Slices */}
-                {slices.map((s, i) => (
-                  <g key={i}>
-                    <path d={s.path} fill={s.color} stroke="#FAF3E0" strokeWidth={2.5} />
-                    <text x={s.tx} y={s.ty} textAnchor="middle" dominantBaseline="middle" fill="#FAF3E0" fontSize={playerCount > 5 ? 12 : 14} fontWeight="900" fontFamily="Nunito, sans-serif" transform={`rotate(${s.textAngle}, ${s.tx}, ${s.ty})`}>
-                      {s.label}
-                    </text>
-                  </g>
-                ))}
+                  {/* Slices */}
+                  {slices.map((s, i) => (
+                    <g key={i}>
+                      <path d={s.path} fill={s.color} stroke="#FAF3E0" strokeWidth={2.5} />
+                      <text x={s.tx} y={s.ty} textAnchor="middle" dominantBaseline="middle" fill="#FAF3E0" fontSize={playerCount > 5 ? 12 : 14} fontWeight="900" fontFamily="Nunito, sans-serif" transform={`rotate(${s.textAngle}, ${s.tx}, ${s.ty})`}>
+                        {s.label}
+                      </text>
+                    </g>
+                  ))}
 
-                {/* Outer Brass Rivet Studs */}
-                {studs.map((st, idx) => (
-                  <circle key={idx} cx={st.sx} cy={st.sy} r={4.5} fill="#FAF3E0" stroke="#257180" strokeWidth={2} />
-                ))}
+                  {/* Outer Brass Rivet Studs */}
+                  {studs.map((st, idx) => (
+                    <circle key={idx} cx={st.sx} cy={st.sy} r={4.5} fill="#FAF3E0" stroke="#257180" strokeWidth={2} />
+                  ))}
 
-                {/* Center Metallic Axle Hub Cap */}
-                <circle cx={cx} cy={cy} r={34} fill="#FAF3E0" stroke="#FD8B51" strokeWidth={4} />
-                <circle cx={cx} cy={cy} r={24} fill="#257180" />
-                <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fill="#FAF3E0" fontSize={15} fontWeight="900">✦</text>
+                  {/* Center Metallic Axle Hub Cap */}
+                  <circle cx={cx} cy={cy} r={34} fill="#FAF3E0" stroke="#FD8B51" strokeWidth={4} />
+                  <circle cx={cx} cy={cy} r={24} fill="#257180" />
+                  <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fill="#FAF3E0" fontSize={15} fontWeight="900">✦</text>
+                </g>
               </svg>
             </div>
 
@@ -636,19 +644,23 @@ function SpinnerWheelFlow({
           </div>
 
           <button onClick={spin} disabled={spinning}
-            className="px-12 py-4 rounded-2xl font-black text-base text-white shadow-xl hover:scale-105 active:scale-95 disabled:opacity-60 transition cursor-pointer"
-            style={{ background: "linear-gradient(135deg, #FD8B51 0%, #CB6040 100%)", boxShadow: "0 10px 30px rgba(253, 139, 81, 0.4)" }}>
-            {spinning ? "Memutar Roulette..." : "Putar Roulette Wheel"}
+            className={`px-10 py-4 rounded-2xl font-black text-base text-white shadow-xl transition cursor-pointer ${spinning ? 'opacity-50 scale-95 cursor-not-allowed' : 'hover:scale-[1.03] active:scale-95'}`}
+            style={{ background: "linear-gradient(135deg, #FD8B51 0%, #CB6040 100%)" }}>
+            {spinning ? 'Roda Sedang Berputar...' : 'Putar Roulette Wheel ✦'}
           </button>
-          {landedIndex !== null && (
-            <div className="text-center p-6 rounded-3xl bg-[#FAF3E0] border-2 border-[#FD8B51] shadow-xl animate-pop-in space-y-4">
-              <div>
-                <div className="text-xs font-black uppercase tracking-wider text-[#257180]/70">Terpilih Kena Tantangan</div>
-                <div className="text-3xl font-black text-[#CB6040] mt-0.5">{selectedName}</div>
+
+          {/* Winner Result Box */}
+          {landedIndex !== null && !spinning && (
+            <div className="bg-[#FAF3E0] p-6 rounded-[32px] border-2 border-[#FD8B51] shadow-2xl text-center space-y-4 max-w-sm w-full animate-pop-in">
+              <div className="space-y-1">
+                <span className="text-[11px] font-black text-[#257180] uppercase tracking-wider">TERPILIH KENA TANTANGAN</span>
+                <h3 className="text-3xl font-black text-[#CB6040]">{selectedName}</h3>
               </div>
+
               <button
-                onClick={() => { sound.playClick(); setTodPhase('choice'); }}
-                className="px-8 py-3.5 rounded-xl font-black text-sm text-white bg-[#257180] hover:bg-[#1d5966] transition shadow-md cursor-pointer">
+                onClick={() => setTodPhase('choice')}
+                className="w-full py-3.5 rounded-2xl font-black text-sm text-white shadow-md hover:scale-[1.02] active:scale-95 transition cursor-pointer"
+                style={{ background: "linear-gradient(135deg, #257180 0%, #1d5966 100%)" }}>
                 Pilih Tantangan (Truth / Dare) →
               </button>
             </div>
@@ -741,7 +753,7 @@ function SpinnerWheelFlow({
           </div>
 
           <button
-            onClick={handleNextTurn}
+            onClick={handleNextSpin}
             className="mt-6 px-10 py-4 rounded-2xl font-black text-base text-white flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition cursor-pointer z-50"
             style={{ background: "linear-gradient(135deg, #FD8B51 0%, #CB6040 100%)" }}>
             <span>Pemain Selanjutnya</span>
@@ -763,6 +775,7 @@ function OfflineGame() {
   const todType = searchParams.get('todType') || 'tatapmuka';
   const topic = searchParams.get('topic') || 'kenalan';
   const totalRounds = parseInt(searchParams.get('rounds') || '3', 10);
+  const roomCode = searchParams.get('roomCode') || undefined;
   
   const rawPlayersParam = searchParams.get('players') || 'Pemain 1,Pemain 2';
   const playerNames = rawPlayersParam.split(',').map(s => s.trim()).filter(Boolean);
@@ -866,12 +879,14 @@ function OfflineGame() {
             totalRounds={totalRounds}
             activePlayerIndex={activePlayerIndex}
             setActivePlayerIndex={setActivePlayerIndex}
+            roomCode={roomCode}
           />
         ) : (
           <SpinnerWheelFlow
             playerNames={playerNames}
             todType={todType}
-            onRoundComplete={handleNextRound}
+            onFinish={handleFinish}
+            roomCode={roomCode}
           />
         )}
       </main>

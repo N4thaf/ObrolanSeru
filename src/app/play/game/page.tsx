@@ -668,97 +668,129 @@ function SpinnerWheelFlow({
         </div>
       )}
 
-      {/* PHASE 2: Choice between TRUTH or DARE (Enlarged Grand Playing Cards) */}
+      {/* PHASE 2: Choice between TRUTH or DARE (Ultra-Classy Luxury Playing Cards) */}
       {todPhase === 'choice' && (
-        <div className="text-center space-y-6 animate-pop-in max-w-lg w-full px-4 my-auto">
-          <div>
-            <div className="text-xs font-black text-[#257180]/70 uppercase tracking-widest">Giliran Tantangan</div>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#257180] mt-1">{selectedName}, Pilih Mana?</h2>
+        <div className="text-center space-y-6 animate-pop-in max-w-xl w-full px-4 my-auto">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#FD8B51]/15 text-[#CB6040] text-[11px] font-black tracking-widest uppercase border border-[#FD8B51]/30">
+              ✦ GILIRAN TANTANGAN ✦
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-[#257180] tracking-tight pt-1">
+              {selectedName}, Pilih Mana?
+            </h2>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:gap-6">
-            {/* TRUTH Card (Enlarged Sleek Grand Playing Card) */}
+          <div className="grid grid-cols-2 gap-4 sm:gap-7 pt-2">
+            {/* TRUTH Card (Luxury Sunset Warm Playing Card) */}
             <button onClick={() => handlePickChoice('truth')}
-              className="relative h-80 sm:h-88 rounded-[30px] p-6 flex flex-col items-center justify-between border-3 border-[#FAF3E0] shadow-2xl hover:scale-105 active:scale-95 transition cursor-pointer overflow-hidden group"
-              style={{ background: "linear-gradient(150deg, #FD8B51 0%, #CB6040 100%)" }}>
-              <div className="absolute inset-3 rounded-[20px] border border-[#FAF3E0]/30 pointer-events-none" />
+              className="relative h-88 sm:h-96 rounded-[32px] p-6 sm:p-7 flex flex-col items-center justify-between border-[3.5px] border-[#FAF3E0] shadow-2xl hover:-translate-y-2 hover:shadow-orange-950/25 active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden group select-none"
+              style={{ background: "linear-gradient(160deg, #FD8B51 0%, #E0753C 50%, #CB6040 100%)" }}>
               
-              <div className="w-full flex justify-between text-xs font-black text-white/70">
+              {/* Fine Linen Double Border */}
+              <div className="absolute inset-3.5 rounded-[22px] border border-[#FAF3E0]/40 pointer-events-none" />
+              
+              {/* Corner Suits Top */}
+              <div className="w-full flex justify-between text-xs font-serif text-[#FAF3E0]/70 z-10">
                 <span>♥</span><span>♠</span>
               </div>
-              <div className="text-center text-white my-auto z-10">
-                <div className="text-4xl sm:text-5xl font-black tracking-tight text-white drop-shadow-md">TRUTH</div>
-                <div className="text-xs sm:text-sm font-bold text-white/90 mt-2">Jawab Jujur</div>
-              </div>
-              <span className="px-6 py-2.5 rounded-full text-xs font-black text-[#257180] bg-[#FAF3E0] shadow-md group-hover:bg-[#257180] group-hover:text-[#FAF3E0] transition-all z-10">
-                Buka Kartu
-              </span>
-            </button>
 
-            {/* DARE Card (Enlarged Sleek Grand Playing Card) */}
-            <button onClick={() => handlePickChoice('dare')}
-              className="relative h-80 sm:h-88 rounded-[30px] p-6 flex flex-col items-center justify-between border-3 border-[#FAF3E0] shadow-2xl hover:scale-105 active:scale-95 transition cursor-pointer overflow-hidden group"
-              style={{ background: "linear-gradient(150deg, #CB6040 0%, #8A3720 100%)" }}>
-              <div className="absolute inset-3 rounded-[20px] border border-[#FAF3E0]/30 pointer-events-none" />
-              
-              <div className="w-full flex justify-between text-xs font-black text-white/70">
+              {/* Center Monogram & Title */}
+              <div className="text-center my-auto z-10 space-y-1">
+                <div className="text-4xl sm:text-5xl font-black italic tracking-widest text-[#FAF3E0] font-serif drop-shadow-md">
+                  TRUTH
+                </div>
+                <div className="text-xs sm:text-sm font-medium text-[#FAF3E0]/90 tracking-wider">
+                  Jawab Jujur
+                </div>
+              </div>
+
+              {/* Bottom Classy Action Button */}
+              <div className="w-full py-3 rounded-2xl bg-[#FAF3E0] text-[#257180] font-black text-xs tracking-wider shadow-lg group-hover:bg-[#257180] group-hover:text-[#FAF3E0] transition-all z-10 flex items-center justify-center gap-1.5">
+                <span>Pilih TRUTH</span>
+                <span>✦</span>
+              </div>
+
+              {/* Corner Suits Bottom */}
+              <div className="w-full flex justify-between text-xs font-serif text-[#FAF3E0]/70 z-10 mt-1">
                 <span>♦</span><span>♣</span>
               </div>
-              <div className="text-center text-white my-auto z-10">
-                <div className="text-4xl sm:text-5xl font-black tracking-tight text-white drop-shadow-md">DARE</div>
-                <div className="text-xs sm:text-sm font-bold text-white/90 mt-2">Lakukan Tantangan</div>
+            </button>
+
+            {/* DARE Card (Luxury Terracotta Playing Card) */}
+            <button onClick={() => handlePickChoice('dare')}
+              className="relative h-88 sm:h-96 rounded-[32px] p-6 sm:p-7 flex flex-col items-center justify-between border-[3.5px] border-[#FAF3E0] shadow-2xl hover:-translate-y-2 hover:shadow-orange-950/25 active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden group select-none"
+              style={{ background: "linear-gradient(160deg, #CB6040 0%, #A8492D 50%, #8A3720 100%)" }}>
+              
+              {/* Fine Linen Double Border */}
+              <div className="absolute inset-3.5 rounded-[22px] border border-[#FAF3E0]/40 pointer-events-none" />
+              
+              {/* Corner Suits Top */}
+              <div className="w-full flex justify-between text-xs font-serif text-[#FAF3E0]/70 z-10">
+                <span>♦</span><span>♣</span>
               </div>
-              <span className="px-6 py-2.5 rounded-full text-xs font-black text-[#257180] bg-[#FAF3E0] shadow-md group-hover:bg-[#257180] group-hover:text-[#FAF3E0] transition-all z-10">
-                Buka Kartu
-              </span>
+
+              {/* Center Monogram & Title */}
+              <div className="text-center my-auto z-10 space-y-1">
+                <div className="text-4xl sm:text-5xl font-black italic tracking-widest text-[#FAF3E0] font-serif drop-shadow-md">
+                  DARE
+                </div>
+                <div className="text-xs sm:text-sm font-medium text-[#FAF3E0]/90 tracking-wider">
+                  Lakukan Tantangan
+                </div>
+              </div>
+
+              {/* Bottom Classy Action Button */}
+              <div className="w-full py-3 rounded-2xl bg-[#FAF3E0] text-[#257180] font-black text-xs tracking-wider shadow-lg group-hover:bg-[#257180] group-hover:text-[#FAF3E0] transition-all z-10 flex items-center justify-center gap-1.5">
+                <span>Pilih DARE</span>
+                <span>🔥</span>
+              </div>
+
+              {/* Corner Suits Bottom */}
+              <div className="w-full flex justify-between text-xs font-serif text-[#FAF3E0]/70 z-10 mt-1">
+                <span>♥</span><span>♠</span>
+              </div>
             </button>
           </div>
         </div>
       )}
 
-      {/* PHASE 3: Reveal Truth / Dare Rectangular Card */}
+      {/* PHASE 3: Reveal Truth / Dare Luxury Playing Card Modal */}
       {todPhase === 'reveal' && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-4 bg-[#257180]/55 backdrop-blur-md">
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-4 bg-[#257180]/60 backdrop-blur-md">
           
-          {/* Long Portrait Rectangular Card */}
-          <div className="relative w-[340px] sm:w-[390px] h-[520px] sm:h-[560px] rounded-[36px] overflow-hidden p-8 flex flex-col items-center justify-between transition-all duration-300 animate-card-flip-pop shadow-2xl"
+          {/* Long Portrait Luxury Playing Card */}
+          <div className="relative w-[340px] sm:w-[390px] h-[520px] sm:h-[560px] rounded-[36px] overflow-hidden p-8 flex flex-col items-center justify-between transition-all duration-300 animate-pop-in shadow-2xl select-none"
             style={{
-              background: chosenType === 'truth' ? "linear-gradient(150deg, #FD8B51 0%, #CB6040 100%)" : "linear-gradient(150deg, #CB6040 0%, #8A3720 100%)",
+              background: chosenType === 'truth' ? "linear-gradient(160deg, #FD8B51 0%, #E0753C 50%, #CB6040 100%)" : "linear-gradient(160deg, #CB6040 0%, #A8492D 50%, #8A3720 100%)",
               border: "3.5px solid #FAF3E0"
             }}>
             
-            {/* Single Clean Inner Frame Line */}
-            <div className="absolute inset-3 rounded-[26px] border border-[#FAF3E0]/35 pointer-events-none z-10" />
+            {/* Fine Linen Double Border */}
+            <div className="absolute inset-3.5 rounded-[26px] border border-[#FAF3E0]/40 pointer-events-none z-10" />
 
             {/* Header */}
             <div className="relative z-10 w-full flex items-center justify-between text-[#FAF3E0]/90 text-xs font-black">
-              <span>{chosenType === 'truth' ? 'TRUTH' : 'DARE'}</span>
+              <span className="font-serif italic tracking-widest text-sm">{chosenType === 'truth' ? 'TRUTH' : 'DARE'}</span>
               <span className="px-3.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#FAF3E0]/20 text-[#FAF3E0]">
                 {selectedName}
               </span>
             </div>
 
-            {/* Question / Challenge Box (Warm Sand - ZERO COLD WHITE) */}
-            <div className="relative z-10 my-auto text-center w-full px-6 py-9 rounded-3xl bg-[#F2E5BF] shadow-xl border-2 border-[#FD8B51]/40">
-              <p className="text-xl sm:text-2xl font-black text-[#257180] leading-relaxed tracking-tight">
-                {todContent}
+            {/* Question / Challenge Box (Warm Cream Container) */}
+            <div className="relative z-10 my-auto text-center w-full px-6 py-8 rounded-[28px] bg-[#FAF3E0] shadow-2xl border-2 border-[#FD8B51]/30">
+              <p className="text-base sm:text-lg font-black text-[#257180] leading-relaxed tracking-tight">
+                "{todContent}"
               </p>
             </div>
 
-            {/* Footer */}
-            <div className="relative z-10 w-full flex items-center justify-between text-xs font-black text-[#FAF3E0]/90">
-              <span>ObrolanSeru</span>
-              <span>✦</span>
-            </div>
+            {/* Action Button */}
+            <button
+              onClick={handleNextSpin}
+              className="relative z-20 w-full py-4 rounded-2xl font-black text-sm text-[#257180] bg-[#FAF3E0] hover:bg-[#257180] hover:text-[#FAF3E0] transition-all shadow-xl cursor-pointer flex items-center justify-center gap-2">
+              <span>Tantangan Selesai · Putar Lagi</span>
+              <span>→</span>
+            </button>
           </div>
-
-          <button
-            onClick={handleNextSpin}
-            className="mt-6 px-10 py-4 rounded-2xl font-black text-base text-white flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition cursor-pointer z-50"
-            style={{ background: "linear-gradient(135deg, #FD8B51 0%, #CB6040 100%)" }}>
-            <span>Pemain Selanjutnya</span>
-            <Check className="w-5 h-5 stroke-[3]" />
-          </button>
         </div>
       )}
 

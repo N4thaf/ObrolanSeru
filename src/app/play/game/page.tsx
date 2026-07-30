@@ -15,16 +15,20 @@ const C = {
   teal: "#257180",
   sand: "#F2E5BF",
   linen: "#FAF3E0",
-  orange: "#FD8B51",
-  rust: "#CB6040",
+  gold: "#FFBB5C",    // User ordered palette color 1
+  orange: "#FF9B50",  // User ordered palette color 2
+  rust: "#E25E3E",    // User ordered palette color 3
+  crimson: "#C63D2F", // User ordered palette color 4
   muted: "#6B8E94",
 };
 
 const CARD_COLORS = [
-  "linear-gradient(150deg, #FD8B51 0%, #E0733C 100%)", // Sunset Orange
-  "linear-gradient(150deg, #CB6040 0%, #9E452A 100%)", // Terracotta Rust
-  "linear-gradient(150deg, #E8A246 0%, #D4882C 100%)", // Warm Gold Sand
-  "linear-gradient(150deg, #D97736 0%, #B8581E 100%)", // Autumn Amber
+  "linear-gradient(150deg, #FFBB5C 0%, #FF9B50 100%)", // Honey Gold to Sunset Orange
+  "linear-gradient(150deg, #FF9B50 0%, #E25E3E 100%)", // Sunset Orange to Terracotta Coral
+  "linear-gradient(150deg, #E25E3E 0%, #C63D2F 100%)", // Terracotta Coral to Crimson Rust
+  "linear-gradient(150deg, #C63D2F 0%, #9E2B1E 100%)", // Deep Vintage Crimson
+  "linear-gradient(150deg, #FFBB5C 0%, #E25E3E 100%)", // Warm Peach to Terracotta
+  "linear-gradient(150deg, #FF9B50 0%, #C63D2F 100%)", // Vibrant Sunset to Crimson
 ];
 
 const TOD_TRUTH = [
@@ -428,7 +432,7 @@ function SpinnerWheelFlow({
   const [chosenType, setChosenType] = useState<'truth'|'dare'|null>(null);
   const [todContent, setTodContent] = useState<string>('');
 
-  const sliceColors = [C.orange, C.teal, C.rust, "#E8A246", "#D97736", C.orange];
+  const sliceColors = [C.gold, C.orange, C.rust, C.crimson, C.teal, C.gold];
   
   const VIEWBOX_SIZE = 400;
   const cx = 200;

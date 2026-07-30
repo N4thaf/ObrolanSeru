@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { RotateCcw, CheckSquare, Volume2, VolumeX, Check } from 'lucide-react';
 import { QUESTION_BANKS } from '../offline/page';
@@ -213,8 +213,27 @@ function AllCardsDisplay({
   const [activeModalIndex, setActiveModalIndex] = useState<number | null>(null);
   const [isClosingModal, setIsClosingModal] = useState(false);
 
+  // Timestamp guard & stable refs to prevent network race conditions from flickering local state
+  const lastUserActionRef = useRef<number>(0);
+  const activeModalIndexRef = useRef<number | null>(activeModalIndex);
+  const dismissedRef = useRef<boolean[]>(dismissed);
+  const activePlayerIndexRef = useRef<number>(activePlayerIndex);
+
+  useEffect(() => {
+    activeModalIndexRef.current = activeModalIndex;
+  }, [activeModalIndex]);
+
+  useEffect(() => {
+    dismissedRef.current = dismissed;
+  }, [dismissed]);
+
+  useEffect(() => {
+    activePlayerIndexRef.current = activePlayerIndex;
+  }, [activePlayerIndex]);
+
   const allDone = dismissed.every(Boolean);
 
+  // Reset round state
   useEffect(() => {
     const initialDismissed = new Array(playerCount).fill(false);
     setDismissed(initialDismissed);
@@ -243,34 +262,40 @@ function AllCardsDisplay({
     } catch (e) {}
   };
 
-  // Poll room state every 500ms for instant cross-device card flips & dismissals
+  // Poll room state safely with local action guard (0 network race flicker)
   useEffect(() => {
     if (!roomCode) return;
     const interval = setInterval(async () => {
+      // If user performed an action in the last 2.5s, skip GET sync to prevent network flicker
+      if (Date.now() - lastUserActionRef.current < 2500) return;
+
       try {
         const res = await fetch(`/api/room?code=${roomCode}`);
         const data = await res.json();
         if (data.success && data.room && data.room.gameState) {
           const gs = data.room.gameState;
-          if (gs.activeModalIndex !== undefined && gs.activeModalIndex !== activeModalIndex) {
+          if (gs.activeModalIndex !== undefined && gs.activeModalIndex !== activeModalIndexRef.current) {
             setActiveModalIndex(gs.activeModalIndex);
           }
-          if (Array.isArray(gs.dismissed) && JSON.stringify(gs.dismissed) !== JSON.stringify(dismissed)) {
+          if (Array.isArray(gs.dismissed) && JSON.stringify(gs.dismissed) !== JSON.stringify(dismissedRef.current)) {
             setDismissed(gs.dismissed);
           }
-          if (gs.activePlayerIndex !== undefined && gs.activePlayerIndex !== activePlayerIndex) {
+          if (gs.activePlayerIndex !== undefined && gs.activePlayerIndex !== activePlayerIndexRef.current) {
             setActivePlayerIndex(gs.activePlayerIndex);
           }
         }
       } catch (e) {}
-    }, 500);
+    }, 800);
+
     return () => clearInterval(interval);
-  }, [roomCode, activeModalIndex, dismissed, activePlayerIndex, setActivePlayerIndex]);
+  }, [roomCode, setActivePlayerIndex]);
 
   const handleOpenCard = (index: number) => {
     if (dismissed[index]) return;
     sound.playFlip();
+    lastUserActionRef.current = Date.now();
     setActiveModalIndex(index);
+
     sendCardRoomSync({
       activeModalIndex: index,
       dismissed,
@@ -281,6 +306,7 @@ function AllCardsDisplay({
   const handleLanjut = () => {
     if (activeModalIndex === null) return;
     sound.playClick();
+    lastUserActionRef.current = Date.now();
     setIsClosingModal(true);
 
     setTimeout(() => {
@@ -518,25 +544,29 @@ function SpinnerWheelFlow({
   const wheelRadius = 170;
   const sliceDeg = 360 / playerCount;
 
-  // Poll room roulette state every 1.2s if roomCode is active
+  const lastActionRef = useRef<number>(0);
+
+  // Poll room roulette state safely with local action guard (0 network race flicker)
   useEffect(() => {
     if (!roomCode) return;
     const interval = setInterval(async () => {
+      if (Date.now() - lastActionRef.current < 2500) return;
+
       try {
         const res = await fetch(`/api/room?code=${roomCode}`);
         const data = await res.json();
         if (data.success && data.room && data.room.gameState) {
           const gs = data.room.gameState;
-          if (gs.rotation !== undefined && gs.rotation !== rotation) setRotation(gs.rotation);
+          if (gs.rotation !== undefined) setRotation(gs.rotation);
           if (gs.todPhase !== undefined) setTodPhase(gs.todPhase);
           if (gs.landedIndex !== undefined) setLandedIndex(gs.landedIndex);
           if (gs.chosenType !== undefined) setChosenType(gs.chosenType);
           if (gs.todContent !== undefined) setTodContent(gs.todContent);
         }
       } catch (e) {}
-    }, 500);
+    }, 800);
     return () => clearInterval(interval);
-  }, [roomCode, rotation]);
+  }, [roomCode]);
 
   const sendRouletteSync = async (nextGS: any) => {
     if (!roomCode) return;
@@ -554,6 +584,7 @@ function SpinnerWheelFlow({
 
   const spin = () => {
     if (spinning) return;
+    lastActionRef.current = Date.now();
     setLandedIndex(null);
     setSpinning(true);
     sound.playFlip();
@@ -578,6 +609,7 @@ function SpinnerWheelFlow({
 
   const handlePickChoice = async (type: 'truth'|'dare') => {
     sound.playFlip();
+    lastActionRef.current = Date.now();
     setChosenType(type);
 
     let seen: string[] = [];

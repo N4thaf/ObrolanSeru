@@ -383,32 +383,54 @@ function AllCardsDisplay({
       {/* ── CARD REVEAL QUESTION MODAL ──────────────────────────────────── */}
       {activeModalIndex !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#257180]/65 backdrop-blur-md">
-          <div className={`relative bg-[#FAF3E0] rounded-[36px] p-7 sm:p-9 w-[340px] sm:w-[390px] h-[520px] sm:h-[560px] border-4 border-[#FD8B51] shadow-2xl flex flex-col justify-between items-center text-center ${isClosingModal ? 'animate-card-flip-close' : 'animate-card-flip-pop'}`}>
+          <div className={`relative bg-[#FAF3E0] rounded-[36px] p-6 sm:p-8 w-[340px] sm:w-[390px] h-[520px] sm:h-[560px] border-4 border-[#FD8B51] shadow-2xl flex flex-col justify-between items-center text-center ${isClosingModal ? 'animate-card-flip-close' : 'animate-card-flip-pop'}`}>
             
             {/* Header Card Badges */}
-            <div className="w-full flex items-center justify-between">
-              <div className="px-3.5 py-1.5 rounded-full bg-[#257180] text-[#FAF3E0] text-[11px] font-black tracking-wider uppercase shadow-sm">
+            <div className="w-full flex items-center justify-between z-10">
+              <div className="px-3.5 py-1.5 rounded-full bg-[#257180] text-[#FAF3E0] text-[11px] font-extrabold tracking-wider uppercase shadow-sm">
                 Kartu Giliran #{activeModalIndex + 1}
               </div>
-              <div className="px-3.5 py-1.5 rounded-full bg-[#FD8B51]/15 text-[#CB6040] text-[11px] font-black shadow-sm">
+              <div className="px-3.5 py-1.5 rounded-full bg-[#FD8B51]/15 text-[#CB6040] text-[11px] font-extrabold shadow-sm">
                 Giliran: {playerNames[activeModalIndex] || `Pemain ${activeModalIndex + 1}`}
               </div>
             </div>
 
-            {/* Inner Luxury Card Content Frame */}
-            <div className="w-full flex-1 my-4 bg-[#F2E5BF]/80 rounded-[28px] border-2 border-[#257180]/15 p-6 flex flex-col justify-center items-center shadow-inner relative overflow-hidden">
-              <div className="absolute top-3 left-3 text-xs font-bold text-[#257180]/40">✦ ObrolanSeru</div>
-              <div className="absolute bottom-3 right-3 text-xs font-bold text-[#257180]/40">✦</div>
+            {/* Inner Luxury Card Content Frame (Textured Playing Card Face - NOT PLAIN) */}
+            <div className="w-full flex-1 my-4 rounded-[28px] p-6 flex flex-col justify-between items-center shadow-inner relative overflow-hidden border-2 border-[#FD8B51]/35 select-none"
+              style={{ background: "linear-gradient(150deg, #FAF3E0 0%, #F3E4C0 100%)" }}>
               
-              <p className="text-base sm:text-lg font-black text-[#257180] leading-relaxed max-w-xs">
-                "{questions[activeModalIndex] || "Ceritakan satu momen paling berkesan dalam hidup kamu!"}"
-              </p>
+              {/* Fine Inner Linen Frame */}
+              <div className="absolute inset-2.5 rounded-[22px] border border-[#257180]/20 pointer-events-none" />
+
+              {/* Corner Suit Accents Top */}
+              <div className="w-full flex justify-between text-xs font-serif text-[#257180]/35 z-10">
+                <span className="flex items-center gap-1"><span className="text-[10px]">♥</span> <span className="text-[9px] font-sans font-bold">ObrolanSeru</span></span>
+                <span>♠</span>
+              </div>
+
+              {/* Central Background Watermark Suit */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] text-8xl font-serif text-[#257180]">
+                ♥
+              </div>
+              
+              {/* Question Text */}
+              <div className="my-auto z-10 px-2">
+                <p className="text-base sm:text-lg font-black text-[#257180] leading-relaxed tracking-tight">
+                  "{questions[activeModalIndex] || "Ceritakan satu momen paling berkesan dalam hidup kamu!"}"
+                </p>
+              </div>
+
+              {/* Corner Suit Accents Bottom */}
+              <div className="w-full flex justify-between text-xs font-serif text-[#257180]/35 z-10">
+                <span>♦</span>
+                <span>♣</span>
+              </div>
             </div>
 
             {/* Footer Action Button */}
             <button
               onClick={handleLanjut}
-              className="w-full py-4 rounded-2xl font-black text-sm text-white shadow-xl hover:scale-[1.02] active:scale-95 transition cursor-pointer"
+              className="w-full py-4 rounded-2xl font-black text-sm text-white shadow-xl hover:scale-[1.02] active:scale-95 transition cursor-pointer z-10"
               style={{ background: "linear-gradient(135deg, #257180 0%, #1d5966 100%)" }}>
               Sudah Dijawab · Lanjut →
             </button>
@@ -801,6 +823,18 @@ function OfflineGame() {
 
   useEffect(() => {
     async function loadFreshAIQuestions() {
+      const BAD_PHRASES = [
+        "diajak nongkrong sama",
+        "disamakan dengan",
+        "apa alasan utamanya",
+        "ceritakan dengan detail",
+        "pilih reaksi paling kocak",
+        "kalau hidup kamu disamakan",
+        "pas kamu dapat kesempatan"
+      ];
+
+      const cleanPool = (list: string[]) => list.filter(q => q && !BAD_PHRASES.some(b => q.toLowerCase().includes(b)));
+
       const totalNeeded = totalRounds * playerNames.length;
       let seen: string[] = [];
       try {
@@ -814,26 +848,28 @@ function OfflineGame() {
         const res = await fetch('/api/generate-questions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ topic, count: totalNeeded, exclude: seen })
+          body: JSON.stringify({ topic, count: totalNeeded + 5, exclude: seen })
         });
         const data = await res.json();
         if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
-          const pool: string[] = shuffle(data.questions as string[]);
-          setAllQuestions(pool);
-          setRoundQuestions(pool.slice(0, playerNames.length));
+          const pool: string[] = cleanPool(shuffle(data.questions as string[]));
+          if (pool.length >= playerNames.length) {
+            setAllQuestions(pool);
+            setRoundQuestions(pool.slice(0, playerNames.length));
 
-          try {
-            const updatedSeen = Array.from(new Set([...seen, ...pool]));
-            sessionStorage.setItem('obrolan_seen_questions', JSON.stringify(updatedSeen));
-          } catch (e) {}
-          return;
+            try {
+              const updatedSeen = Array.from(new Set([...seen, ...pool]));
+              sessionStorage.setItem('obrolan_seen_questions', JSON.stringify(updatedSeen));
+            } catch (e) {}
+            return;
+          }
         }
       } catch (e) {
         console.warn("Falling back to local pool:", e);
       }
 
       // Fallback if API fails
-      const bank = QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan'];
+      const bank = cleanPool(QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan']);
       const pool: string[] = [];
       while (pool.length < totalNeeded) pool.push(...shuffle(bank));
       const selected = pool.slice(0, totalNeeded);

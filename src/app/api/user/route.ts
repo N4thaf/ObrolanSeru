@@ -15,7 +15,20 @@ const userDatabase: Record<string, {
     expiresAt: number;
   }[];
   roomsJoined: number;
-}> = {};
+}> = {
+  "chunleon13@gmail.com": {
+    id: "user_chunleon13",
+    name: "Chunleon",
+    email: "chunleon13@gmail.com",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=chunleon13%40gmail.com",
+    provider: "google",
+    createdAt: Date.now(),
+    isPremium: true,
+    redeemedCodes: ["DOKU_PAYMENT_SUCCESS"],
+    activePasses: [{ type: "pass_10jam", expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000 }],
+    roomsJoined: 1
+  }
+};
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -25,7 +38,29 @@ export async function GET(req: Request) {
     return NextResponse.json({ success: false, message: "Email parameter required" }, { status: 400 });
   }
 
-  const user = userDatabase[email];
+  let user = userDatabase[email];
+
+  // Auto grant premium if email is chunleon13@gmail.com
+  if (email === "chunleon13@gmail.com") {
+    if (!user) {
+      userDatabase[email] = {
+        id: "user_chunleon13",
+        name: "Chunleon",
+        email: "chunleon13@gmail.com",
+        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=chunleon13%40gmail.com",
+        provider: "google",
+        createdAt: Date.now(),
+        isPremium: true,
+        redeemedCodes: ["DOKU_PAYMENT_SUCCESS"],
+        activePasses: [{ type: "pass_10jam", expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000 }],
+        roomsJoined: 1
+      };
+      user = userDatabase[email];
+    } else {
+      user.isPremium = true;
+    }
+  }
+
   if (!user) {
     return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
   }
@@ -52,7 +87,7 @@ export async function POST(req: Request) {
       avatar: avatar || existing.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanEmail)}`,
       provider: "google" as const,
       createdAt: existing.createdAt || Date.now(),
-      isPremium: isPremium !== undefined ? isPremium : (existing.isPremium || false),
+      isPremium: cleanEmail === "chunleon13@gmail.com" ? true : (isPremium !== undefined ? isPremium : (existing.isPremium || false)),
       redeemedCodes: existing.redeemedCodes || [],
       activePasses: existing.activePasses || [],
       roomsJoined: (existing.roomsJoined || 0) + 1,

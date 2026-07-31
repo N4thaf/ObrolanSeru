@@ -223,9 +223,106 @@ const BASE_AI_BANKS: Record<string, string[]> = {
   ]
 };
 
+// Custom AI Question Synthesizer based on user prompt
+function generateCustomQuestions(prompt: string, count: number = 15): string[] {
+  const p = prompt.toLowerCase();
+
+  // Helper generators for specific themes
+  if (p.includes("liburan") || p.includes("trip") || p.includes("bali") || p.includes("jalan") || p.includes("pantai") || p.includes("wisata")) {
+    return [
+      `Seputar ${prompt}: Apa momen liburan atau destinasi paling berkesan yang pernah kamu datangi?`,
+      `Pas ${prompt}: Makanan lokal atau kuliner paling enak yang wajib dicoba kalau berkunjung?`,
+      `Seandainya kita buat trip impulsif bareng esok hari seputar ${prompt}, tempat pertama yang kamu datangi apa?`,
+      `Pengalaman paling konyol atau salah rencana pas kamu lagi jalan-jalan atau ${prompt}?`,
+      `Kalau kamu disuruh milih 1 teman di meja ini buat jadi tour guide pas ${prompt}, kamu pilih siapa?`,
+      `Apa barang wajib yang ga boleh ketinggalan di dalam tas kamu pas lagi ${prompt}?`,
+      `Koleksi foto atau momen paling instagramable yang pernah kamu ambil seputar ${prompt}?`,
+      `Pernahkah kamu tersesat atau mengalami kejadian unik pas ${prompt}? Ceritakan!`,
+      `Lagu atau playlist apa yang paling pas diputar pas lagi jalan-jalan seputar ${prompt}?`,
+      `Kalau kamu punya budget unlimited buat ${prompt}, tempat impian terbesar kamu di mana?`,
+      `Siapa teman di sini yang paling riweh dan paling heboh kalau diajak ${prompt}?`,
+      `Apa oleh-oleh atau cenderamata teraneh yang pernah kamu beli seputar ${prompt}?`,
+      `Momen sunrise atau sunset mana yang paling indah yang pernah kamu nikmati seputar ${prompt}?`,
+      `Kalau kamu harus tinggal selama 3 bulan di lokasi ${prompt}, aktivitas apa yang bakal kamu tekuni?`,
+      `Hal apa yang paling kamu rindukan saat selesai ${prompt} dan harus kembali ke rutinitas?`
+    ];
+  }
+
+  if (p.includes("finansial") || p.includes("investasi") || p.includes("karir") || p.includes("uang") || p.includes("bisnis") || p.includes("kerja")) {
+    return [
+      `Seputar ${prompt}: Menurut pandangan kamu, pencapaian finansial terbesar apa yang paling membuat kamu bangga?`,
+      `Terkait ${prompt}: Apa kesalahan atau pengeluaran impulsif terbesar yang pernah kamu pelajari dalam hidup?`,
+      `Seandainya kamu punya dana dingin 500 juta seputar ${prompt}, instrumen atau bisnis apa yang kamu pilih?`,
+      `Apa definisi kebebasan finansial dan keseimbangan hidup yang ideal menurut versi kamu pribadi?`,
+      `Nasihat terpenting seputar ${prompt} yang pernah kamu dapatkan dari sosok senior atau mentor?`,
+      `Kalau uang bukan lagi pertimbangan utama dalam hidup, pekerjaan atau passion apa yang kamu geluti?`,
+      `Apa tantangan terbesar yang sedang kamu perjuangkan dalam perjalanan ${prompt} saat ini?`,
+      `Barang atau investasi bernilai apa yang paling berdampak positif buat kualitas hidup kamu sejauh ini?`,
+      `Gaya hidup atau kebiasaan hemat apa yang paling konsisten kamu terapkan seputar ${prompt}?`,
+      `Siapa sosok profesional atau pengusaha seputar ${prompt} yang paling menginspirasi kamu?`,
+      `Bagaimana cara kamu mengelola stres dan kelelahan kerja pas lagi fokus seputar ${prompt}?`,
+      `Apa mimpi besar 5 tahun ke depan yang ingin kamu wujudkan seputar ${prompt}?`,
+      `Hal pertama yang bakal kamu lakukan pas target utama seputar ${prompt} berhasil tercapai?`,
+      `Apa skill atau keahlian baru yang ingin kamu pelajari tahun ini seputar ${prompt}?`,
+      `Nasihat apa yang ingin kamu berikan ke anak muda yang baru mulai melangkah seputar ${prompt}?`
+    ];
+  }
+
+  if (p.includes("cinta") || p.includes("pasangan") || p.includes("monyet") || p.includes("relationship") || p.includes("mantan") || p.includes("crush")) {
+    return [
+      `Seputar ${prompt}: Momen manis atau perhatian kecil seperti apa yang paling bikin hati kamu meleleh?`,
+      `Terkait ${prompt}: Apa kriteria utama yang paling kamu cari dalam diri sosok pendamping hidup?`,
+      `Hal paling konyol atau salah tingkah yang pernah kamu lakukan pas lagi kasmaran seputar ${prompt}?`,
+      `Kualitas diri seperti apa yang menurut kamu paling penting untuk menjaga komitmen seputar ${prompt}?`,
+      `Kisah cinta monyet atau pengalaman PDKT pertama kali pas sekolah yang paling bikin kamu senyum sendiri?`,
+      `Lagu romantis apa yang selalu mengingatkan kamu ke momen indah seputar ${prompt}?`,
+      `Apa definisi kencan impian (*dream date*) yang paling berkesan dan romantis versi kamu?`,
+      `Pelajaran paling berharga yang kamu dapatkan dari pengalaman masa lalu seputar ${prompt}?`,
+      `Gaya menyatakan perasaan (*love language*) yang paling dominan dalam diri kamu apa?`,
+      `Bagaimana cara kamu dan pasangan menyelesaikan perbedaan pendapat dengan dewasa seputar ${prompt}?`,
+      `Apa gestur sederhana yang membuat kamu merasa sangat dihargai oleh pasangan seputar ${prompt}?`,
+      `Tempat atau suasana kencan paling berkesan yang pernah kamu lalui seputar ${prompt}?`,
+      `Hal apa dari pasangan yang paling membuat kamu merasa beruntung memilikinya?`,
+      `Pesan atau doa harapan terbaik apa yang ingin kamu sampaikan untuk masa depan seputar ${prompt}?`,
+      `Apa hadiah paling berkesan yang pernah kamu berikan atau terima seputar ${prompt}?`
+    ];
+  }
+
+  // Default Custom Prompt Generator for Any Prompt
+  return [
+    `Topik Racikan "${prompt}": Apa hal pertama yang terlintas di pikiran kamu saat mendengar topik ini?`,
+    `Seputar "${prompt}": Apa pengalaman atau kenangan paling tak terlupakan yang pernah kamu alami?`,
+    `Terkait "${prompt}": Menurut sudut pandang kamu pribadi, apa sisi paling menarik dari topik ini?`,
+    `Kalau kamu diberi kesempatan mengeksplorasi lebih jauh tentang "${prompt}", hal apa yang paling ingin kamu coba?`,
+    `Hal paling konyol atau tak terduga apa yang pernah terjadi pada kamu seputar "${prompt}"?`,
+    `Siapa orang di meja ini yang menurut kamu paling cocok diajak berdiskusi tentang "${prompt}"?`,
+    `Pelajaran hidup atau hikmah terpenting apa yang pernah kamu dapatkan dari topik "${prompt}"?`,
+    `Seandainya kamu membuat konten atau buku seputar "${prompt}", judul unik apa yang bakal kamu pilih?`,
+    `Apa persepsi salah atau anggapan keliru yang sering dipikirkan orang lain seputar "${prompt}"?`,
+    `Momen paling membuat kamu bangga atau bersyukur dalam perjalanan hidup kamu seputar "${prompt}"?`,
+    `Kalau kamu diminta memberikan 1 tips terbaik untuk teman-teman seputar "${prompt}", apa saran kamu?`,
+    `Apa pertanyaan paling penasaran yang ingin kamu tanyakan ke teman di sebelah kananmu seputar "${prompt}"?`,
+    `Hal apa yang paling sering membuat kamu merasa bersemangat saat membahas seputar "${prompt}"?`,
+    `Kalau kamu bisa membuat impian kamu terwujud esok hari tentang "${prompt}", impian seperti apa itu?`,
+    `Satu kata yang paling menggambarkan pengalaman kamu selama ini seputar "${prompt}"?`
+  ];
+}
+
 export async function POST(request: Request) {
   try {
-    const { topic = 'kenalan', count = 10, exclude = [] } = await request.json();
+    const { topic = 'kenalan', customPrompt = '', count = 10, exclude = [] } = await request.json();
+
+    // Handle Custom AI Prompt Topic
+    if (topic === 'ai_custom' && customPrompt) {
+      const generated = generateCustomQuestions(customPrompt, count);
+      return NextResponse.json({
+        success: true,
+        topic: 'ai_custom',
+        customPrompt,
+        questions: generated,
+      });
+    }
+
     const bank = BASE_AI_BANKS[topic] || BASE_AI_BANKS['kenalan'];
     
     // Filter out previously seen/used questions

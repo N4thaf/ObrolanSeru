@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, RotateCcw, Heart, Smile, Sparkles, Compass, Moon, Home as HomeIcon, Clock, Rocket, Shuffle, MessageSquare, Dices, User, Users, Globe, Lock } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Heart, Smile, Sparkles, Compass, Moon, Home as HomeIcon, Clock, Rocket, Shuffle, MessageSquare, Dices, User, Users, Globe, Lock, Wand2 } from 'lucide-react';
 import { sound } from '@/utils/sound';
 import { useAuth } from '@/context/AuthContext';
 import { LockedFeatureModal } from '@/app/components/LockedFeatureModal';
@@ -27,6 +27,7 @@ const TOPICS = [
   { id: "nostalgia", name: "Nostalgia",       desc: "Masa kecil & kenangan lalu",       icon: Clock, free: false },
   { id: "whatif",    name: "What If...?",     desc: "Skenario imajinatif",              icon: Compass, free: false },
   { id: "karir",     name: "Karir & Mimpi",   desc: "Cita-cita & perjalanan hidup",     icon: Rocket, free: false },
+  { id: "ai_custom", name: "Racikan AI",      desc: "Racik topik custom sesuai imajinasimu", icon: Wand2, free: false },
 ];
 
 export const QUESTION_BANKS: Record<string, string[]> = {
@@ -179,6 +180,10 @@ export default function OfflineSetup() {
     else handleStart();
   };
 
+  const [customAiPrompt, setCustomAiPrompt] = useState<string>('');
+  const [showAiPromptModal, setShowAiPromptModal] = useState<boolean>(false);
+  const [tempPromptInput, setTempPromptInput] = useState<string>('');
+
   const handleStart = () => {
     sound.playChime();
     const cleanNames = playerNames.map((n, i) => n.trim() || `Pemain ${i + 1}`);
@@ -187,7 +192,8 @@ export default function OfflineSetup() {
       todType: todType,
       players: cleanNames.join(','),
       rounds: String(rounds),
-      ...(selectedTopic ? { topic: selectedTopic } : {})
+      ...(selectedTopic ? { topic: selectedTopic } : {}),
+      ...(customAiPrompt ? { aiPrompt: customAiPrompt } : {})
     });
     router.push(`/play/game?${params}`);
   };
@@ -449,6 +455,9 @@ export default function OfflineSetup() {
                           setLockedModalTitle(t.name);
                         } else {
                           setSelectedTopic(t.id);
+                          if (t.id === 'ai_custom') {
+                            setShowAiPromptModal(true);
+                          }
                         }
                       }}
                       className={`relative p-3.5 rounded-2xl border-2 transition flex flex-col items-center justify-center text-center cursor-pointer ${
@@ -492,6 +501,67 @@ export default function OfflineSetup() {
 
         </div>
       </main>
+
+      {/* Custom AI Prompt Configuration Modal */}
+      {showAiPromptModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#257180]/65 backdrop-blur-md animate-pop-in">
+          <div className="bg-[#FAF3E0] rounded-[36px] p-7 sm:p-9 w-[340px] sm:w-[420px] border-4 border-[#FD8B51] shadow-2xl flex flex-col items-center text-center relative select-none">
+            <button
+              onClick={() => {
+                sound.playClick();
+                setShowAiPromptModal(false);
+              }}
+              className="absolute top-4 right-4 text-[#257180]/50 hover:text-[#257180] font-black text-sm w-8 h-8 rounded-full bg-[#F2E5BF] flex items-center justify-center cursor-pointer">
+              ✕
+            </button>
+
+            <div className="w-14 h-14 rounded-2xl bg-[#FD8B51]/15 border border-[#FD8B51]/30 flex items-center justify-center text-[#FD8B51] my-2 shadow-sm">
+              <Wand2 className="w-7 h-7" />
+            </div>
+
+            <h3 className="text-2xl font-black text-[#257180] tracking-tight">Racik Topik AI Custom</h3>
+            <p className="text-xs font-semibold text-[#257180]/80 mt-1">
+              Ketik suasana atau topik apa saja yang ingin kamu racik menjadi kartu pertanyaan AI!
+            </p>
+
+            {/* Quick Suggestions Chips */}
+            <div className="flex flex-wrap gap-1.5 my-3 justify-center">
+              {[
+                "Trip Liburan ke Bali",
+                "Deep Talk Finansial",
+                "Cinta Monyet & PDKT",
+                "Pertanyaan Absurd & Random"
+              ].map((chip, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setTempPromptInput(chip)}
+                  className="px-2.5 py-1 rounded-full bg-[#257180]/10 text-[#257180] hover:bg-[#FD8B51] hover:text-white transition text-[11px] font-extrabold cursor-pointer">
+                  + {chip}
+                </button>
+              ))}
+            </div>
+
+            <textarea
+              rows={3}
+              value={tempPromptInput}
+              onChange={(e) => setTempPromptInput(e.target.value)}
+              placeholder="misal: Pertanyaan konyol buat reuni alumni SMA..."
+              className="w-full p-4 rounded-2xl bg-white border-2 border-[#257180]/20 text-xs sm:text-sm font-bold text-[#257180] outline-none focus:border-[#FD8B51] placeholder:text-[#257180]/40 resize-none my-2"
+            />
+
+            <button
+              onClick={() => {
+                sound.playChime();
+                setCustomAiPrompt(tempPromptInput.trim());
+                setShowAiPromptModal(false);
+              }}
+              className="w-full py-3.5 rounded-2xl font-black text-sm text-white bg-[#FD8B51] hover:bg-[#e0753c] transition shadow-md cursor-pointer mt-2">
+              Simpan Racikan AI
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Locked Premium Feature Redeem Modal */}
       <LockedFeatureModal

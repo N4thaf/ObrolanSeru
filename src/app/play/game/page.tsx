@@ -988,10 +988,11 @@ function OfflineGame() {
       let selectedQuestions: string[] = [];
 
       try {
+        const aiPromptParam = searchParams.get('aiPrompt') || '';
         const res = await fetch('/api/generate-questions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ topic, count: totalNeeded + 5, exclude: seen })
+          body: JSON.stringify({ topic, customPrompt: aiPromptParam, count: totalNeeded + 5, exclude: seen })
         });
         const data = await res.json();
         if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {

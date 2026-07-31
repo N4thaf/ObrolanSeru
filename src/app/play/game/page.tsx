@@ -135,8 +135,8 @@ function Navbar({
         {/* Col 3: Audio & Finish */}
         <div className="z-10 flex-shrink-0 flex items-center gap-1 sm:gap-1.5">
           <button onClick={toggleAudio}
-            className="p-1.5 sm:px-3 sm:py-1.5 rounded-full text-xs font-black text-[#257180] bg-[#F2E5BF] border border-[#257180]/20 hover:bg-[#ebdcae] active:scale-95 transition shadow-sm cursor-pointer">
-            {soundOn ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-black text-[#257180] bg-[#F2E5BF] border border-[#257180]/20 hover:bg-[#ebdcae] active:scale-95 transition shadow-sm cursor-pointer whitespace-nowrap">
+            {soundOn ? <Volume2 className="w-3.5 h-3.5 flex-shrink-0" /> : <VolumeX className="w-3.5 h-3.5 flex-shrink-0" />}
             <span className="hidden sm:inline">{soundOn ? "Suara" : "Mute"}</span>
           </button>
           <button onClick={() => { sound.playClick(); onFinish(); }}

@@ -268,15 +268,34 @@ export default function OfflineSetup() {
 
                 {/* Opsi 2: Jarak Jauh (Online Remote - Premium Subscriber) */}
                 <button
-                  onClick={() => { sound.playClick(); setTodType('jarakjauh'); setStep('players'); }}
-                  className="w-full p-5 sm:p-6 rounded-2xl border-2 border-[#CB6040] bg-[#F2E5BF] text-left flex items-start gap-4 transition hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-sm">
+                  onClick={() => {
+                    sound.playClick();
+                    if (!isPremium) {
+                      setLockedModalTitle("Truth or Dare Jarak Jauh (Online Remote)");
+                    } else {
+                      setTodType('jarakjauh');
+                      setStep('players');
+                    }
+                  }}
+                  className={`w-full p-5 sm:p-6 rounded-2xl border-2 text-left flex items-start gap-4 transition hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-sm relative ${
+                    !isPremium ? 'border-[#257180]/20 bg-[#F2E5BF]/50' : 'border-[#CB6040] bg-[#F2E5BF]'
+                  }`}>
                   <div className="w-12 h-12 rounded-xl bg-[#CB6040] text-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
                     <Globe className="w-6 h-6" />
                   </div>
                   <div>
                     <div className="font-black text-base sm:text-lg text-[#257180] flex items-center gap-2 flex-wrap">
                       <span>Jarak Jauh (Online Remote)</span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#CB6040] text-white">Premium Subscriber</span>
+                      {!isPremium ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#257180] text-white flex items-center gap-1">
+                          <Lock className="w-3 h-3 text-white" />
+                          <span>Locked</span>
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#CB6040] text-white">
+                          VIP Premium
+                        </span>
+                      )}
                     </div>
                     <div className="text-xs sm:text-sm font-medium text-[#257180]/80 mt-1 leading-relaxed">
                       Tantangan Dare digital via video call, chat, sosial media &amp; telepon jarak jauh.

@@ -67,12 +67,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const setUserProfile = (profile: UserProfile) => {
+  const setUserProfile = async (profile: UserProfile) => {
     sound.playChime();
     setUser(profile);
     try {
       localStorage.setItem("obrolan_user_session", JSON.stringify(profile));
       sessionStorage.setItem("my_name", profile.name.split(" ")[0]);
+
+      // Sync user profile to backend server database
+      await fetch('/api/user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profile)
+      });
     } catch (e) {}
   };
 

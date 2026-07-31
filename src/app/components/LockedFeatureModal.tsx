@@ -12,15 +12,15 @@ interface LockedFeatureModalProps {
 }
 
 export function LockedFeatureModal({ isOpen, onClose, featureTitle }: LockedFeatureModalProps) {
-  const { redeemCode } = useAuth();
+  const { redeemCode, user } = useAuth();
   const [inputCode, setInputCode] = useState("OS4FREE");
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   if (!isOpen) return null;
 
-  const handleRedeem = (e: React.FormEvent) => {
+  const handleRedeem = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = redeemCode(inputCode);
+    const result = await redeemCode(inputCode);
     if (result.success) {
       setStatusMessage({ type: "success", text: result.message });
       setTimeout(() => {

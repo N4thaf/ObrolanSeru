@@ -16,7 +16,7 @@ interface AuthContextType {
   isLoading: boolean;
   isPremium: boolean;
   setUserProfile: (profile: UserProfile) => void;
-  redeemCode: (code: string) => { success: boolean; message: string };
+  redeemCode: (code: string) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
 }
 
@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   isPremium: false,
   setUserProfile: () => {},
-  redeemCode: () => ({ success: false, message: "" }),
+  redeemCode: async () => ({ success: false, message: "" }),
   logout: () => {},
 });
 
@@ -51,59 +51,110 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isPremium, setIsPremium] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Load existing session & premium pass status on mount
-  useEffect(() => {
+  // Helper to fetch user premium status from server database
+  const syncAccountPremiumStatus = async (email: string) => {
     try {
-      const stored = localStorage.getItem("obrolan_user_session");
-      if (stored) {
-        const parsed: UserProfile = JSON.parse(stored);
-        if (parsed.email === "nathaf@gmail.com" || parsed.email === "pemain@gmail.com") {
-          localStorage.removeItem("obrolan_user_session");
-          setUser(null);
-        } else {
-          setUser(parsed);
-        }
-      }
-
-      // Check premium unlock status (default is false)
-      const premiumStatus = localStorage.getItem("obrolan_is_premium");
-      if (premiumStatus === "true") {
-        setIsPremium(true);
+      const res = await fetch(`/api/user?email=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      if (data.success && data.user) {
+        setIsPremium(!!data.user.isPremium);
+      } else {
+        setIsPremium(false);
       }
     } catch (e) {
-      console.warn("Failed to load user session:", e);
-    } finally {
-      setIsLoading(false);
+      setIsPremium(false);
     }
+  };
+
+  // Load existing session & sync Google account premium status on mount
+  useEffect(() => {
+    async function initSession() {
+      try {
+        const stored = localStorage.getItem("obrolan_user_session");
+        if (stored) {
+          const parsed: UserProfile = JSON.parse(stored);
+          if (parsed.email === "nathaf@gmail.com" || parsed.email === "pemain@gmail.com") {
+            localStorage.removeItem("obrolan_user_session");
+            setUser(null);
+            setIsPremium(false);
+          } else {
+            setUser(parsed);
+            await syncAccountPremiumStatus(parsed.email);
+          }
+        } else {
+          setIsPremium(false);
+        }
+      } catch (e) {
+        console.warn("Failed to load user session:", e);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    initSession();
   }, []);
 
   const setUserProfile = async (profile: UserProfile) => {
     sound.playChime();
     setUser(profile);
+
     try {
       localStorage.setItem("obrolan_user_session", JSON.stringify(profile));
       sessionStorage.setItem("my_name", profile.name.split(" ")[0]);
 
-      // Sync user profile to backend server database
-      await fetch("/api/user", {
+      // Sync user profile to backend server database & check premium status
+      const res = await fetch("/api/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profile),
       });
+
+      const data = await res.json();
+      if (data.success && data.user) {
+        setIsPremium(!!data.user.isPremium);
+      }
     } catch (e) {}
   };
 
-  const redeemCode = (code: string): { success: boolean; message: string } => {
+  const redeemCode = async (code: string): Promise<{ success: boolean; message: string }> => {
+    if (!user || !user.email) {
+      sound.playClick();
+      return {
+        success: false,
+        message: "Silakan Masuk dengan Akun Google terlebih dahulu agar Pass Premium terikat di akun kamu!",
+      };
+    }
+
     const clean = code.trim().toUpperCase();
     if (clean === "OS4FREE") {
       sound.playChime();
-      setIsPremium(true);
+
       try {
-        localStorage.setItem("obrolan_is_premium", "true");
+        // Send redeem request to backend database bound to this Google email
+        const res = await fetch("/api/user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: user.email,
+            redeemCode: "OS4FREE",
+            isPremium: true,
+          }),
+        });
+
+        const data = await res.json();
+        if (data.success && data.user) {
+          setIsPremium(true);
+          return {
+            success: true,
+            message: `Selamat ${user.name}! Kode OS4FREE berhasil terikat di akun ${user.email}. Seluruh Akses Premium terbuka!`,
+          };
+        }
       } catch (e) {}
+
+      setIsPremium(true);
       return {
         success: true,
-        message: "Selamat! Kode OS4FREE berhasil. Seluruh Mode & Topik Premium telah terbuka!",
+        message: `Selamat ${user.name}! Kode OS4FREE telah diaktifkan untuk akun ${user.email}!`,
       };
     }
 

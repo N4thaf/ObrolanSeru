@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-// Serverless user database store (per server instance / persistent backend)
+// Serverless user database store (bound to user Google accounts)
 const userDatabase: Record<string, {
   id: string;
   name: string;
@@ -8,6 +8,8 @@ const userDatabase: Record<string, {
   avatar: string;
   provider: "google";
   createdAt: number;
+  isPremium: boolean;
+  redeemedCodes: string[];
   activePasses: {
     type: string;
     expiresAt: number;
@@ -34,7 +36,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { id, name, email, avatar, activePass } = body;
+    const { id, name, email, avatar, isPremium, redeemCode, activePass } = body;
 
     if (!email) {
       return NextResponse.json({ success: false, message: "Email is required" }, { status: 400 });
@@ -50,9 +52,18 @@ export async function POST(req: Request) {
       avatar: avatar || existing.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanEmail)}`,
       provider: "google" as const,
       createdAt: existing.createdAt || Date.now(),
+      isPremium: isPremium !== undefined ? isPremium : (existing.isPremium || false),
+      redeemedCodes: existing.redeemedCodes || [],
       activePasses: existing.activePasses || [],
       roomsJoined: (existing.roomsJoined || 0) + 1,
     };
+
+    if (redeemCode && !updatedUser.redeemedCodes.includes(redeemCode.toUpperCase())) {
+      updatedUser.redeemedCodes.push(redeemCode.toUpperCase());
+      if (redeemCode.toUpperCase() === "OS4FREE") {
+        updatedUser.isPremium = true;
+      }
+    }
 
     if (activePass) {
       updatedUser.activePasses.push(activePass);

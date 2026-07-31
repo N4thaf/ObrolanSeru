@@ -16,10 +16,12 @@ export const metadata: Metadata = {
   keywords: ["game kartu", "truth or dare", "icebreaker", "deep talk", "kenalan"],
   icons: {
     icon: [
-      { url: "/icon.svg?v=3", type: "image/svg+xml" },
+      { url: "/favicon-192.png?v=10", sizes: "192x192", type: "image/png" },
+      { url: "/favicon.png?v=10", sizes: "32x32", type: "image/png" },
+      { url: "/icon.svg?v=10", type: "image/svg+xml" },
     ],
-    shortcut: "/icon.svg?v=3",
-    apple: "/apple-touch-icon.png?v=3",
+    shortcut: "/favicon.png?v=10",
+    apple: "/apple-touch-icon.png?v=10",
   },
 };
 
@@ -30,6 +32,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" className={`${nunito.variable} h-full antialiased`}>
+      <head>
+        <link rel="icon" href="/favicon-192.png?v=10" sizes="192x192" type="image/png" />
+        <link rel="icon" href="/favicon.png?v=10" sizes="32x32" type="image/png" />
+        <link rel="shortcut icon" href="/favicon.png?v=10" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=10" />
+      </head>
       <body className="min-h-full flex flex-col">
         <AuthProvider>{children}</AuthProvider>
       </body>

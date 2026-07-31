@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, RotateCcw, Heart, Smile, Sparkles, Compass, Moon, Home as HomeIcon, Clock, Rocket, Shuffle, MessageSquare, Dices, User, Users, Globe, Lock } from 'lucide-react';
 import { sound } from '@/utils/sound';
+import { useAuth } from '@/context/AuthContext';
 
 const C = {
   teal: "#257180",
@@ -110,6 +111,8 @@ function Header({ onBack, stepIndex, totalSteps }: { onBack: () => void; stepInd
 
 export default function OfflineSetup() {
   const router = useRouter();
+  const { user } = useAuth();
+
   const [step, setStep] = useState<'mode'|'todType'|'players'|'rounds'|'topic'>('mode');
   const [selectedMode, setSelectedMode] = useState<'pertanyaan'|'tod'>('pertanyaan');
   const [todType, setTodType] = useState<'tatapmuka'|'jarakjauh'>('tatapmuka');
@@ -117,6 +120,18 @@ export default function OfflineSetup() {
   const [playerCount, setPlayerCount] = useState(2);
   const [playerNames, setPlayerNames] = useState<string[]>(['Pemain 1', 'Pemain 2']);
   const [rounds, setRounds] = useState(3);
+
+  useEffect(() => {
+    if (user?.name) {
+      setPlayerNames(prev => {
+        const next = [...prev];
+        if (!next[0] || next[0] === 'Pemain 1') {
+          next[0] = user.name;
+        }
+        return next;
+      });
+    }
+  }, [user]);
 
   const MAX_PLAYERS = 8;
   const MAX_ROUNDS = 20;

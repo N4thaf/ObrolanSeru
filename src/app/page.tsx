@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Play, Users, ShoppingBag, X, Coins, ShieldCheck, Check, Crown, HelpCircle, Share2, LogOut, User, FileText, Info, BookOpen, Lock, MessageSquare } from "lucide-react";
 import { BrandLogo } from "./components/BrandLogo";
+import { GoogleAuthButton } from "./components/GoogleAuthButton";
 
 /* Official User Color Palette */
 const C = {
@@ -80,28 +81,7 @@ export default function Home() {
 
           {/* User Status Bar & Toko */}
           <div className="flex items-center gap-2 sm:gap-3">
-            
-            {/* Status Akun Badge */}
-            {user ? (
-              <button
-                onClick={() => setShowAccountBenefits(true)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#257180]/10 border border-[#257180]/20 text-[#257180] hover:bg-[#257180]/20 transition cursor-pointer">
-                <div className="w-4.5 h-4.5 rounded-full bg-[#257180] text-[#FAF3E0] text-[9px] font-black flex items-center justify-center">
-                  {user.name.charAt(0).toUpperCase()}
-                </div>
-                <span className="text-xs font-black truncate max-w-[90px] sm:max-w-[120px]">{user.name}</span>
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#FD8B51]/20 text-[#CB6040]">
-                  {user.plan}
-                </span>
-              </button>
-            ) : (
-              <button
-                onClick={() => setShowAccountBenefits(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#257180]/10 border border-[#257180]/20 text-[#257180] hover:bg-[#257180]/20 transition cursor-pointer">
-                <ShieldCheck className="w-4 h-4 text-[#257180]" />
-                <span className="text-xs font-black">Status: Gratis</span>
-              </button>
-            )}
+            <GoogleAuthButton />
 
             {/* Toko Pass Button */}
             <Link href="/store" className="flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-[#FD8B51] text-white hover:bg-[#e0753c] transition shadow-sm">

@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Users, PlusCircle, LogIn, Copy, Check, Sparkles, ShieldCheck } from "lucide-react";
 import { sound } from "@/utils/sound";
 import { BrandLogo } from "@/app/components/BrandLogo";
+import { useAuth } from "@/context/AuthContext";
 
 export default function OnlineRoomSetup() {
   const router = useRouter();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'create' | 'join'>('create');
   
   // Create Room State
@@ -18,6 +20,13 @@ export default function OnlineRoomSetup() {
   // Join Room State
   const [joinCode, setJoinCode] = useState("");
   const [playerName, setPlayerName] = useState("");
+
+  useEffect(() => {
+    if (user?.name) {
+      setHostName(user.name);
+      setPlayerName(user.name);
+    }
+  }, [user]);
 
   const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();

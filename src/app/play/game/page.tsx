@@ -948,11 +948,6 @@ function OfflineGame() {
 
   useEffect(() => {
     async function loadFreshAIQuestions() {
-      // Force clear any stale questions stored in sessionStorage from previous builds
-      try {
-        sessionStorage.removeItem('obrolan_seen_questions');
-      } catch (e) {}
-
       // If playing in an online room, check if room already has questions broadcasted
       if (roomCode) {
         try {
@@ -1018,6 +1013,12 @@ function OfflineGame() {
       const firstRoundQs = selectedQuestions.slice(0, playerNames.length);
       setAllQuestions(selectedQuestions);
       setRoundQuestions(firstRoundQs);
+
+      // Save seen questions to prevent duplicates across rounds & games
+      try {
+        const updatedSeen = Array.from(new Set([...seen, ...selectedQuestions]));
+        sessionStorage.setItem('obrolan_seen_questions', JSON.stringify(updatedSeen));
+      } catch (e) {}
 
       // Broadcast questions to room so ALL devices get 100% identical questions!
       if (roomCode) {

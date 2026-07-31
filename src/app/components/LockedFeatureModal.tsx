@@ -51,9 +51,10 @@ export function LockedFeatureModal({ isOpen, onClose, featureTitle }: LockedFeat
           <div className="w-18 h-18 rounded-3xl bg-gradient-to-br from-[#FD8B51] to-[#CB6040] text-white flex items-center justify-center shadow-xl border-2 border-[#FAF3E0]">
             <Lock className="w-9 h-9 text-[#FAF3E0] drop-shadow-md" />
           </div>
-          {/* Metallic Chain Badge Overlay */}
-          <div className="absolute -top-1 -right-1 bg-[#257180] text-white text-[10px] font-black px-2 py-0.5 rounded-full border border-white shadow-md">
-            🔒 Locked
+          {/* Metallic Badge Overlay */}
+          <div className="absolute -top-1 -right-1 bg-[#257180] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full border border-white shadow-md flex items-center gap-1">
+            <Lock className="w-2.5 h-2.5 text-white" />
+            <span>Locked</span>
           </div>
         </div>
 

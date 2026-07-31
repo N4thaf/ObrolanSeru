@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Check, Clock, Calendar, Crown, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Check, Clock, Calendar, Crown, ShieldCheck, Sparkles } from "lucide-react";
 import { BrandLogo } from "../components/BrandLogo";
 import { useAuth } from "@/context/AuthContext";
 
@@ -235,7 +235,8 @@ function StoreRedeemBox() {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-center sm:text-left space-y-1">
           <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#257180]/10 text-[#257180] text-[11px] font-black">
-            <span>🎟️ Punya Kode Voucher / Promo?</span>
+            <Sparkles className="w-3.5 h-3.5 text-[#FD8B51]" />
+            <span>Punya Kode Voucher / Promo?</span>
           </div>
           <h3 className="text-xl font-black text-[#257180]">Tukarkan Kode Promo</h3>
           <p className="text-xs font-semibold text-[#257180]/75">

@@ -80,7 +80,14 @@ const TOD_DARE_ONLINE = [
   "Buka aplikasi belanja online di HP kamu dan tunjukkan keranjang belanjaan kamu ke layar!"
 ];
 
-function shuffle<T>(arr: T[]): T[] { return [...arr].sort(() => Math.random() - 0.5); }
+function shuffle<T>(arr: T[]): T[] {
+  const result = [...arr];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
 
 function getCardDimensions(count: number) {
   if (count <= 3) return { w: 165, h: 235, symbolSize: "text-5xl", fontBtn: "text-xs px-4 py-2" };
@@ -639,11 +646,12 @@ function SpinnerWheelFlow({
       const res = await fetch('/api/generate-questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: type === 'truth' ? 'tod_truth' : (todType === 'jarakjauh' ? 'tod_dare_online' : 'tod_dare_offline'), count: 1, exclude: seen })
+        body: JSON.stringify({ topic: type === 'truth' ? 'tod_truth' : (todType === 'jarakjauh' ? 'tod_dare_online' : 'tod_dare_offline'), count: 5, exclude: seen })
       });
       const data = await res.json();
       if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
-        const item = data.questions[0];
+        const shuffledPool = shuffle(data.questions as string[]);
+        const item = shuffledPool[0];
         setTodContent(item);
         setTodPhase('reveal');
         sendRouletteSync({ todPhase: 'reveal', chosenType: type, todContent: item });
@@ -658,10 +666,18 @@ function SpinnerWheelFlow({
     const fallbackBank = type === 'truth'
       ? TOD_TRUTH
       : (todType === 'jarakjauh' ? TOD_DARE_ONLINE : TOD_DARE_OFFLINE);
-    const item = fallbackBank[Math.floor(Math.random() * fallbackBank.length)];
+
+    const unseenItems = fallbackBank.filter(q => !seen.includes(q));
+    const poolToUse = unseenItems.length > 0 ? unseenItems : fallbackBank;
+    const item = poolToUse[Math.floor(Math.random() * poolToUse.length)];
+
     setTodContent(item);
     setTodPhase('reveal');
     sendRouletteSync({ todPhase: 'reveal', chosenType: type, todContent: item });
+    try {
+      const updatedSeen = Array.from(new Set([...seen, item]));
+      sessionStorage.setItem('obrolan_seen_tod', JSON.stringify(updatedSeen));
+    } catch (e) {}
   };
 
   const handleNextSpin = () => {

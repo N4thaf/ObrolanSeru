@@ -293,6 +293,16 @@ function generateCustomQuestions(rawPrompt: string, count: number = 20): string[
   ];
 }
 
+// Fisher-Yates Shuffle algorithm for true uniform randomness across all accounts & devices
+function fisherYatesShuffle<T>(arr: T[]): T[] {
+  const result = [...arr];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 export async function POST(request: Request) {
   try {
     const { topic = 'kenalan', customPrompt = '', count = 20, exclude = [] } = await request.json();
@@ -300,11 +310,12 @@ export async function POST(request: Request) {
     // Handle Custom AI Prompt Topic
     if (topic === 'ai_custom' && customPrompt) {
       const generated = generateCustomQuestions(customPrompt, count);
+      const shuffledCustom = fisherYatesShuffle(generated);
       return NextResponse.json({
         success: true,
         topic: 'ai_custom',
         customPrompt,
-        questions: generated,
+        questions: shuffledCustom,
       });
     }
 
@@ -319,8 +330,8 @@ export async function POST(request: Request) {
       availablePool = [...bank];
     }
 
-    // Shuffle available base questions safely
-    const shuffled = [...availablePool].sort(() => Math.random() - 0.5);
+    // Shuffle available base questions with true Fisher-Yates algorithm
+    const shuffled = fisherYatesShuffle(availablePool);
     const selectedQuestions = shuffled.slice(0, Math.min(count, shuffled.length));
 
     return NextResponse.json({
@@ -330,7 +341,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const fallbackBank = BASE_AI_BANKS['kenalan'];
-    const shuffled = [...fallbackBank].sort(() => Math.random() - 0.5);
+    const shuffled = fisherYatesShuffle(fallbackBank);
     return NextResponse.json({
       success: true,
       topic: 'kenalan',

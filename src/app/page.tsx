@@ -87,40 +87,41 @@ export default function Home() {
             <span className="font-extrabold text-xl tracking-tight text-[#257180] hidden sm:inline group-hover:text-[#FD8B51] transition-colors">ObrolanSeru</span>
           </Link>
 
-          {/* User Status Bar, Redeem Code & Toko */}
+          {/* User Status Bar, Prominent Toko & Redeem Code */}
           <div className="flex items-center gap-2 sm:gap-2.5">
             <GoogleAuthButton />
 
-            {/* Dedicated Standalone Redeem Code Button */}
+            {/* Secondary Subtle Redeem Code Button */}
             <button
               onClick={() => {
                 sound.playClick();
                 setShowStandaloneRedeem(true);
               }}
-              className="inline-flex items-center gap-1.5 text-xs font-black px-3.5 py-1.5 rounded-full bg-[#FAF3E0] text-[#257180] border-2 border-[#257180]/20 hover:bg-[#F2E5BF] hover:border-[#FD8B51]/50 transition cursor-pointer shadow-sm">
-              <Ticket className="w-3.5 h-3.5 text-[#FD8B51]" />
-              <span>Tukar Kode</span>
+              className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-extrabold px-3 py-1.5 rounded-full bg-[#FAF3E0] text-[#257180]/80 border border-[#257180]/20 hover:text-[#257180] hover:border-[#FD8B51]/40 transition cursor-pointer">
+              <Ticket className="w-3.5 h-3.5 text-[#FD8B51]/80" />
+              <span className="hidden sm:inline">Tukar Kode</span>
             </button>
 
             {/* Mode Status Indicator Badge */}
             {isPremium ? (
-              <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-black px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+              <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-black px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
                 <Crown className="w-3.5 h-3.5 text-amber-600" />
                 <span>VIP Premium</span>
               </span>
             ) : (
-              <button
-                onClick={() => setShowStandaloneRedeem(true)}
-                className="hidden sm:inline-flex items-center gap-1 text-[11px] font-black px-3 py-1.5 rounded-full bg-[#257180]/10 text-[#257180] border border-[#257180]/20 hover:bg-[#257180]/20 transition cursor-pointer">
+              <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-black px-3 py-1.5 rounded-full bg-[#257180]/10 text-[#257180]">
                 <Lock className="w-3 h-3 text-[#257180]" />
-                <span>Mode: Gratis</span>
-              </button>
+                <span>Mode Gratis</span>
+              </span>
             )}
 
-            {/* Toko Pass Button */}
-            <Link href="/store" className="flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-[#FD8B51] text-white hover:bg-[#e0753c] transition shadow-sm">
-              <ShoppingBag className="w-3.5 h-3.5" />
-              <span className="hidden xs:inline">Beli Pass</span>
+            {/* PROMINENT EYE-CATCHING TOKO PREMIUM BUTTON */}
+            <Link
+              href="/store"
+              onClick={() => sound.playClick()}
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-black px-4 py-2 rounded-full bg-gradient-to-r from-[#FD8B51] via-[#e0753c] to-[#CB6040] text-white hover:scale-105 active:scale-95 transition-all shadow-md shadow-orange-500/20 border border-white/20 cursor-pointer">
+              <ShoppingBag className="w-4 h-4 text-white" />
+              <span>Toko Premium</span>
             </Link>
           </div>
         </div>

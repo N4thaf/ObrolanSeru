@@ -87,19 +87,19 @@ export default function Home() {
             <span className="font-extrabold text-xl tracking-tight text-[#257180] hidden sm:inline group-hover:text-[#FD8B51] transition-colors">ObrolanSeru</span>
           </Link>
 
-          {/* User Status Bar, Prominent Toko & Redeem Code */}
+          {/* User Status Bar & Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-2.5">
             <GoogleAuthButton />
 
-            {/* Secondary Subtle Redeem Code Button */}
+            {/* Standalone Redeem Code Button */}
             <button
               onClick={() => {
                 sound.playClick();
                 setShowStandaloneRedeem(true);
               }}
-              className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-extrabold px-3 py-1.5 rounded-full bg-[#FAF3E0] text-[#257180]/80 border border-[#257180]/20 hover:text-[#257180] hover:border-[#FD8B51]/40 transition cursor-pointer">
-              <Ticket className="w-3.5 h-3.5 text-[#FD8B51]/80" />
-              <span className="hidden sm:inline">Tukar Kode</span>
+              className="inline-flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-[#FAF3E0] text-[#257180] border border-[#257180]/20 hover:border-[#FD8B51]/50 transition cursor-pointer">
+              <Ticket className="w-3.5 h-3.5 text-[#FD8B51]" />
+              <span>Tukar Kode</span>
             </button>
 
             {/* Mode Status Indicator Badge */}
@@ -115,12 +115,12 @@ export default function Home() {
               </span>
             )}
 
-            {/* PROMINENT EYE-CATCHING TOKO PREMIUM BUTTON */}
+            {/* Elegant Toko Premium Button Matching Size */}
             <Link
               href="/store"
               onClick={() => sound.playClick()}
-              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-black px-4 py-2 rounded-full bg-gradient-to-r from-[#FD8B51] via-[#e0753c] to-[#CB6040] text-white hover:scale-105 active:scale-95 transition-all shadow-md shadow-orange-500/20 border border-white/20 cursor-pointer">
-              <ShoppingBag className="w-4 h-4 text-white" />
+              className="inline-flex items-center gap-1.5 text-xs font-black px-3.5 py-1.5 rounded-full bg-[#FD8B51] text-white hover:bg-[#e0753c] transition shadow-sm cursor-pointer">
+              <ShoppingBag className="w-3.5 h-3.5 text-white" />
               <span>Toko Premium</span>
             </Link>
           </div>

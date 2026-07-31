@@ -48,8 +48,27 @@ export function parseGoogleJwt(token: string): any {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [isPremium, setIsPremium] = useState<boolean>(false);
+  
+  // Instant 0ms cache for isPremium to prevent refresh flickers
+  const [isPremium, setIsPremiumState] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("obrolan_is_premium") === "true";
+    }
+    return false;
+  });
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const setIsPremium = (val: boolean) => {
+    setIsPremiumState(val);
+    try {
+      if (val) {
+        localStorage.setItem("obrolan_is_premium", "true");
+      } else {
+        localStorage.removeItem("obrolan_is_premium");
+      }
+    } catch (e) {}
+  };
 
   // Helper to fetch user premium status from server database
   const syncAccountPremiumStatus = async (email: string) => {
@@ -62,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsPremium(false);
       }
     } catch (e) {
-      setIsPremium(false);
+      // Retain existing local premium status on network errors
     }
   };
 
@@ -75,6 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const parsed: UserProfile = JSON.parse(stored);
           if (parsed.email === "nathaf@gmail.com" || parsed.email === "pemain@gmail.com") {
             localStorage.removeItem("obrolan_user_session");
+            localStorage.removeItem("obrolan_is_premium");
             setUser(null);
             setIsPremium(false);
           } else {
@@ -134,6 +154,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const clean = code.trim().toUpperCase();
+
+    if (!clean) {
+      sound.playClick();
+      return {
+        success: false,
+        message: "Silakan masukkan kode redeem terlebih dahulu!",
+      };
+    }
+
     if (clean === "OS4FREE") {
       sound.playChime();
 
@@ -173,7 +202,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     sound.playClick();
     return {
       success: false,
-      message: "Kode promo tidak valid. Gunakan kode: OS4FREE",
+      message: `Kode promo "${clean}" tidak terdaftar. Periksa kembali kode yang kamu ketik!`,
     };
   };
 

@@ -211,6 +211,7 @@ function AllCardsDisplay({
   const playerCount = playerNames.length;
   const [dismissed, setDismissed] = useState<boolean[]>(new Array(playerCount).fill(false));
   const [activeModalIndex, setActiveModalIndex] = useState<number | null>(null);
+  const [activeQuestionText, setActiveQuestionText] = useState<string>('');
   const [isClosingModal, setIsClosingModal] = useState(false);
 
   // Timestamp guard & stable refs to prevent network race conditions from flickering local state
@@ -238,10 +239,12 @@ function AllCardsDisplay({
     const initialDismissed = new Array(playerCount).fill(false);
     setDismissed(initialDismissed);
     setActiveModalIndex(null);
+    setActiveQuestionText('');
 
     if (roomCode) {
       sendCardRoomSync({
         activeModalIndex: null,
+        activeQuestionText: '',
         dismissed: initialDismissed
       });
     }
@@ -276,6 +279,12 @@ function AllCardsDisplay({
           const gs = data.room.gameState;
           if (gs.activeModalIndex !== undefined && gs.activeModalIndex !== activeModalIndexRef.current) {
             setActiveModalIndex(gs.activeModalIndex);
+            if (gs.activeQuestionText) {
+              setActiveQuestionText(gs.activeQuestionText);
+            }
+          }
+          if (gs.activeQuestionText && !activeQuestionText) {
+            setActiveQuestionText(gs.activeQuestionText);
           }
           if (Array.isArray(gs.dismissed) && JSON.stringify(gs.dismissed) !== JSON.stringify(dismissedRef.current)) {
             setDismissed(gs.dismissed);
@@ -288,16 +297,20 @@ function AllCardsDisplay({
     }, 800);
 
     return () => clearInterval(interval);
-  }, [roomCode, setActivePlayerIndex]);
+  }, [roomCode, activeQuestionText, setActivePlayerIndex]);
 
   const handleOpenCard = (index: number) => {
     if (dismissed[index]) return;
     sound.playFlip();
     lastUserActionRef.current = Date.now();
+
+    const selectedQuestion = questions[index] || "Ceritakan satu momen paling berkesan dalam hidup kamu!";
+    setActiveQuestionText(selectedQuestion);
     setActiveModalIndex(index);
 
     sendCardRoomSync({
       activeModalIndex: index,
+      activeQuestionText: selectedQuestion,
       dismissed,
       activePlayerIndex
     });
@@ -498,7 +511,7 @@ function AllCardsDisplay({
               {/* Question Text */}
               <div className="my-auto z-10 px-2">
                 <p className="text-base sm:text-lg font-black text-[#257180] leading-relaxed tracking-tight">
-                  "{questions[activeModalIndex] || "Ceritakan satu momen paling berkesan dalam hidup kamu!"}"
+                  "{activeQuestionText || questions[activeModalIndex] || "Ceritakan satu momen paling berkesan dalam hidup kamu!"}"
                 </p>
               </div>
 

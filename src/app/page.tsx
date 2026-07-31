@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Play, Users, ShoppingBag, X, Coins, ShieldCheck, Check, Crown, HelpCircle, Share2, LogOut, User, FileText, Info, BookOpen, Lock, MessageSquare } from "lucide-react";
 import { BrandLogo } from "./components/BrandLogo";
 import { GoogleAuthButton } from "./components/GoogleAuthButton";
+import { LockedFeatureModal } from "./components/LockedFeatureModal";
+import { useAuth } from "@/context/AuthContext";
 
 /* Official User Color Palette */
 const C = {
@@ -24,9 +26,11 @@ interface UserAccount {
 }
 
 export default function Home() {
+  const { isPremium } = useAuth();
   const [showOnline, setShowOnline] = useState(false);
   const [showAccountBenefits, setShowAccountBenefits] = useState(false);
   const [showGoogleModal, setShowGoogleModal] = useState(false);
+  const [showRedeemModal, setShowRedeemModal] = useState(false);
   const [activeFooterModal, setActiveFooterModal] = useState<'about' | 'howToPlay' | 'privacy' | 'terms' | 'help' | null>(null);
   const [user, setUser] = useState<UserAccount | null>(null);
   const [copiedShare, setCopiedShare] = useState(false);
@@ -82,6 +86,21 @@ export default function Home() {
           {/* User Status Bar & Toko */}
           <div className="flex items-center gap-2 sm:gap-3">
             <GoogleAuthButton />
+
+            {/* Mode Status Indicator Badge */}
+            {isPremium ? (
+              <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-black px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                <Crown className="w-3.5 h-3.5 text-amber-600" />
+                <span>VIP Premium</span>
+              </span>
+            ) : (
+              <button
+                onClick={() => setShowRedeemModal(true)}
+                className="hidden sm:inline-flex items-center gap-1 text-[11px] font-black px-3 py-1.5 rounded-full bg-[#257180]/10 text-[#257180] border border-[#257180]/20 hover:bg-[#257180]/20 transition cursor-pointer">
+                <Lock className="w-3 h-3 text-[#257180]" />
+                <span>Mode: Gratis</span>
+              </button>
+            )}
 
             {/* Toko Pass Button */}
             <Link href="/store" className="flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-[#FD8B51] text-white hover:bg-[#e0753c] transition shadow-sm">
@@ -509,6 +528,12 @@ export default function Home() {
           </button>
         </div>
       </footer>
+
+      {/* Redeem Promo Code Modal */}
+      <LockedFeatureModal
+        isOpen={showRedeemModal}
+        onClose={() => setShowRedeemModal(false)}
+      />
 
     </div>
   );

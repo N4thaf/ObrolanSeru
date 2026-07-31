@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, RotateCcw, Heart, Smile, Sparkles, Compass, Moon, Home as HomeIcon, Clock, Rocket, Shuffle, MessageSquare, Dices, User, Users, Globe, Lock } from 'lucide-react';
 import { sound } from '@/utils/sound';
 import { useAuth } from '@/context/AuthContext';
+import { LockedFeatureModal } from '@/app/components/LockedFeatureModal';
 
 const C = {
   teal: "#257180",
@@ -17,15 +18,15 @@ const C = {
 };
 
 const TOPICS = [
-  { id: "kenalan",   name: "Kenalan Dulu",    desc: "Obrolan santai ketemu teman baru", icon: Smile },
-  { id: "absurd",    name: "Absurd Abis",     desc: "Pertanyaan random & kocak",        icon: Sparkles },
-  { id: "mix",       name: "Acak Topik",      desc: "Campuran semua topik seru",        icon: Shuffle },
-  { id: "deep",      name: "Deep Talk",       desc: "Diskusi bermakna & personal",      icon: Moon },
-  { id: "pasangan",  name: "Khusus Pasangan", desc: "Topik romantis buat couple",       icon: Heart },
-  { id: "keluarga",  name: "Keluarga",        desc: "Obrolan hangat sekeluarga",         icon: HomeIcon },
-  { id: "nostalgia", name: "Nostalgia",       desc: "Masa kecil & kenangan lalu",       icon: Clock },
-  { id: "whatif",    name: "What If...?",     desc: "Skenario imajinatif",              icon: Compass },
-  { id: "karir",     name: "Karir & Mimpi",   desc: "Cita-cita & perjalanan hidup",     icon: Rocket },
+  { id: "kenalan",   name: "Kenalan Dulu",    desc: "Obrolan santai ketemu teman baru", icon: Smile, free: true },
+  { id: "mix",       name: "Acak Topik",      desc: "Campuran semua topik seru",        icon: Shuffle, free: true },
+  { id: "absurd",    name: "Absurd Abis",     desc: "Pertanyaan random & kocak",        icon: Sparkles, free: false },
+  { id: "deep",      name: "Deep Talk",       desc: "Diskusi bermakna & personal",      icon: Moon, free: false },
+  { id: "pasangan",  name: "Khusus Pasangan", desc: "Topik romantis buat couple",       icon: Heart, free: false },
+  { id: "keluarga",  name: "Keluarga",        desc: "Obrolan hangat sekeluarga",         icon: HomeIcon, free: false },
+  { id: "nostalgia", name: "Nostalgia",       desc: "Masa kecil & kenangan lalu",       icon: Clock, free: false },
+  { id: "whatif",    name: "What If...?",     desc: "Skenario imajinatif",              icon: Compass, free: false },
+  { id: "karir",     name: "Karir & Mimpi",   desc: "Cita-cita & perjalanan hidup",     icon: Rocket, free: false },
 ];
 
 export const QUESTION_BANKS: Record<string, string[]> = {
@@ -111,7 +112,7 @@ function Header({ onBack, stepIndex, totalSteps }: { onBack: () => void; stepInd
 
 export default function OfflineSetup() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isPremium } = useAuth();
 
   const [step, setStep] = useState<'mode'|'todType'|'players'|'rounds'|'topic'>('mode');
   const [selectedMode, setSelectedMode] = useState<'pertanyaan'|'tod'>('pertanyaan');
@@ -120,6 +121,7 @@ export default function OfflineSetup() {
   const [playerCount, setPlayerCount] = useState(2);
   const [playerNames, setPlayerNames] = useState<string[]>(['Pemain 1', 'Pemain 2']);
   const [rounds, setRounds] = useState(3);
+  const [lockedModalTitle, setLockedModalTitle] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?.name) {
@@ -418,20 +420,40 @@ export default function OfflineSetup() {
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {TOPICS.map(t => {
                   const selected = selectedTopic === t.id;
+                  const isLocked = !t.free && !isPremium;
                   const IconComp = t.icon;
                   return (
                     <button key={t.id}
-                      onClick={() => { sound.playClick(); setSelectedTopic(t.id); }}
+                      onClick={() => {
+                        sound.playClick();
+                        if (isLocked) {
+                          setLockedModalTitle(t.name);
+                        } else {
+                          setSelectedTopic(t.id);
+                        }
+                      }}
                       className={`relative p-3.5 rounded-2xl border-2 transition flex flex-col items-center justify-center text-center cursor-pointer ${
-                        selected ? 'bg-[#F2E5BF] border-[#FD8B51]' : 'bg-[#FAF3E0] border-[#257180]/15 hover:bg-[#F2E5BF]/50'
+                        isLocked
+                          ? 'bg-[#F2E5BF]/40 border-[#257180]/15 opacity-90 hover:border-[#FD8B51]/50'
+                          : selected
+                          ? 'bg-[#F2E5BF] border-[#FD8B51]'
+                          : 'bg-[#FAF3E0] border-[#257180]/15 hover:bg-[#F2E5BF]/50'
                       }`}>
-                      <div className="w-11 h-11 rounded-xl bg-[#257180]/10 flex items-center justify-center mb-2.5">
+                      <div className="w-11 h-11 rounded-xl bg-[#257180]/10 flex items-center justify-center mb-2.5 relative">
                         <IconComp className="w-5 h-5 text-[#257180]" />
                       </div>
                       <div className="font-extrabold text-xs sm:text-sm text-[#257180] leading-tight text-center w-full">{t.name}</div>
                       <div className="text-[11px] font-medium text-[#257180]/65 mt-0.5 leading-tight text-center w-full">{t.desc}</div>
 
-                      {selected && (
+                      {/* Locked Premium Badge (Chain & Padlock) */}
+                      {isLocked && (
+                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-[#FD8B51] text-white text-[9px] font-black flex items-center gap-1 shadow-sm">
+                          <Lock className="w-2.5 h-2.5" />
+                          <span>Locked</span>
+                        </div>
+                      )}
+
+                      {selected && !isLocked && (
                         <div className="absolute top-2.5 right-2.5 w-4.5 h-4.5 rounded-full bg-[#FD8B51] text-[#FAF3E0] flex items-center justify-center text-[10px] font-black">
                           ✓
                         </div>
@@ -451,6 +473,13 @@ export default function OfflineSetup() {
 
         </div>
       </main>
+
+      {/* Locked Premium Feature Redeem Modal */}
+      <LockedFeatureModal
+        isOpen={!!lockedModalTitle}
+        onClose={() => setLockedModalTitle(null)}
+        featureTitle={lockedModalTitle || undefined}
+      />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Check, Clock, Calendar, Crown, ShieldCheck } from "lucide-react";
 import { BrandLogo } from "../components/BrandLogo";
+import { useAuth } from "@/context/AuthContext";
 
 /* Official User Color Palette (Warm Sunset & Deep Teal - Zero Cold White - Zero Emojis) */
 const C = {
@@ -198,12 +199,15 @@ export default function StorePage() {
                     backgroundColor: isBought ? "#6B8E94" : pkg.ctaBg,
                     color: isBought ? "#FAF3E0" : pkg.ctaText,
                   }}>
-                  {isBought ? "Pass Aktif ✓" : `Beli ${pkg.name}`}
+                  {isBought ? "✓ Pass Aktif" : "Pilih Pass Ini"}
                 </button>
               </div>
             );
           })}
         </div>
+
+        {/* Dedicated Redeem Code Section (OS4FREE) */}
+        <StoreRedeemBox />
 
         {/* Footer Guarantee Info Box */}
         <div className="bg-[#FAF3E0] rounded-2xl p-4 border border-[#257180]/15 text-center text-xs font-bold text-[#257180]/70 max-w-xl mx-auto flex items-center justify-center gap-2">
@@ -211,6 +215,61 @@ export default function StorePage() {
           <span>Pembayaran aman via Midtrans &amp; GPay. Pass otomatis aktif seketika setelah pembayaran terverifikasi.</span>
         </div>
       </main>
+    </div>
+  );
+}
+
+function StoreRedeemBox() {
+  const { redeemCode, isPremium } = useAuth();
+  const [code, setCode] = useState("OS4FREE");
+  const [msg, setMsg] = useState<{ success: boolean; text: string } | null>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = redeemCode(code);
+    setMsg({ success: res.success, text: res.message });
+  };
+
+  return (
+    <div className="bg-[#FAF3E0] rounded-[32px] p-6 sm:p-8 border-2 border-[#257180]/20 shadow-lg max-w-2xl mx-auto space-y-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="text-center sm:text-left space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#257180]/10 text-[#257180] text-[11px] font-black">
+            <span>🎟️ Punya Kode Voucher / Promo?</span>
+          </div>
+          <h3 className="text-xl font-black text-[#257180]">Tukarkan Kode Promo</h3>
+          <p className="text-xs font-semibold text-[#257180]/75">
+            Gunakan kode <strong className="text-[#FD8B51]">OS4FREE</strong> untuk mengaktifkan seluruh Mode &amp; Topik Premium GRATIS!
+          </p>
+        </div>
+
+        {isPremium && (
+          <div className="px-4 py-2 rounded-2xl bg-green-100 border border-green-300 text-green-800 font-extrabold text-xs flex-shrink-0">
+            ✓ Status VIP Aktif
+          </div>
+        )}
+      </div>
+
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+        <input
+          type="text"
+          value={code}
+          onChange={(e) => setCode(e.target.value.toUpperCase())}
+          placeholder="Ketik kode: OS4FREE"
+          className="flex-1 px-4 py-3.5 rounded-2xl bg-white border-2 border-[#257180]/20 text-sm font-black tracking-widest text-[#257180] outline-none uppercase placeholder:normal-case placeholder:font-semibold placeholder:tracking-normal placeholder:text-[#257180]/40 focus:border-[#257180]"
+        />
+        <button
+          type="submit"
+          className="px-6 py-3.5 rounded-2xl font-black text-xs text-white bg-[#257180] hover:bg-[#1d5966] transition shadow-md cursor-pointer whitespace-nowrap">
+          Gunakan Kode
+        </button>
+      </form>
+
+      {msg && (
+        <div className={`p-3 rounded-2xl text-xs font-black ${msg.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          {msg.text}
+        </div>
+      )}
     </div>
   );
 }

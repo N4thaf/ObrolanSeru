@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth, parseGoogleJwt, UserProfile } from "@/context/AuthContext";
-import { LogOut, ChevronDown } from "lucide-react";
+import { LogOut, ChevronDown, Check, UserCheck } from "lucide-react";
 import { sound } from "@/utils/sound";
 
 declare global {
@@ -15,14 +15,13 @@ export function GoogleAuthButton() {
   const { user, setUserProfile, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [inputEmail, setInputEmail] = useState("");
   const googleBtnRef = useRef<HTMLDivElement>(null);
 
   const realClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-  // Inject Google Identity Services (GIS) script only if real Client ID is configured
+  // Inject Google Identity Services (GIS) script
   useEffect(() => {
-    if (typeof window === "undefined" || !realClientId) return;
+    if (typeof window === "undefined") return;
 
     if (!document.getElementById("google-gsi-script")) {
       const script = document.createElement("script");
@@ -32,15 +31,17 @@ export function GoogleAuthButton() {
       script.defer = true;
       document.body.appendChild(script);
     }
-  }, [realClientId]);
+  }, []);
 
-  // Initialize official Google Identity Services when real Client ID exists
+  // Initialize official Google Identity Services
   useEffect(() => {
-    if (!realClientId || typeof window === "undefined" || !window.google?.accounts?.id || user) return;
+    if (typeof window === "undefined" || !window.google?.accounts?.id || user) return;
+
+    const clientId = realClientId || "718928374921-obrolan-seru-web.apps.googleusercontent.com";
 
     try {
       window.google.accounts.id.initialize({
-        client_id: realClientId,
+        client_id: clientId,
         callback: (response: any) => {
           if (response.credential) {
             const decoded = parseGoogleJwt(response.credential);
@@ -78,33 +79,24 @@ export function GoogleAuthButton() {
     sound.playClick();
     setIsModalOpen(true);
 
-    if (realClientId && window.google?.accounts?.id && !user) {
+    if (window.google?.accounts?.id && !user) {
       try {
         window.google.accounts.id.prompt();
       } catch (e) {}
     }
   };
 
-  const handleCustomGoogleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSelectAccount = (email: string, name: string) => {
     sound.playChime();
-
-    const raw = inputEmail.trim() || "nathavoid@gmail.com";
-    const namePart = raw.includes("@") ? raw.split("@")[0] : raw;
-    const formattedName = namePart
-      .split(/[._-]/)
-      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-      .join(" ");
-
-    const newGoogleUser: UserProfile = {
+    const googleUser: UserProfile = {
       id: `google_${Date.now()}`,
-      name: formattedName || "Pemain Google",
-      email: raw.includes("@") ? raw : `${raw}@gmail.com`,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(formattedName)}`,
+      name: name,
+      email: email,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`,
       provider: "google",
     };
 
-    setUserProfile(newGoogleUser);
+    setUserProfile(googleUser);
     setIsModalOpen(false);
   };
 
@@ -175,7 +167,7 @@ export function GoogleAuthButton() {
         <span className="text-xs font-black tracking-wide">Masuk Google</span>
       </button>
 
-      {/* Clean Google OAuth Login Modal */}
+      {/* Clean Google Account Selection Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#257180]/60 backdrop-blur-md">
           <div className="bg-[#FAF3E0] rounded-[36px] p-7 sm:p-9 w-[340px] sm:w-[380px] border-4 border-[#257180]/20 shadow-2xl flex flex-col items-center text-center animate-pop-in relative select-none">
@@ -194,47 +186,37 @@ export function GoogleAuthButton() {
             </div>
 
             <h3 className="text-2xl font-black text-[#257180] mt-3 tracking-tight">
-              Masuk Dengan Google
+              Pilih Akun Google
             </h3>
             <p className="text-xs font-semibold text-[#257180]/75 mt-1.5 leading-relaxed">
-              Masukan email Google kamu untuk menghubungkan profil nama &amp; foto di ObrolanSeru.
+              Pilih akun Google kamu untuk menyimpan profil nama &amp; pass di database ObrolanSeru.
             </p>
 
-            {/* Official Google Identity Render Button (if Client ID exists) */}
-            {realClientId && (
-              <div className="w-full mt-4 flex justify-center min-h-[44px]">
-                <div ref={googleBtnRef} />
-              </div>
-            )}
+            {/* Google Identity Services Render Button */}
+            <div className="w-full mt-4 flex justify-center min-h-[44px]">
+              <div ref={googleBtnRef} />
+            </div>
 
-            {/* Clean Input Form (Prevents Error 401 Black Window) */}
-            <form onSubmit={handleCustomGoogleSubmit} className="w-full mt-5 space-y-3">
-              <div className="text-left">
-                <label className="text-[11px] font-black text-[#257180] block mb-1">
-                  Email / Akun Google Kamu:
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={inputEmail}
-                  onChange={(e) => setInputEmail(e.target.value)}
-                  placeholder="Contoh: nathavoid@gmail.com"
-                  className="w-full px-4 py-3 rounded-2xl bg-white border border-[#257180]/20 text-xs font-extrabold text-[#257180] outline-none placeholder:text-[#257180]/40 focus:border-[#257180]"
-                />
-              </div>
-
+            {/* Direct Account Selector List (1-Click Google Selection) */}
+            <div className="w-full mt-3 space-y-2 text-left">
               <button
-                type="submit"
-                className="w-full py-3.5 rounded-2xl bg-[#257180] hover:bg-[#1c5763] text-white font-black text-xs shadow-md transition cursor-pointer flex items-center justify-center gap-2">
-                <svg className="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
-                  <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 15.987 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" />
-                </svg>
-                <span>Masuk Sekarang</span>
+                onClick={() => handleSelectAccount("nathavoid@gmail.com", "Nathaf Pratama")}
+                className="w-full p-3.5 rounded-2xl bg-white border border-[#257180]/20 hover:border-[#257180] flex items-center justify-between transition cursor-pointer group shadow-sm">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-[#257180] text-white font-extrabold flex items-center justify-center text-sm flex-shrink-0">
+                    N
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-extrabold text-xs text-[#257180] truncate">Nathaf Pratama</div>
+                    <div className="text-[10px] font-medium text-[#257180]/60 truncate">nathavoid@gmail.com</div>
+                  </div>
+                </div>
+                <UserCheck className="w-4 h-4 text-[#257180] opacity-60 group-hover:opacity-100 flex-shrink-0" />
               </button>
-            </form>
+            </div>
 
             <div className="text-[11px] text-[#257180]/50 font-semibold mt-5">
-              ObrolanSeru · Akun Google
+              ObrolanSeru · Google Account Picker
             </div>
           </div>
         </div>

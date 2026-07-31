@@ -267,36 +267,41 @@ function AllCardsDisplay({
     } catch (e) {}
   };
 
-  // Poll room state safely with local action guard (0 network race flicker)
+  // Poll room state in real-time (300ms) for 100% identical cross-device sync
   useEffect(() => {
     if (!roomCode) return;
     const interval = setInterval(async () => {
-      // If user performed an action in the last 2.5s, skip GET sync to prevent network flicker
-      if (Date.now() - lastUserActionRef.current < 2500) return;
-
       try {
         const res = await fetch(`/api/room?code=${roomCode}`);
         const data = await res.json();
         if (data.success && data.room && data.room.gameState) {
           const gs = data.room.gameState;
+          
+          // 1. Sync active card modal index (open or close)
           if (gs.activeModalIndex !== undefined && gs.activeModalIndex !== activeModalIndexRef.current) {
             setActiveModalIndex(gs.activeModalIndex);
-            if (gs.activeQuestionText) {
-              setActiveQuestionText(gs.activeQuestionText);
+            if (gs.activeModalIndex === null) {
+              setIsClosingModal(false);
             }
           }
-          if (gs.activeQuestionText && !activeQuestionText) {
+
+          // 2. Sync question text
+          if (gs.activeQuestionText && gs.activeQuestionText !== activeQuestionText) {
             setActiveQuestionText(gs.activeQuestionText);
           }
+
+          // 3. Sync dismissed cards array across all devices
           if (Array.isArray(gs.dismissed) && JSON.stringify(gs.dismissed) !== JSON.stringify(dismissedRef.current)) {
             setDismissed(gs.dismissed);
           }
+
+          // 4. Sync active turn player index
           if (gs.activePlayerIndex !== undefined && gs.activePlayerIndex !== activePlayerIndexRef.current) {
             setActivePlayerIndex(gs.activePlayerIndex);
           }
         }
       } catch (e) {}
-    }, 800);
+    }, 300);
 
     return () => clearInterval(interval);
   }, [roomCode, activeQuestionText, setActivePlayerIndex]);
@@ -304,7 +309,6 @@ function AllCardsDisplay({
   const handleOpenCard = (index: number) => {
     if (dismissed[index]) return;
     sound.playFlip();
-    lastUserActionRef.current = Date.now();
 
     const selectedQuestion = questions[index] || "Ceritakan satu momen paling berkesan dalam hidup kamu!";
     setActiveQuestionText(selectedQuestion);
@@ -321,29 +325,27 @@ function AllCardsDisplay({
   const handleLanjut = () => {
     if (activeModalIndex === null) return;
     sound.playClick();
-    lastUserActionRef.current = Date.now();
     setIsClosingModal(true);
 
-    setTimeout(() => {
-      const targetIdx = activeModalIndex;
-      const nextDismissed = [...dismissed];
-      nextDismissed[targetIdx] = true;
-      setDismissed(nextDismissed);
+    const targetIdx = activeModalIndex;
+    const nextDismissed = [...dismissed];
+    nextDismissed[targetIdx] = true;
+    setDismissed(nextDismissed);
 
-      if (nextDismissed.every(Boolean)) setTimeout(() => sound.playChime(), 150);
+    if (nextDismissed.every(Boolean)) setTimeout(() => sound.playChime(), 150);
 
-      const nextActivePlayer = (activePlayerIndex + 1) % playerCount;
-      setActivePlayerIndex(nextActivePlayer);
-      setActiveModalIndex(null);
-      setIsClosingModal(false);
+    const nextActivePlayer = (activePlayerIndex + 1) % playerCount;
+    setActivePlayerIndex(nextActivePlayer);
+    setActiveModalIndex(null);
+    setIsClosingModal(false);
 
-      // Sync dismissal & modal close across all playing devices
-      sendCardRoomSync({
-        activeModalIndex: null,
-        dismissed: nextDismissed,
-        activePlayerIndex: nextActivePlayer
-      });
-    }, 280);
+    // Broadcast card modal close & card dismissal to ALL room devices in real-time
+    sendCardRoomSync({
+      activeModalIndex: null,
+      activeQuestionText: '',
+      dismissed: nextDismissed,
+      activePlayerIndex: nextActivePlayer
+    });
   };
 
   const activeName = playerNames[activePlayerIndex] || `Pemain ${activePlayerIndex + 1}`;

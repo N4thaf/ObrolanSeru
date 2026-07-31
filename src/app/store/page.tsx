@@ -27,10 +27,10 @@ const PASS_PACKAGES = [
     badge: null,
     icon: Zap,
     features: [
-      "Akses seluruh 9+ topik obrolan",
+      "Akses seluruh 10+ topik obrolan & mode game",
+      "Truth or Dare Jarak Jauh (Online)",
       "Main sepuasnya selama 3 jam",
-      "Cocok untuk 1x nongkrong santai",
-      "Tanpa batas ronde permainan"
+      "Cocok untuk 1x nongkrong santai"
     ],
     border: "#257180",
     bg: "#FAF3E0",
@@ -46,10 +46,10 @@ const PASS_PACKAGES = [
     badge: "Hemat 50%",
     icon: Timer,
     features: [
-      "Akses seluruh 9+ topik obrolan",
+      "Akses seluruh 10+ topik obrolan & mode game",
+      "Truth or Dare Jarak Jauh (Online)",
       "Main sepuasnya selama 10 jam",
-      "Cocok untuk maraton kumpul seharian",
-      "Akses AI Question Generator"
+      "Akses Racikan AI Custom Topic"
     ],
     border: "#E0753C",
     bg: "#FAF3E0",
@@ -65,10 +65,10 @@ const PASS_PACKAGES = [
     badge: "Pilihan Populer",
     icon: Calendar,
     features: [
-      "Akses seluruh 9+ topik obrolan",
+      "Akses seluruh 10+ topik obrolan & mode game",
+      "Truth or Dare Jarak Jauh (Online)",
       "Bebas main selama 7 hari penuh",
-      "Cocok untuk liburan & trip bareng",
-      "Akses fitur AI & pembaharuan topik"
+      "Akses Racikan AI Custom Topic"
     ],
     border: "#FD8B51",
     bg: "#FAF3E0",
@@ -87,7 +87,7 @@ const PASS_PACKAGES = [
       "Akses SELURUH topik & mode game",
       "Truth or Dare Jarak Jauh (Online)",
       "Bebas main tanpa batas 30 hari",
-      "Pengalaman VIP paling hemat"
+      "Akses Racikan AI Custom Topic"
     ],
     border: "#CB6040",
     bg: "#FAF3E0",
@@ -203,11 +203,11 @@ export default function StorePage() {
         <div className="bg-[#FAF3E0] rounded-[32px] p-8 border-2 border-[#FD8B51]/30 shadow-lg text-center max-w-3xl mx-auto space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#FD8B51]/15 text-[#CB6040] text-xs font-black mb-1">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Pembayaran Resmi DOKU (QRIS &amp; E-Wallet)</span>
+            <span>Pembayaran Instan via QRIS</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black text-[#257180] tracking-tight">Pilih Pass Akses Obrolan Kamu</h2>
           <p className="text-xs sm:text-sm font-semibold text-[#257180]/75 max-w-xl mx-auto">
-            Tanpa ribet sistem koin. Cukup pilih pass 3 jam, 10 jam, 1 minggu, atau 1 bulan untuk membuka seluruh topik obrolan sepuasnya!
+            Pilih pass 3 jam, 10 jam, 1 minggu, atau 1 bulan untuk membuka seluruh topik obrolan sepuasnya!
           </p>
         </div>
 
@@ -275,7 +275,7 @@ export default function StorePage() {
                   </ul>
                 </div>
 
-                {/* DOKU Real Checkout Action Button */}
+                {/* Real Checkout Action Button */}
                 <button
                   onClick={() => handleCheckout(pkg)}
                   disabled={isLoadingThis || (isPremium && pkg.id === "pass_1bulan")}
@@ -287,12 +287,12 @@ export default function StorePage() {
                   {isLoadingThis ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Menghubungkan DOKU...</span>
+                      <span>Menghubungkan QRIS...</span>
                     </>
                   ) : isPremium && pkg.id === "pass_1bulan" ? (
                     "✓ Pass VIP Aktif"
                   ) : (
-                    "Bayar via DOKU / QRIS →"
+                    "Bayar via QRIS →"
                   )}
                 </button>
               </div>

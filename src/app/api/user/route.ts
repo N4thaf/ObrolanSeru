@@ -93,9 +93,17 @@ export async function POST(req: Request) {
       roomsJoined: (existing.roomsJoined || 0) + 1,
     };
 
-    if (redeemCode && !updatedUser.redeemedCodes.includes(redeemCode.toUpperCase())) {
-      updatedUser.redeemedCodes.push(redeemCode.toUpperCase());
-      if (redeemCode.toUpperCase() === "OS4FREE") {
+    if (redeemCode) {
+      const cleanCode = redeemCode.trim().toUpperCase();
+      if (existing.redeemedCodes && existing.redeemedCodes.includes(cleanCode)) {
+        return NextResponse.json({
+          success: false,
+          alreadyRedeemed: true,
+          message: `Kode promo ${cleanCode} sudah pernah kamu gunakan di akun email ${cleanEmail}. Setiap akun hanya dapat menggunakan 1x.`
+        }, { status: 400 });
+      }
+      updatedUser.redeemedCodes.push(cleanCode);
+      if (cleanCode === "OS4FREE") {
         updatedUser.isPremium = true;
       }
     }

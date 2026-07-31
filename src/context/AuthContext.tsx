@@ -189,14 +189,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             success: true,
             message: `Selamat ${user.name}! Kode OS4FREE berhasil mengaktifkan Pass Gratis 3 Jam untuk akun ${user.email}. Seluruh topik terbuka selama 3 jam!`,
           };
+        } else {
+          sound.playClick();
+          return {
+            success: false,
+            message: data.message || `Kode promo OS4FREE sudah pernah kamu gunakan di akun email ${user.email}. Setiap akun hanya dapat menggunakan 1x.`
+          };
         }
-      } catch (e) {}
-
-      setIsPremium(true);
-      return {
-        success: true,
-        message: `Selamat ${user.name}! Kode OS4FREE berhasil mengaktifkan Pass Gratis 3 Jam untuk akun ${user.email}!`,
-      };
+      } catch (e) {
+        sound.playClick();
+        return {
+          success: false,
+          message: "Terjadi kesalahan saat memproses penukaran kode promo."
+        };
+      }
     }
 
     sound.playClick();

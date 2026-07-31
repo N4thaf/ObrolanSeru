@@ -109,13 +109,18 @@ export async function POST(req: Request) {
       });
     }
 
+    const errorMessage =
+      dokuData?.error?.message ||
+      dokuData?.message ||
+      (typeof dokuData === "object" ? JSON.stringify(dokuData) : "Gagal membuat transaksi DOKU");
+
     return NextResponse.json(
       {
         success: false,
-        message: dokuData.message || "Gagal membuat transaksi DOKU",
+        message: `DOKU Error: ${errorMessage}`,
         details: dokuData,
       },
-      { status: 500 }
+      { status: 400 }
     );
   } catch (error: any) {
     return NextResponse.json(

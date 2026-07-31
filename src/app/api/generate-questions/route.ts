@@ -103,98 +103,95 @@ const BASE_AI_BANKS: Record<string, string[]> = {
   ],
   tod_dare_online: [
     "Kirim pesan singkat ke kontak ke-5 di HP kamu: 'Aku mau bicara sesuatu penting banget.'",
-    "Perlihatkan foto paling konyol di galeri HP kamu lewat kamera atau share screen!",
+    "Perlihatkan foto paling konyol yang ada di galeri HP kamu lewat kamera / share screen!",
     "Kirimkan voice note menyapa teman kamu di WhatsApp dengan suara paling menggemaskan!"
   ]
 };
 
-// Clean Custom AI Question Synthesizer without robotic prefixes or double quotes
+// Natural Custom AI Question Synthesizer (Zero robotic prefixes)
 function generateCustomQuestions(rawPrompt: string, count: number = 20): string[] {
   const p = rawPrompt.trim().toLowerCase();
-  
-  // Clean raw prompt string for display
-  const cleanTopic = rawPrompt.replace(/["']/g, '').trim();
 
-  // Category 1: Sedih / Curhat / Jujur-Jujuran / Deep Heart-to-Heart
-  if (p.includes("sedih") || p.includes("jujur") || p.includes("curhat") || p.includes("rahasia") || p.includes("penyesalan") || p.includes("luka")) {
+  // Intent 1: Konyol / Lucu / Receh / Teman Lama / Sekolah / Alumni / Reuni / Aib / Memalukan
+  if (p.includes("konyol") || p.includes("lucu") || p.includes("receh") || p.includes("aib") || p.includes("memalukan") || p.includes("teman lama") || p.includes("sekolah") || p.includes("alumni") || p.includes("reuni") || p.includes("gokil") || p.includes("ngakak")) {
     return [
-      "Apa kebohongan paling menyakitkan yang pernah kamu katakan demi melindungi perasaan orang lain?",
-      "Kapan momen terakhir kali kamu merasa benar-benar kesepian atau merasa tidak ada orang yang mengerti kamu?",
-      "Apa kenangan pahit atau kekecewaan masa lalu yang sampai hari ini belum bisa kamu maafkan sepenuhnya?",
-      "Ceritakan satu penyesalan terbesar dalam hidup kamu yang kalau bisa diputar waktu ingin kamu ubah!",
+      "Siapa teman lama di sini yang paling sering janji 'otw' padahal sebenarnya baru banget bangun tidur?",
+      "Foto jaman sekolah atau gaya rambut masa lalu mana yang kalau kamu lihat lagi sekarang bikin tengsin setengah mati?",
+      "Hal paling konyol atau bodoh yang pernah kalian lakukan bareng pas bolos sekolah atau nongkrong dulu?",
+      "Siapa teman yang paling sering pura-pura mengerti pelajaran di kelas padahal otaknya kosong sama sekali?",
+      "Ceritakan pengalaman paling memalukan atau salah tingkah yang pernah kamu alami di depan gebetan jaman sekolah!",
+      "Siapa orang pertama di antara kalian yang paling sering kena marah guru atau kedapatan ketiduran di kelas?",
+      "Hal paling konyol atau tidak berguna apa yang pernah kamu beli pas pertama kali pegang uang sendiri?",
+      "Ceritakan momen ketika kamu salah kirim pesan ke grup yang salah dan isinya bikin malu banget!",
+      "Siapa teman yang dari dulu sampai sekarang gaya bicaranya paling heboh dan tidak pernah berubah?",
+      "Apa kebohongan receh jaman sekolah yang dulu kamu percayai 100% tapi ternyata cuma gosip konyol?",
+      "Pengalaman salah kostum atau salah pakai baju paling kocak yang pernah kamu alami saat menghadiri acara?",
+      "Siapa teman yang paling sering lupa bawa dompet atau pura-pura ga punya uang pas jam makan siang?",
+      "Hal teraneh atau kebiasaan konyol apa yang cuma teman dekat kamu yang tahu dan ga pernah kamu ceritakan ke orang lain?",
+      "Siapa yang paling sering punya julukan konyol jaman sekolah dan dari mana asal-usul nama julukan itu?",
+      "Ceritakan saat kamu tertawa paling kencang sampai keluar air mata karena kelakuan konyol teman kamu!",
+      "Kalau kalian semua terdampar di pulau terpencil, siapa teman di sini yang bakal panik duluan dan paling heboh?",
+      "Gaya joget atau gerakan kocak seperti apa yang pernah kamu lakukan saat lagi bahagia banget?",
+      "Siapa teman yang paling jago bikin alasan ngaco kalau diajak kumpul tapi malas keluar rumah?",
+      "Apa barang paling aneh atau barang bekas konyol yang sampai sekarang masih kamu simpan di kamar?",
+      "Kalau ada lomba kelakuan paling receh, siapa di antara kalian yang pasti menang juara 1?"
+    ];
+  }
+
+  // Intent 2: Sedih / Galau / Emosional / Tangis / Duka / Patah Hati / Kesepian / Kecewa
+  if (p.includes("sedih") || p.includes("galau") || p.includes("emosional") || p.includes("tangis") || p.includes("duka") || p.includes("patah hati") || p.includes("kecewa") || p.includes("sepi") || p.includes("kesepian") || p.includes("luka") || p.includes("nangis")) {
+    return [
+      "Apa momen dalam hidup kamu yang paling membuat kamu menangis sesenggukan dan merasa sangat terpukul?",
+      "Kapan kali terakhir kamu merasa benar-benar kesepian dan merasa tidak ada satu orang pun yang mengerti perasaanmu?",
+      "Apa kekecewaan atau rasa sakit masa lalu yang sampai hari ini masih sering membekas di hati kamu?",
+      "Siapa sosok yang paling kamu rindukan saat ini, namun kamu sadar kamu tidak bisa memeluknya lagi?",
+      "Hal paling berat apa yang sedang kamu pikul sendirian saat ini tanpa ada satu orang pun yang tahu?",
+      "Pernahkah kamu menyembunyikan rasa sedih di balik senyuman saat sedang kumpul bersama teman-teman?",
+      "Apa penyesalan terbesar dalam hidup kamu yang kalau waktu bisa diputar balik ingin sekali kamu perbaiki?",
+      "Ceritakan momen ketika kamu merasa sangat kecewa dengan seseorang yang sangat kamu percayai!",
+      "Apa kalimat atau perkataan orang lain yang pernah membuat kamu sangat terluka dan teringat sampai sekarang?",
       "Hal apa dari diri kamu sendiri yang paling sering membuat kamu merasa lelah secara emosional?",
-      "Pernahkah kamu menyembunyikan rasa sedih mendalam di balik senyuman di depan teman-teman? Kapan momen itu?",
-      "Siapa sosok yang paling kamu rindukan saat ini tapi kamu sadar tidak bisa bersamanya lagi?",
-      "Apa hal paling berat yang sedang kamu pikul sendirian saat ini tanpa ada satu pun orang yang tahu?",
-      "Ceritakan momen ketika kamu merasa sangat kecewa dengan seseorang yang paling kamu percayai!",
-      "Apa ketakutan terbesar kamu jika masa depan tidak berjalan sesuai dengan apa yang kamu perjuangkan?",
-      "Pernahkah kamu pura-pura bahagia atau baik-baik saja demi membuat orang di sekitar kamu tidak khawatir?",
+      "Pernahkah kamu merasa berada di titik terendah sampai bingung harus melangkah ke mana lagi?",
+      "Apa kebohongan paling menyakitkan yang pernah kamu ucapkan demi melindungi perasaan orang lain?",
+      "Siapa orang yang paling kamu harapkan hadir dan merangkul kamu saat kamu sedang merasa hancur?",
+      "Apa ketakutan terbesar kamu jika masa depan tidak berjalan sesuai dengan apa yang kamu impikan?",
       "Hal apa yang paling sering membuat kamu merasa berkecil hati saat membandingkan diri dengan orang lain?",
-      "Apa kata-kata atau tangisan yang paling membekas dan pernah membuat kamu terpukul dalam hidup?",
-      "Siapa orang yang paling ingin kamu mintai maaf saat ini jika kamu punya keberanian penuh?",
-      "Apa mimpi atau harapan kamu yang dulu sangat kamu inginkan, namun terpaksa harus kamu relakan?",
-      "Ceritakan satu keputusasaan terberat dalam hidup kamu dan apa yang membuat kamu tetap bertahan sampai hari ini!",
-      "Apa pujian atau kalimat penyemangat yang paling kamu butuhkan untuk didengar saat ini?",
-      "Hal apa dari masa lalu yang paling sering membuat kamu terbangun di malam hari sambil merenung?",
-      "Siapa sosok yang paling kamu harapkan hadir dan merangkul kamu saat kamu sedang merasa terpuruk?",
-      "Apa pesan tulus yang ingin kamu sampaikan ke diri kamu sendiri untuk menguatkan langkah kamu ke depan?"
+      "Ceritakan satu mimpi atau harapan besar kamu yang terpaksa harus kamu kubur dan kamu relakan!",
+      "Apa pujian atau kalimat penguatan yang paling ingin kamu dengar saat ini saat sedang lelah?",
+      "Pernahkah kamu menangis sendirian di kamar malam hari tanpa ingin siapapun mendengar? Kapan itu?",
+      "Satu hal apa dari masa lalu kamu yang sampai sekarang masih berusaha kamu maafkan dan ikhlaskan?",
+      "Apa pesan tulus yang ingin kamu sampaikan ke diri sendiri agar tetap kuat menghadapi hari esok?"
     ];
   }
 
-  // Category 2: Liburan / Trip / Jalan-Jalan / Kuliner
-  if (p.includes("liburan") || p.includes("trip") || p.includes("bali") || p.includes("jalan") || p.includes("pantai") || p.includes("wisata") || p.includes("kuliner")) {
+  // Intent 3: Horor / Mistis / Takut / Angker / Hantu / Gaib
+  if (p.includes("horor") || p.includes("mistis") || p.includes("takut") || p.includes("angker") || p.includes("hantu") || p.includes("gaib") || p.includes("seram") || p.includes("setan")) {
     return [
-      `Momen liburan atau perjalanan mana yang paling berkesan dan paling membuat kamu bahagia sepanjang hidup?`,
-      `Makanan lokal atau kuliner paling enak dan unik yang wajib dicoba kalau berkunjung ke tempat favorit kamu?`,
-      `Seandainya kita buat trip impulsif bareng esok hari, destinasi impian pertama yang ingin kamu tuju ke mana?`,
-      `Ceritakan pengalaman paling konyol atau kejadian salah rencana saat kamu sedang liburan bareng teman!`,
-      `Kalau kamu disuruh memilih 1 teman di meja ini untuk jadi tour guide liburan, kamu bakal pilih siapa dan kenapa?`,
-      `Apa barang paling wajib dan ga boleh ketinggalan sama sekali di dalam tas kamu pas lagi traveling?`,
-      `Koleksi foto atau kenangan mana yang menurut kamu paling estetik dari semua perjalanan yang pernah kamu lakukan?`,
-      `Pernahkah kamu tersesat atau mengalami hal tak terduga saat liburan? Ceritakan pengalamannya!`,
-      `Lagu atau playlist musik apa yang paling pas diputar saat perjalanan road trip atau liburan?`,
-      `Kalau kamu diberikan budget unlimited untuk jalan-jalan sebulan penuh, destinasi impian kamu di mana?`,
-      `Siapa teman di lingkaran kamu yang paling heboh dan paling riweh kalau diajak koordinasi liburan?`,
-      `Oleh-oleh atau cenderamata paling unik yang pernah kamu beli atau dapatkan dari suatu tempat?`,
-      `Momen pemandangan alam mana (sunrise/sunset/gunung/pantai) yang paling membuat kamu terpukau sampai tidak bisa lupa?`,
-      `Kalau kamu harus tinggal selama 3 bulan di lokasi wisata impian kamu, aktivitas apa yang bakal kamu lakukan?`,
-      `Hal apa yang paling kamu kangenin saat perjalanan liburan selesai dan harus kembali ke rutinitas harian?`,
-      `Pengalaman menginap atau tempat tinggal paling unik yang pernah kamu coba saat traveling?`,
-      `Tipe liburan seperti apa yang paling kamu suka: jelajah alam liar, santai di tempat estetik, atau wisata kuliner?`,
-      `Ceritakan momen kebersamaan paling hangat bareng teman-teman saat kumpul malam hari di tempat liburan!`,
-      `Kalau kamu diberi kesempatan membuat agen tour sendiri, konsep perjalanan unik seperti apa yang kamu tawarkan?`,
-      `Apa impian destinasi tempat wisata yang paling ingin kamu kunjungi bersama sosok tersayang di masa depan?`
+      "Pernahkah kamu mengalami kejadian mistis atau melihat penampakan aneh secara langsung? Ceritakan!",
+      "Tempat atau lokasi mana yang pernah kamu datangi dan punya aura paling merinding dan angker?",
+      "Mimpi buruk atau kejadian tindihan (*sleep paralysis*) paling seram yang pernah bikin kamu kebangun panik?",
+      "Hal ghaib atau mitos lokal apa yang sampai sekarang paling bikin kamu takut dan merinding?",
+      "Pernahkah kamu mendengar suara bisikan atau langkah kaki aneh saat kamu sedang sendirian di rumah?",
+      "Kalau kamu terpaksa harus menginap sendirian di rumah tua angker selama 1 malam, barang apa yang kamu bawa?",
+      "Pengalaman paling seram apa yang pernah terjadi saat kamu lagi perjalanan malam atau camping?",
+      "Siapa teman di sini yang penakut banget dan paling gampang teriak kalau dikagetin hal mistis?",
+      "Film horor mana yang paling sukses bikin kamu ga berani tidur sendirian atau ga berani ke kamar mandi malam hari?",
+      "Pernahkah kamu merasa seperti ada yang memperhatikan kamu dari sudut kamar saat lampu dimatikan?",
+      "Ceritakan kisah horor paling terkenal di sekolah, kampus, atau lingkungan tempat tinggal kamu!",
+      "Apa yang bakal kamu lakukan pertama kali kalau tiba-tiba lampu mati dan ada sosok berdiri di ujung lorong?",
+      "Pilih mana: ketemu hantu di dalam kamar sendiri, atau tersesat di hutan angker jam 2 malam?",
+      "Pernahkah kamu punya barang antik atau benda tua yang tiba-tiba bergeser atau berbunyi sendiri?",
+      "Kejadian aneh apa yang pernah bikin kamu kapok dan ga mau lagi melewati jalanan sepi malam hari?",
+      "Ceritakan pengalamaan teman atau keluarga kamu yang pernah ketempelan atau mengalami hal gaib!",
+      "Suara atau bau aneh apa yang paling bikin kamu merinding saat lewat tempat sepi?",
+      "Kalau kamu disuruh menjelajahi bangunan tua terbengkalai malam hari, kamu mau ajak siapa dari meja ini?",
+      "Apa reaksi kamu kalau tiba-tiba HP kamu berbunyi dan ada pesan dari nomor misterius tanpa nama?",
+      "Hal horor apa yang menurut kamu paling menakutkan: hantu visual, suara ghaib, atau teror psikologis?"
     ];
   }
 
-  // Category 3: Finansial / Karir / Investasi / Bisnis
-  if (p.includes("finansial") || p.includes("investasi") || p.includes("karir") || p.includes("uang") || p.includes("bisnis") || p.includes("kerja")) {
-    return [
-      "Menurut pandangan kamu pribadi, pencapaian finansial atau karir terbesar apa yang paling membuat kamu bangga?",
-      "Apa pengeluaran atau keputusan finansial paling impulsif yang pernah kamu pelajari dalam hidup?",
-      "Seandainya kamu punya dana dingin 500 juta esok hari, instrumen atau proyek bisnis apa yang bakal kamu pilih?",
-      "Apa definisi kebebasan finansial dan keseimbangan hidup (*work-life balance*) yang ideal versi kamu?",
-      "Nasihat terpenting seputar karir dan uang yang pernah kamu dapatkan dari sosok senior atau mentor?",
-      "Kalau finansial kamu sudah terjamin 100 percent seumur hidup, pekerjaan atau passion apa yang tetap ingin kamu geluti?",
-      "Apa tantangan atau tekanan terbesar yang sedang kamu perjuangkan dalam perjalanan karir saat ini?",
-      "Barang atau barang bernilai apa yang pernah kamu beli dan ternyata paling meningkatkan kualitas hidup kamu?",
-      "Kebiasaan hemat atau strategi mengelola keuangan seperti apa yang paling konsisten kamu terapkan?",
-      "Siapa sosok profesional atau pengusaha inspiratif yang paling banyak memotivasi cara berpikir kamu?",
-      "Bagaimana cara kamu mengelola stres dan rasa jenuh (*burnout*) saat pekerjaan sedang sangat menumpuk?",
-      "Apa target karir atau impian finansial 5 tahun ke depan yang ingin kamu capai?",
-      "Hal pertama yang bakal kamu lakukan saat target besar dalam karir atau bisnis kamu berhasil terwujud?",
-      "Skill atau keahlian baru apa yang paling ingin kamu kuasai tahun ini untuk menunjang karir kamu?",
-      "Nasihat apa yang ingin kamu berikan ke anak muda yang baru mulai memasuki dunia kerja dan bisnis?",
-      "Pernahkah kamu mengambil risiko besar dalam pekerjaan atau investasi? Bagaimana hasilnya?",
-      "Lingkungan kerja seperti apa yang paling membuat kamu merasa dihargai dan bisa berkembang pesat?",
-      "Apa kegagalan terbesar dalam karir yang awalnya terasa berat namun ternyata membawa pelajaran berharga?",
-      "Pilih mana: gaji besar tapi pekerjaan sangat membuat stres, atau gaji cukup tapi lingkungan sangat suportif?",
-      "Apa prinsip finansial utama yang bakal kamu ajarkan ke keluarga dan keturunan kamu kelak?"
-    ];
-  }
-
-  // Category 4: Cinta / Pasangan / Romance / PDKT
-  if (p.includes("cinta") || p.includes("pasangan") || p.includes("monyet") || p.includes("relationship") || p.includes("mantan") || p.includes("crush") || p.includes("pdkt")) {
+  // Intent 4: Romantis / Cinta / Couple / Pacar / Gebetan / PDKT / Crush
+  if (p.includes("romantis") || p.includes("cinta") || p.includes("couple") || p.includes("pacar") || p.includes("gebetan") || p.includes("pdkt") || p.includes("crush") || p.includes("pasangan")) {
     return [
       "Momen manis atau perhatian kecil seperti apa dari seseorang yang paling cepat membuat hati kamu meleleh?",
       "Apa kriteria atau nilai utama yang paling kamu prioritaskan saat mencari sosok pasangan hidup?",
@@ -219,28 +216,80 @@ function generateCustomQuestions(rawPrompt: string, count: number = 20): string[
     ];
   }
 
-  // Fallback Dynamic Synthesis tailored cleanly to prompt
+  // Intent 5: Deep Talk / Rahasia / Pribadi / Filosofis / Kehidupan
+  if (p.includes("deep") || p.includes("rahasia") || p.includes("pribadi") || p.includes("filosofis") || p.includes("hidup") || p.includes("prinsip") || p.includes("mindset")) {
+    return [
+      "Apa ketakutan terbesar dalam hidup kamu yang jarang banget kamu ceritakan ke teman dekat sekali pun?",
+      "Siapa satu sosok dalam hidup kamu yang paling banyak membentuk cara berpikir dan prinsip kamu sampai hari ini?",
+      "Kalau kamu bisa kirim satu kalimat pesan singkat ke diri kamu sendiri 10 tahun lalu, apa pesan utamanya?",
+      "Menurut pandangan kamu pribadi, definisi bahagia dan tenang yang sesungguhnya itu seperti apa?",
+      "Pernahkah kamu merasa berada di titik terendah dalam hidup dan apa hal yang bikin kamu bangkit kembali?",
+      "Apa pencapaian terkecil kamu yang orang lain sepelekan tapi sebenarnya paling kamu syukuri?",
+      "Siapa orang pertama yang paling kamu inginkan hadir saat kamu sedang merasa sedih atau lelah?",
+      "Satu hal apa dari diri kamu sendiri yang sampai sekarang masih berusaha kamu maafi dan ikhlaskan?",
+      "Kalau kamu melihat kehidupan kamu 5 tahun ke depan, suasana seperti apa yang ingin kamu capai?",
+      "Apa nilai kebaikan atau prinsip hidup yang tidak akan pernah kamu kompromikan demi apapun?"
+    ];
+  }
+
+  // Intent 6: Liburan / Trip / Traveling / Pantai / Gunung / Jalan-Jalan
+  if (p.includes("liburan") || p.includes("trip") || p.includes("traveling") || p.includes("pantai") || p.includes("gunung") || p.includes("jalan") || p.includes("wisata") || p.includes("kuliner")) {
+    return [
+      "Momen liburan atau perjalanan mana yang paling berkesan dan paling membuat kamu bahagia sepanjang hidup?",
+      "Makanan lokal atau kuliner paling enak dan unik yang wajib dicoba kalau berkunjung ke tempat favorit kamu?",
+      "Seandainya kita buat trip impulsif bareng esok hari, destinasi impian pertama yang ingin kamu tuju ke mana?",
+      "Ceritakan pengalaman paling konyol atau kejadian salah rencana saat kamu sedang liburan bareng teman!",
+      "Kalau kamu disuruh memilih 1 teman di meja ini untuk jadi tour guide liburan, kamu bakal pilih siapa dan kenapa?",
+      "Apa barang paling wajib dan ga boleh ketinggalan sama sekali di dalam tas kamu pas lagi traveling?",
+      "Koleksi foto atau kenangan mana yang menurut kamu paling estetik dari semua perjalanan yang pernah kamu lakukan?",
+      "Pernahkah kamu tersesat atau mengalami hal tak terduga saat liburan? Ceritakan pengalamannya!",
+      "Lagu atau playlist musik apa yang paling pas diputar saat perjalanan road trip atau liburan?",
+      "Kalau kamu diberikan budget unlimited untuk jalan-jalan sebulan penuh, destinasi impian kamu di mana?",
+      "Siapa teman di lingkaran kamu yang paling heboh dan paling riweh kalau diajak koordinasi liburan?",
+      "Oleh-oleh atau cenderamata paling unik yang pernah kamu beli atau dapatkan dari suatu tempat?",
+      "Momen pemandangan alam mana (sunrise/sunset/gunung/pantai) yang paling membuat kamu terpukau sampai tidak bisa lupa?",
+      "Kalau kamu harus tinggal selama 3 bulan di lokasi wisata impian kamu, aktivitas apa yang bakal kamu lakukan?",
+      "Hal apa yang paling kamu kangenin saat perjalanan liburan selesai dan harus kembali ke rutinitas harian?"
+    ];
+  }
+
+  // Intent 7: Karir / Uang / Bisnis / Kerja / Finansial / Masa Depan
+  if (p.includes("karir") || p.includes("uang") || p.includes("bisnis") || p.includes("kerja") || p.includes("finansial") || p.includes("masa depan") || p.includes("investasi")) {
+    return [
+      "Menurut pandangan kamu pribadi, pencapaian finansial atau karir terbesar apa yang paling membuat kamu bangga?",
+      "Apa pengeluaran atau keputusan finansial paling impulsif yang pernah kamu pelajari dalam hidup?",
+      "Seandainya kamu punya dana dingin 500 juta esok hari, instrumen atau proyek bisnis apa yang bakal kamu pilih?",
+      "Apa definisi kebebasan finansial dan keseimbangan hidup (*work-life balance*) yang ideal versi kamu?",
+      "Nasihat terpenting seputar karir dan uang yang pernah kamu dapatkan dari sosok senior atau mentor?",
+      "Kalau finansial kamu sudah terjamin 100 percent seumur hidup, pekerjaan atau passion apa yang tetap ingin kamu geluti?",
+      "Apa tantangan atau tekanan terbesar yang sedang kamu perjuangkan dalam perjalanan karir saat ini?",
+      "Barang atau barang bernilai apa yang pernah kamu beli dan ternyata paling meningkatkan kualitas hidup kamu?",
+      "Kebiasaan hemat atau strategi mengelola keuangan seperti apa yang paling konsisten kamu terapkan?",
+      "Siapa sosok profesional atau pengusaha inspiratif yang paling banyak memotivasi cara berpikir kamu?"
+    ];
+  }
+
+  // Universal Fallback: Clean Natural Subject Questions (Zero "seputar pertanyaan..." prefixes)
+  const cleanSubject = rawPrompt.replace(/["']/g, '').trim();
   return [
-    `Apa hal pertama yang paling menarik perhatian kamu saat membahas topik ${cleanTopic}?`,
-    `Pengalaman atau kenangan paling tak terlupakan apa yang pernah kamu alami terkait ${cleanTopic}?`,
-    `Menurut pandangan kamu pribadi, apa sisi paling berharga atau menarik dari ${cleanTopic}?`,
-    `Kalau kamu diberi kesempatan mengeksplorasi lebih dalam seputar ${cleanTopic}, hal apa yang ingin kamu coba?`,
-    `Ceritakan kejadian paling lucu, tak terduga, atau unik yang pernah kamu alami seputar ${cleanTopic}!`,
-    `Siapa teman di meja ini yang menurut kamu punya wawasan atau pengalaman paling seru tentang ${cleanTopic}?`,
-    `Pelajaran hidup atau hikmah terpenting apa yang pernah kamu dapatkan seputar ${cleanTopic}?`,
-    `Seandainya kamu membuat buku atau karya seputar ${cleanTopic}, judul unik apa yang bakal kamu pilih?`,
-    `Apa anggapan keliru atau persepsi salah yang sering dipikirkan orang lain seputar ${cleanTopic}?`,
-    `Momen paling membuat kamu bangga atau bersyukur dalam perjalanan hidup kamu seputar ${cleanTopic}?`,
-    `Saran atau tips terbaik apa yang ingin kamu bagikan ke teman-teman seputar ${cleanTopic}?`,
-    `Apa pertanyaan paling penasaran yang ingin kamu tanyakan ke teman sebelah kananmu seputar ${cleanTopic}?`,
-    `Hal apa yang paling membuat kamu merasa bersemangat saat berdiskusi seputar ${cleanTopic}?`,
-    `Kalau kamu bisa mewujudkan impian terbesar kamu esok hari tentang ${cleanTopic}, impian seperti apa itu?`,
-    `Satu kata yang paling pas menggambarkan pengalaman dan sudut pandang kamu seputar ${cleanTopic}?`,
-    `Pernahkah kamu mengambil keputusan penting seputar ${cleanTopic}? Bagaimana hasilnya?`,
-    `Sosok mana yang paling banyak memberikan inspirasi bagi kamu saat mendalami ${cleanTopic}?`,
-    `Apa tantangan terbesar yang pernah kamu lalui dan berhasil kamu lewati seputar ${cleanTopic}?`,
-    `Hal baru apa yang baru kamu sadari dan kamu syukuri belakangan ini tentang ${cleanTopic}?`,
-    `Pesan positif apa yang ingin kamu tinggalkan untuk semua orang seputar ${cleanTopic}?`
+    `Apa momen paling tak terlupakan yang pernah kamu alami saat membahas tentang ${cleanSubject}?`,
+    `Menurut sudut pandang kamu pribadi, apa hal paling menarik dari ${cleanSubject}?`,
+    `Kalau kamu diberi kesempatan bebas menjelajahi ${cleanSubject}, hal pertama yang ingin kamu lakukan apa?`,
+    `Ceritakan pengalaman paling lucu atau tak terduga yang pernah kamu alami terkait ${cleanSubject}!`,
+    `Siapa orang di meja ini yang menurut kamu punya pengalaman paling seru tentang ${cleanSubject}?`,
+    `Pelajaran hidup atau hikmah terpenting apa yang pernah kamu dapatkan dari ${cleanSubject}?`,
+    `Seandainya kamu membuat buku atau karya tentang ${cleanSubject}, judul unik apa yang bakal kamu pilih?`,
+    `Apa persepsi salah atau anggapan keliru yang sering dipikirkan orang lain tentang ${cleanSubject}?`,
+    `Momen paling membuat kamu bangga atau bersyukur dalam hidup kamu terkait ${cleanSubject}?`,
+    `Saran atau tips terbaik apa yang ingin kamu bagikan ke teman-teman tentang ${cleanSubject}?`,
+    `Apa hal yang paling sering membuat kamu merasa bersemangat saat berdiskusi tentang ${cleanSubject}?`,
+    `Kalau kamu bisa mewujudkan impian terbesar kamu esok hari tentang ${cleanSubject}, impian seperti apa itu?`,
+    `Satu kata yang paling pas menggambarkan pengalaman dan pandangan kamu tentang ${cleanSubject}?`,
+    `Pernahkah kamu mengambil keputusan besar terkait ${cleanSubject}? Bagaimana hasilnya?`,
+    `Sosok mana yang paling banyak memberikan inspirasi bagi kamu saat mendalami ${cleanSubject}?`,
+    `Apa tantangan terbesar yang pernah kamu lalui dan berhasil kamu lewati terkait ${cleanSubject}?`,
+    `Hal baru apa yang baru kamu sadari dan kamu syukuri belakangan ini tentang ${cleanSubject}?`,
+    `Pesan positif apa yang ingin kamu tinggalkan untuk semua orang tentang ${cleanSubject}?`
   ];
 }
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Check, Clock, Calendar, Crown, ShieldCheck, Sparkles, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, Clock, Calendar, Crown, ShieldCheck, Sparkles, Loader2, Zap, Timer } from "lucide-react";
 import { BrandLogo } from "../components/BrandLogo";
 import { useAuth } from "@/context/AuthContext";
 import { sound } from "@/utils/sound";
@@ -25,7 +25,7 @@ const PASS_PACKAGES = [
     price: "Rp 5.000",
     numericPrice: 5000,
     badge: null,
-    icon: Clock,
+    icon: Zap,
     features: [
       "Akses seluruh 9+ topik obrolan",
       "Main sepuasnya selama 3 jam",
@@ -44,7 +44,7 @@ const PASS_PACKAGES = [
     price: "Rp 10.000",
     numericPrice: 10000,
     badge: "Hemat 50%",
-    icon: Clock,
+    icon: Timer,
     features: [
       "Akses seluruh 9+ topik obrolan",
       "Main sepuasnya selama 10 jam",

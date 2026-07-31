@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Check, Clock, Calendar, Crown, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, Clock, Calendar, Crown, ShieldCheck, Sparkles, Loader2 } from "lucide-react";
 import { BrandLogo } from "../components/BrandLogo";
 import { useAuth } from "@/context/AuthContext";
+import { sound } from "@/utils/sound";
 
 /* Official User Color Palette (Warm Sunset & Deep Teal - Zero Cold White - Zero Emojis) */
 const C = {
@@ -22,6 +23,7 @@ const PASS_PACKAGES = [
     name: "Pass 3 Jam",
     subtitle: "Akses Penuh 3 Jam",
     price: "Rp 5.000",
+    numericPrice: 5000,
     badge: null,
     icon: Clock,
     features: [
@@ -40,6 +42,7 @@ const PASS_PACKAGES = [
     name: "Pass 10 Jam",
     subtitle: "Akses Penuh 10 Jam",
     price: "Rp 10.000",
+    numericPrice: 10000,
     badge: "Hemat 50%",
     icon: Clock,
     features: [
@@ -58,6 +61,7 @@ const PASS_PACKAGES = [
     name: "Pass 1 Minggu",
     subtitle: "Akses Penuh 7 Hari",
     price: "Rp 20.000",
+    numericPrice: 20000,
     badge: "Pilihan Populer",
     icon: Calendar,
     features: [
@@ -76,6 +80,7 @@ const PASS_PACKAGES = [
     name: "Pass 1 Bulan",
     subtitle: "Akses Penuh 30 Hari (VIP)",
     price: "Rp 50.000",
+    numericPrice: 50000,
     badge: "Akses Terbaik",
     icon: Crown,
     features: [
@@ -92,7 +97,49 @@ const PASS_PACKAGES = [
 ];
 
 export default function StorePage() {
-  const [bought, setBought] = useState<string | null>(null);
+  const { user, isPremium } = useAuth();
+  const [loadingPkgId, setLoadingPkgId] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  const handleCheckout = async (pkg: typeof PASS_PACKAGES[0]) => {
+    sound.playClick();
+    setCheckoutError(null);
+
+    if (!user || !user.email) {
+      setCheckoutError("Silakan Masuk dengan Akun Google terlebih dahulu di pojok kanan atas sebelum membeli pass!");
+      return;
+    }
+
+    setLoadingPkgId(pkg.id);
+
+    try {
+      const res = await fetch("/api/checkout/doku", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          passId: pkg.id,
+          passName: pkg.name,
+          amount: pkg.numericPrice,
+          userEmail: user.email,
+          userName: user.name,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success && data.paymentUrl) {
+        sound.playChime();
+        // Redirect directly to official DOKU Payment Page (QRIS, VA, E-Wallet, CC)
+        window.location.href = data.paymentUrl;
+      } else {
+        setCheckoutError(data.message || "Gagal memproses pembayaran DOKU. Pastikan DOKU_CLIENT_ID & DOKU_SECRET_KEY sudah diisi di Vercel.");
+      }
+    } catch (e: any) {
+      setCheckoutError(e.message || "Terjadi kesalahan koneksi saat memanggil DOKU.");
+    } finally {
+      setLoadingPkgId(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F2E5BF] text-[#257180] font-sans pb-12">
@@ -130,7 +177,7 @@ export default function StorePage() {
         <div className="bg-[#FAF3E0] rounded-[32px] p-8 border-2 border-[#FD8B51]/30 shadow-lg text-center max-w-3xl mx-auto space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#FD8B51]/15 text-[#CB6040] text-xs font-black mb-1">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Sistem Pass Waktu Praktis</span>
+            <span>Pembayaran Resmi DOKU (QRIS &amp; E-Wallet)</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black text-[#257180] tracking-tight">Pilih Pass Akses Obrolan Kamu</h2>
           <p className="text-xs sm:text-sm font-semibold text-[#257180]/75 max-w-xl mx-auto">
@@ -138,11 +185,17 @@ export default function StorePage() {
           </p>
         </div>
 
+        {checkoutError && (
+          <div className="bg-red-100 border-2 border-red-300 text-red-800 p-4 rounded-2xl max-w-2xl mx-auto text-xs font-extrabold text-center animate-pop-in">
+            {checkoutError}
+          </div>
+        )}
+
         {/* 4 Column Grid Layout */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
           {PASS_PACKAGES.map((pkg) => {
             const IconComp = pkg.icon;
-            const isBought = bought === pkg.id;
+            const isLoadingThis = loadingPkgId === pkg.id;
 
             return (
               <div
@@ -190,16 +243,25 @@ export default function StorePage() {
                   </ul>
                 </div>
 
-                {/* CTA Action Button */}
+                {/* DOKU Real Checkout Action Button */}
                 <button
-                  onClick={() => setBought(pkg.id)}
-                  disabled={isBought}
-                  className="w-full mt-6 py-3.5 rounded-2xl font-black text-xs transition cursor-pointer shadow-md text-center"
+                  onClick={() => handleCheckout(pkg)}
+                  disabled={isLoadingThis || (isPremium && pkg.id === "pass_1bulan")}
+                  className="w-full mt-6 py-3.5 rounded-2xl font-black text-xs transition cursor-pointer shadow-md text-center flex items-center justify-center gap-2"
                   style={{
-                    backgroundColor: isBought ? "#6B8E94" : pkg.ctaBg,
-                    color: isBought ? "#FAF3E0" : pkg.ctaText,
+                    backgroundColor: isPremium && pkg.id === "pass_1bulan" ? "#6B8E94" : pkg.ctaBg,
+                    color: isPremium && pkg.id === "pass_1bulan" ? "#FAF3E0" : pkg.ctaText,
                   }}>
-                  {isBought ? "✓ Pass Aktif" : "Pilih Pass Ini"}
+                  {isLoadingThis ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Menghubungkan DOKU...</span>
+                    </>
+                  ) : isPremium && pkg.id === "pass_1bulan" ? (
+                    "✓ Pass VIP Aktif"
+                  ) : (
+                    "Bayar via DOKU / QRIS →"
+                  )}
                 </button>
               </div>
             );
@@ -212,7 +274,7 @@ export default function StorePage() {
         {/* Footer Guarantee Info Box */}
         <div className="bg-[#FAF3E0] rounded-2xl p-4 border border-[#257180]/15 text-center text-xs font-bold text-[#257180]/70 max-w-xl mx-auto flex items-center justify-center gap-2">
           <ShieldCheck className="w-4 h-4 text-[#257180] flex-shrink-0" />
-          <span>Pembayaran aman via Midtrans &amp; GPay. Pass otomatis aktif seketika setelah pembayaran terverifikasi.</span>
+          <span>Pembayaran aman via DOKU Checkout &amp; QRIS. Pass otomatis terikat ke akun Google kamu seketika.</span>
         </div>
       </main>
     </div>

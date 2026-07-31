@@ -1082,6 +1082,7 @@ function OfflineGame() {
     nostalgia: "Nostalgia",
     whatif: "What If...?",
     karir: "Karir & Mimpi",
+    ai_custom: "Racikan AI",
   };
 
   const navTitle = mode === 'tod'

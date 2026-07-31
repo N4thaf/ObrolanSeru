@@ -552,12 +552,29 @@ export default function OfflineSetup() {
 
             <button
               onClick={() => {
+                const promptToUse = tempPromptInput.trim() || "Pertanyaan Seru & Random";
                 sound.playChime();
-                setCustomAiPrompt(tempPromptInput.trim());
                 setShowAiPromptModal(false);
+
+                const cleanNames = playerNames.map((n, i) => n.trim() || `Pemain ${i + 1}`);
+                const params = new URLSearchParams({
+                  mode: selectedMode,
+                  todType: todType,
+                  players: cleanNames.join(','),
+                  rounds: String(rounds),
+                  topic: 'ai_custom',
+                  aiPrompt: promptToUse
+                });
+
+                // Clear temp state for next custom creation
+                setTempPromptInput('');
+                setCustomAiPrompt('');
+
+                // DIRECTLY NAVIGATE STRAIGHT TO GAME!
+                router.push(`/play/game?${params}`);
               }}
               className="w-full py-3.5 rounded-2xl font-black text-sm text-white bg-[#FD8B51] hover:bg-[#e0753c] transition shadow-md cursor-pointer mt-2">
-              Simpan Racikan AI
+              Racik &amp; Mulai Bermain →
             </button>
           </div>
         </div>

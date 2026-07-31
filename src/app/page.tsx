@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Play, Users, ShoppingBag, X, Coins, ShieldCheck, Check, Crown, HelpCircle, Share2, LogOut, User, FileText, Info, BookOpen, Lock, MessageSquare } from "lucide-react";
+import { Play, Users, ShoppingBag, X, Coins, ShieldCheck, Check, Crown, HelpCircle, Share2, LogOut, User, FileText, Info, BookOpen, Lock, MessageSquare, Ticket } from "lucide-react";
 import { BrandLogo } from "./components/BrandLogo";
 import { GoogleAuthButton } from "./components/GoogleAuthButton";
 import { LockedFeatureModal } from "./components/LockedFeatureModal";
+import { StandaloneRedeemModal } from "./components/StandaloneRedeemModal";
 import { useAuth } from "@/context/AuthContext";
+import { sound } from "@/utils/sound";
 
 /* Official User Color Palette */
 const C = {
@@ -70,6 +72,8 @@ export default function Home() {
     }
   };
 
+  const [showStandaloneRedeem, setShowStandaloneRedeem] = useState(false);
+
   return (
     <div className="h-screen max-h-screen overflow-hidden flex flex-col justify-between relative bg-[#F2E5BF] text-[#257180] font-sans select-none">
       
@@ -83,9 +87,20 @@ export default function Home() {
             <span className="font-extrabold text-xl tracking-tight text-[#257180] hidden sm:inline group-hover:text-[#FD8B51] transition-colors">ObrolanSeru</span>
           </Link>
 
-          {/* User Status Bar & Toko */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* User Status Bar, Redeem Code & Toko */}
+          <div className="flex items-center gap-2 sm:gap-2.5">
             <GoogleAuthButton />
+
+            {/* Dedicated Standalone Redeem Code Button */}
+            <button
+              onClick={() => {
+                sound.playClick();
+                setShowStandaloneRedeem(true);
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-black px-3.5 py-1.5 rounded-full bg-[#FAF3E0] text-[#257180] border-2 border-[#257180]/20 hover:bg-[#F2E5BF] hover:border-[#FD8B51]/50 transition cursor-pointer shadow-sm">
+              <Ticket className="w-3.5 h-3.5 text-[#FD8B51]" />
+              <span>Tukar Kode</span>
+            </button>
 
             {/* Mode Status Indicator Badge */}
             {isPremium ? (
@@ -95,7 +110,7 @@ export default function Home() {
               </span>
             ) : (
               <button
-                onClick={() => setShowRedeemModal(true)}
+                onClick={() => setShowStandaloneRedeem(true)}
                 className="hidden sm:inline-flex items-center gap-1 text-[11px] font-black px-3 py-1.5 rounded-full bg-[#257180]/10 text-[#257180] border border-[#257180]/20 hover:bg-[#257180]/20 transition cursor-pointer">
                 <Lock className="w-3 h-3 text-[#257180]" />
                 <span>Mode: Gratis</span>
@@ -105,7 +120,7 @@ export default function Home() {
             {/* Toko Pass Button */}
             <Link href="/store" className="flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-[#FD8B51] text-white hover:bg-[#e0753c] transition shadow-sm">
               <ShoppingBag className="w-3.5 h-3.5" />
-              <span>Beli Pass</span>
+              <span className="hidden xs:inline">Beli Pass</span>
             </Link>
           </div>
         </div>
@@ -529,12 +544,16 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Redeem Promo Code Modal */}
+      {/* Redeem Promo Code Modals */}
       <LockedFeatureModal
         isOpen={showRedeemModal}
         onClose={() => setShowRedeemModal(false)}
       />
 
+      <StandaloneRedeemModal
+        isOpen={showStandaloneRedeem}
+        onClose={() => setShowStandaloneRedeem(false)}
+      />
     </div>
   );
 }

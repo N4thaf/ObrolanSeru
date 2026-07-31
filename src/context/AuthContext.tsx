@@ -125,12 +125,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
     }
 
+    if (isPremium) {
+      sound.playClick();
+      return {
+        success: false,
+        message: "Akun kamu sudah menjadi VIP Premium Aktif! Kode promo tidak perlu digunakan lagi karena kamu sudah memiliki akses penuh.",
+      };
+    }
+
     const clean = code.trim().toUpperCase();
     if (clean === "OS4FREE") {
       sound.playChime();
 
       try {
-        // Send redeem request to backend database bound to this Google email
+        // Send redeem request to backend database bound to this Google email (Pass 3 Jam)
         const res = await fetch("/api/user", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -138,6 +146,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: user.email,
             redeemCode: "OS4FREE",
             isPremium: true,
+            activePass: {
+              type: "pass_3jam_promo",
+              expiresAt: Date.now() + 3 * 60 * 60 * 1000 // Pass 3 Jam
+            }
           }),
         });
 
@@ -146,7 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setIsPremium(true);
           return {
             success: true,
-            message: `Selamat ${user.name}! Kode OS4FREE berhasil terikat di akun ${user.email}. Seluruh Akses Premium terbuka!`,
+            message: `Selamat ${user.name}! Kode OS4FREE berhasil mengaktifkan Pass Gratis 3 Jam untuk akun ${user.email}. Seluruh topik terbuka selama 3 jam!`,
           };
         }
       } catch (e) {}
@@ -154,7 +166,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsPremium(true);
       return {
         success: true,
-        message: `Selamat ${user.name}! Kode OS4FREE telah diaktifkan untuk akun ${user.email}!`,
+        message: `Selamat ${user.name}! Kode OS4FREE berhasil mengaktifkan Pass Gratis 3 Jam untuk akun ${user.email}!`,
       };
     }
 

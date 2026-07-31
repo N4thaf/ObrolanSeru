@@ -61,8 +61,8 @@ export function LockedFeatureModal({ isOpen, onClose, featureTitle }: LockedFeat
         <h3 className="text-2xl font-black text-[#257180] mt-3 tracking-tight">
           {featureTitle ? `"${featureTitle}" Terkunci` : "Fitur Premium Terkunci"}
         </h3>
-        <p className="text-xs font-semibold text-[#257180]/75 mt-1.5 leading-relaxed">
-          Fitur ini khusus untuk pengguna Mode Premium. Gunakan Kode Promo redeem gratis di bawah ini untuk membuka seluruh akses!
+        <p className="text-xs font-semibold text-[#257180]/80 mt-1">
+          Gunakan kode promo <strong className="text-[#FD8B51] font-black">OS4FREE</strong> untuk mengaktifkan Pass Gratis 3 Jam!
         </p>
 
         {/* Redeem Code Form */}

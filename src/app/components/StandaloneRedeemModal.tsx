@@ -65,7 +65,7 @@ export function StandaloneRedeemModal({ isOpen, onClose }: StandaloneRedeemModal
         {/* Modal Title */}
         <h2 className="text-2xl font-black text-[#257180] tracking-tight">Tukarkan Kode Promo</h2>
         <p className="text-xs font-semibold text-[#257180]/75 mt-1">
-          Masukkan kode promo untuk mengaktifkan seluruh topik &amp; mode ObrolanSeru.
+          Gunakan kode promo <strong className="text-[#FD8B51] font-black">OS4FREE</strong> untuk mengaktifkan Pass Gratis 3 Jam!
         </p>
 
         {/* User Google Login Warning if not logged in */}

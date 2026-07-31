@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Copy, Check, Users, Play, Share2, Sparkles, RefreshCw, Crown } from "lucide-react";
+import { ArrowLeft, Copy, Check, Users, Play, Share2, Sparkles, RefreshCw, Crown, Lock } from "lucide-react";
 import { sound } from "@/utils/sound";
 import { BrandLogo } from "@/app/components/BrandLogo";
+import { useAuth } from "@/context/AuthContext";
+import { LockedFeatureModal } from "@/app/components/LockedFeatureModal";
 
 interface RoomState {
   code: string;
@@ -21,6 +23,8 @@ export default function RoomPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { isPremium } = useAuth();
+  const [lockedModalTitle, setLockedModalTitle] = useState<string | null>(null);
 
   const rawCode = (params.code as string) || "OS361";
   const code = rawCode.replace(/-/g, "").toUpperCase();
@@ -242,17 +246,33 @@ export default function RoomPage() {
                   <label className="text-[11px] font-black text-[#257180] uppercase tracking-wider">Topik</label>
                   <select
                     value={room.topic}
-                    onChange={(e) => broadcastRoomUpdate({ ...room, topic: e.target.value })}
+                    onChange={(e) => {
+                      const newTopic = e.target.value;
+                      const isFree = newTopic === "kenalan" || newTopic === "mix";
+                      if (!isFree && !isPremium) {
+                        const TOPIC_NAMES: Record<string, string> = {
+                          kenalan: "Kenalan Dulu", mix: "Acak Topik", absurd: "Absurd Abis",
+                          deep: "Deep Talk", pasangan: "Khusus Pasangan", keluarga: "Keluarga",
+                          nostalgia: "Nostalgia", whatif: "What If...?", karir: "Karir & Mimpi",
+                          ai_custom: "Racikan AI",
+                        };
+                        sound.playClick();
+                        setLockedModalTitle(TOPIC_NAMES[newTopic] || "Topik Premium");
+                        return;
+                      }
+                      broadcastRoomUpdate({ ...room, topic: newTopic });
+                    }}
                     className="w-full px-3 py-2.5 rounded-xl bg-[#F2E5BF] border border-[#257180]/20 text-xs font-bold text-[#257180] focus:outline-none">
                     <option value="kenalan">Kenalan Dulu</option>
-                    <option value="absurd">Absurd Abis</option>
                     <option value="mix">Acak Topik</option>
-                    <option value="deep">Deep Talk</option>
-                    <option value="pasangan">Khusus Pasangan</option>
-                    <option value="keluarga">Keluarga</option>
-                    <option value="nostalgia">Nostalgia</option>
-                    <option value="whatif">What If...?</option>
-                    <option value="karir">Karir &amp; Mimpi</option>
+                    <option value="absurd">{!isPremium ? "🔒 Absurd Abis (Locked)" : "Absurd Abis"}</option>
+                    <option value="deep">{!isPremium ? "🔒 Deep Talk (Locked)" : "Deep Talk"}</option>
+                    <option value="pasangan">{!isPremium ? "🔒 Khusus Pasangan (Locked)" : "Khusus Pasangan"}</option>
+                    <option value="keluarga">{!isPremium ? "🔒 Keluarga (Locked)" : "Keluarga"}</option>
+                    <option value="nostalgia">{!isPremium ? "🔒 Nostalgia (Locked)" : "Nostalgia"}</option>
+                    <option value="whatif">{!isPremium ? "🔒 What If...? (Locked)" : "What If...?"}</option>
+                    <option value="karir">{!isPremium ? "🔒 Karir & Mimpi (Locked)" : "Karir & Mimpi"}</option>
+                    <option value="ai_custom">{!isPremium ? "🔒 Racikan AI (Locked)" : "Racikan AI"}</option>
                   </select>
                 </div>
 
@@ -293,6 +313,12 @@ export default function RoomPage() {
       <footer className="text-center text-xs font-bold text-[#257180]/60 max-w-xl mx-auto">
         ObrolanSeru Real-Time Engine · Room {code}
       </footer>
+      {/* Locked Premium Topic Redeem Modal */}
+      <LockedFeatureModal
+        isOpen={!!lockedModalTitle}
+        onClose={() => setLockedModalTitle(null)}
+        featureTitle={lockedModalTitle || undefined}
+      />
     </div>
   );
 }

@@ -88,7 +88,7 @@ export default function Home() {
           </Link>
 
           {/* User Status Bar & Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             <GoogleAuthButton />
 
             {/* Standalone Redeem Code Button */}
@@ -97,31 +97,32 @@ export default function Home() {
                 sound.playClick();
                 setShowStandaloneRedeem(true);
               }}
-              className="inline-flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-[#FAF3E0] text-[#257180] border border-[#257180]/20 hover:border-[#FD8B51]/50 transition cursor-pointer">
-              <Ticket className="w-3.5 h-3.5 text-[#FD8B51]" />
-              <span>Tukar Kode</span>
+              title="Tukar Kode Promo"
+              className="inline-flex items-center gap-1 text-xs font-extrabold px-2.5 sm:px-3.5 py-1.5 rounded-full bg-[#FAF3E0] text-[#257180] border border-[#257180]/20 hover:border-[#FD8B51]/50 transition cursor-pointer whitespace-nowrap">
+              <Ticket className="w-3.5 h-3.5 text-[#FD8B51] flex-shrink-0" />
+              <span className="hidden xs:inline">Tukar Kode</span>
             </button>
 
             {/* Mode Status Indicator Badge */}
             {isPremium ? (
-              <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-black px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+              <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-black px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">
                 <Crown className="w-3.5 h-3.5 text-amber-600" />
                 <span>VIP Premium</span>
               </span>
             ) : (
-              <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-black px-3 py-1.5 rounded-full bg-[#257180]/10 text-[#257180]">
+              <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-black px-3 py-1.5 rounded-full bg-[#257180]/10 text-[#257180] whitespace-nowrap">
                 <Lock className="w-3 h-3 text-[#257180]" />
                 <span>Mode Gratis</span>
               </span>
             )}
 
-            {/* Elegant Toko Premium Button Matching Size */}
+            {/* Toko Premium Button */}
             <Link
               href="/store"
               onClick={() => sound.playClick()}
-              className="inline-flex items-center gap-1.5 text-xs font-black px-3.5 py-1.5 rounded-full bg-[#FD8B51] text-white hover:bg-[#e0753c] transition shadow-sm cursor-pointer">
-              <ShoppingBag className="w-3.5 h-3.5 text-white" />
-              <span>Toko Premium</span>
+              className="inline-flex items-center gap-1 text-xs font-black px-3 sm:px-3.5 py-1.5 rounded-full bg-[#FD8B51] text-white hover:bg-[#e0753c] transition shadow-sm cursor-pointer whitespace-nowrap">
+              <ShoppingBag className="w-3.5 h-3.5 text-white flex-shrink-0" />
+              <span>Toko<span className="hidden sm:inline"> Premium</span></span>
             </Link>
           </div>
         </div>

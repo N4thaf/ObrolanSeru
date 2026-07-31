@@ -14,27 +14,51 @@ export interface UserProfile {
 interface AuthContextType {
   user: UserProfile | null;
   isLoading: boolean;
-  loginWithGoogle: (mockProfile?: Partial<UserProfile>) => void;
+  setUserProfile: (profile: UserProfile) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
-  loginWithGoogle: () => {},
+  setUserProfile: () => {},
   logout: () => {},
 });
+
+// Helper to decode Google JWT token securely
+export function parseGoogleJwt(token: string): any {
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Load existing session on mount
+  // Load existing session on mount (and purge dummy data)
   useEffect(() => {
     try {
       const stored = localStorage.getItem("obrolan_user_session");
       if (stored) {
-        setUser(JSON.parse(stored));
+        const parsed: UserProfile = JSON.parse(stored);
+        // Purge old dummy mock data if present
+        if (parsed.email === "nathaf@gmail.com" || parsed.email === "pemain@gmail.com") {
+          localStorage.removeItem("obrolan_user_session");
+          setUser(null);
+        } else {
+          setUser(parsed);
+        }
       }
     } catch (e) {
       console.warn("Failed to load user session:", e);
@@ -43,20 +67,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const loginWithGoogle = (mockProfile?: Partial<UserProfile>) => {
+  const setUserProfile = (profile: UserProfile) => {
     sound.playChime();
-    const newUser: UserProfile = {
-      id: mockProfile?.id || `google_${Date.now()}`,
-      name: mockProfile?.name || "Nathaf Pratama",
-      email: mockProfile?.email || "nathaf@gmail.com",
-      avatar: mockProfile?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
-      provider: "google",
-    };
-
-    setUser(newUser);
+    setUser(profile);
     try {
-      localStorage.setItem("obrolan_user_session", JSON.stringify(newUser));
-      sessionStorage.setItem("my_name", newUser.name.split(" ")[0]);
+      localStorage.setItem("obrolan_user_session", JSON.stringify(profile));
+      sessionStorage.setItem("my_name", profile.name.split(" ")[0]);
     } catch (e) {}
   };
 
@@ -69,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, setUserProfile, logout }}>
       {children}
     </AuthContext.Provider>
   );

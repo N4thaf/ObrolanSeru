@@ -1,15 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 
-// DOKU Jokul Credentials (Set in Vercel Environment Variables)
-const DOKU_CLIENT_ID = process.env.DOKU_CLIENT_ID || "";
-const DOKU_SECRET_KEY = process.env.DOKU_SECRET_KEY || "";
-const DOKU_IS_PRODUCTION = process.env.DOKU_IS_PRODUCTION === "true";
-
-const DOKU_BASE_URL = DOKU_IS_PRODUCTION
-  ? "https://api.doku.com"
-  : "https://api-sandbox.doku.com";
-
 // Helper to generate DOKU Signature (HMAC-SHA256)
 function generateDokuSignature(
   clientId: string,
@@ -36,7 +27,11 @@ export async function POST(req: Request) {
   try {
     const { passId, passName, amount, userEmail, userName } = await req.json();
 
-    if (!DOKU_CLIENT_ID || !DOKU_SECRET_KEY) {
+    const clientId = (process.env.DOKU_CLIENT_ID || "").trim();
+    const secretKey = (process.env.DOKU_SECRET_KEY || "").trim();
+    const isProduction = process.env.DOKU_IS_PRODUCTION === "true";
+
+    if (!clientId || !secretKey) {
       return NextResponse.json(
         {
           success: false,
@@ -64,7 +59,7 @@ export async function POST(req: Request) {
         ],
       },
       payment: {
-        payment_due_date: 60, // 60 menit batas waktu bayar QRIS/VA
+        payment_due_date: 60,
       },
       customer: {
         name: userName || "Pemain ObrolanSeru",
@@ -79,18 +74,22 @@ export async function POST(req: Request) {
       .digest("base64");
 
     const signature = generateDokuSignature(
-      DOKU_CLIENT_ID,
+      clientId,
       requestId,
       requestTimestamp,
       requestTarget,
       digest,
-      DOKU_SECRET_KEY
+      secretKey
     );
 
-    const dokuRes = await fetch(`${DOKU_BASE_URL}${requestTarget}`, {
+    // Try primary base URL first, then fallback if environment mismatch occurs
+    const primaryUrl = isProduction ? "https://api.doku.com" : "https://api-sandbox.doku.com";
+    const fallbackUrl = isProduction ? "https://api-sandbox.doku.com" : "https://api.doku.com";
+
+    let dokuRes = await fetch(`${primaryUrl}${requestTarget}`, {
       method: "POST",
       headers: {
-        "Client-Id": DOKU_CLIENT_ID,
+        "Client-Id": clientId,
         "Request-Id": requestId,
         "Request-Timestamp": requestTimestamp,
         "Signature": `HMACSHA256=${signature}`,
@@ -99,7 +98,23 @@ export async function POST(req: Request) {
       body: jsonPayload,
     });
 
-    const dokuData = await dokuRes.json();
+    let dokuData = await dokuRes.json();
+
+    // Auto retry with fallback URL if DOKU returns Invalid Client-Id due to Sandbox/Production mismatch
+    if (!dokuRes.ok && (dokuData?.error?.message?.includes("Client-Id") || dokuData?.message?.includes("Client-Id"))) {
+      dokuRes = await fetch(`${fallbackUrl}${requestTarget}`, {
+        method: "POST",
+        headers: {
+          "Client-Id": clientId,
+          "Request-Id": requestId,
+          "Request-Timestamp": requestTimestamp,
+          "Signature": `HMACSHA256=${signature}`,
+          "Content-Type": "application/json",
+        },
+        body: jsonPayload,
+      });
+      dokuData = await dokuRes.json();
+    }
 
     if (dokuRes.ok && dokuData.response?.payment?.url) {
       return NextResponse.json({

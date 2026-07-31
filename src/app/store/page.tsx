@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Check, Clock, Calendar, Crown, ShieldCheck, Sparkles, Loader2 } from "lucide-react";
 import { BrandLogo } from "../components/BrandLogo";
@@ -97,9 +97,35 @@ const PASS_PACKAGES = [
 ];
 
 export default function StorePage() {
-  const { user, isPremium } = useAuth();
+  const { user, isPremium, setUserProfile } = useAuth();
   const [loadingPkgId, setLoadingPkgId] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [successBanner, setSuccessBanner] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const status = params.get("status");
+      const targetEmail = params.get("email");
+
+      if (status === "success" && (targetEmail || user?.email)) {
+        const finalEmail = targetEmail || user?.email || "";
+        sound.playChime();
+        setSuccessBanner(`✓ Pembayaran Berhasil! Pass VIP Premium kamu telah aktif untuk akun ${finalEmail}!`);
+
+        // Auto activate in server database
+        fetch("/api/user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: finalEmail, isPremium: true }),
+        }).then(() => {
+          if (user) {
+            setUserProfile({ ...user });
+          }
+        });
+      }
+    }
+  }, [user]);
 
   const handleCheckout = async (pkg: typeof PASS_PACKAGES[0]) => {
     sound.playClick();
@@ -184,6 +210,12 @@ export default function StorePage() {
             Tanpa ribet sistem koin. Cukup pilih pass 3 jam, 10 jam, 1 minggu, atau 1 bulan untuk membuka seluruh topik obrolan sepuasnya!
           </p>
         </div>
+
+        {successBanner && (
+          <div className="bg-green-100 border-2 border-green-400 text-green-800 p-5 rounded-2xl max-w-2xl mx-auto text-xs sm:text-sm font-black text-center shadow-md animate-pop-in">
+            {successBanner}
+          </div>
+        )}
 
         {checkoutError && (
           <div className="bg-red-100 border-2 border-red-300 text-red-800 p-4 rounded-2xl max-w-2xl mx-auto text-xs font-extrabold text-center animate-pop-in">

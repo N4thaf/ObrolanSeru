@@ -60,6 +60,8 @@ export async function POST(req: Request) {
       },
       payment: {
         payment_due_date: 60,
+        payment_url_redirect: true,
+        callback_url: `https://obrolanseru.com/store?status=success&email=${encodeURIComponent(userEmail)}&passId=${encodeURIComponent(passId)}`,
       },
       customer: {
         name: userName || "Pemain ObrolanSeru",

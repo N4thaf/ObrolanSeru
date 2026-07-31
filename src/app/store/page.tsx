@@ -315,7 +315,7 @@ export default function StorePage() {
 
 function StoreRedeemBox() {
   const { redeemCode, isPremium } = useAuth();
-  const [code, setCode] = useState("OS4FREE");
+  const [code, setCode] = useState("");
   const [msg, setMsg] = useState<{ success: boolean; text: string } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -334,7 +334,7 @@ function StoreRedeemBox() {
           </div>
           <h3 className="text-xl font-black text-[#257180]">Tukarkan Kode Promo</h3>
           <p className="text-xs font-semibold text-[#257180]/75">
-            Gunakan kode <strong className="text-[#FD8B51]">OS4FREE</strong> untuk mengaktifkan seluruh Mode &amp; Topik Premium GRATIS!
+            Gunakan kode <strong className="text-[#FD8B51]">OS4FREE</strong> untuk mengaktifkan Pass Gratis 3 Jam!
           </p>
         </div>
 
@@ -350,7 +350,7 @@ function StoreRedeemBox() {
           type="text"
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
-          placeholder="Ketik kode: OS4FREE"
+          placeholder="Masukkan kode redeem..."
           className="flex-1 px-4 py-3.5 rounded-2xl bg-white border-2 border-[#257180]/20 text-sm font-black tracking-widest text-[#257180] outline-none uppercase placeholder:normal-case placeholder:font-semibold placeholder:tracking-normal placeholder:text-[#257180]/40 focus:border-[#257180]"
         />
         <button

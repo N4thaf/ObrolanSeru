@@ -13,7 +13,7 @@ interface LockedFeatureModalProps {
 
 export function LockedFeatureModal({ isOpen, onClose, featureTitle }: LockedFeatureModalProps) {
   const { redeemCode, user } = useAuth();
-  const [inputCode, setInputCode] = useState("OS4FREE");
+  const [inputCode, setInputCode] = useState("");
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   if (!isOpen) return null;
@@ -77,7 +77,7 @@ export function LockedFeatureModal({ isOpen, onClose, featureTitle }: LockedFeat
                 required
                 value={inputCode}
                 onChange={(e) => setInputCode(e.target.value.toUpperCase())}
-                placeholder="Masukkan kode: OS4FREE"
+                placeholder="Masukkan kode redeem..."
                 className="w-full px-4 py-3 rounded-2xl bg-white border-2 border-[#FD8B51]/40 text-sm font-black tracking-widest text-[#257180] uppercase outline-none placeholder:normal-case placeholder:font-semibold placeholder:tracking-normal placeholder:text-[#257180]/40 focus:border-[#FD8B51]"
               />
               <button

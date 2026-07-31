@@ -13,7 +13,7 @@ interface StandaloneRedeemModalProps {
 
 export function StandaloneRedeemModal({ isOpen, onClose }: StandaloneRedeemModalProps) {
   const { redeemCode, user, isPremium } = useAuth();
-  const [inputCode, setInputCode] = useState("OS4FREE");
+  const [inputCode, setInputCode] = useState("");
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -90,7 +90,7 @@ export function StandaloneRedeemModal({ isOpen, onClose }: StandaloneRedeemModal
             type="text"
             value={inputCode}
             onChange={(e) => setInputCode(e.target.value.toUpperCase())}
-            placeholder="Ketik kode promo..."
+            placeholder="Masukkan kode redeem..."
             className="w-full px-4 py-3 rounded-2xl bg-white border-2 border-[#257180]/20 text-center font-black text-base text-[#257180] outline-none uppercase placeholder:normal-case placeholder:font-semibold placeholder:text-sm focus:border-[#FD8B51]"
           />
 

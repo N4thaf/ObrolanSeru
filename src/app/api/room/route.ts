@@ -50,6 +50,7 @@ export async function POST(req: Request) {
     const cleanCode = code.toUpperCase();
     const existing = rooms[cleanCode] || {};
 
+    const now = Date.now();
     const updatedRoom = {
       code: cleanCode,
       host: host || existing.host || "Host",
@@ -58,8 +59,12 @@ export async function POST(req: Request) {
       rounds: rounds || existing.rounds || 3,
       players: Array.from(new Set([...(existing.players || []), ...(players || [])])),
       status: status || existing.status || "lobby",
-      updatedAt: Date.now(),
-      gameState: { ...(existing.gameState || {}), ...(gameState || {}) },
+      updatedAt: now,
+      gameState: {
+        ...(existing.gameState || {}),
+        ...(gameState || {}),
+        updatedAt: now
+      },
     };
 
     rooms[cleanCode] = updatedRoom;

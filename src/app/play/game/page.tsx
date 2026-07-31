@@ -224,7 +224,7 @@ function AllCardsDisplay({
   const [isClosingModal, setIsClosingModal] = useState(false);
 
   // Timestamp guard & stable refs to prevent network race conditions from flickering local state
-  const lastUserActionRef = useRef<number>(0);
+  const lastActionTimeRef = useRef<number>(0);
   const activeModalIndexRef = useRef<number | null>(activeModalIndex);
   const dismissedRef = useRef<boolean[]>(dismissed);
   const activePlayerIndexRef = useRef<number>(activePlayerIndex);
@@ -262,6 +262,8 @@ function AllCardsDisplay({
   // Helper to send real-time card state to /api/room
   const sendCardRoomSync = async (patch: any) => {
     if (!roomCode) return;
+    const now = Date.now();
+    lastActionTimeRef.current = now;
     try {
       await fetch('/api/room', {
         method: 'POST',
@@ -274,7 +276,7 @@ function AllCardsDisplay({
     } catch (e) {}
   };
 
-  // Poll room state in real-time (300ms) for 100% identical cross-device sync
+  // Poll room state in real-time (300ms) with strict timestamp guard (0 race flicker)
   useEffect(() => {
     if (!roomCode) return;
     const interval = setInterval(async () => {
@@ -284,6 +286,11 @@ function AllCardsDisplay({
         if (data.success && data.room && data.room.gameState) {
           const gs = data.room.gameState;
           
+          // Ignore stale server responses if a newer local action occurred
+          if (gs.updatedAt && gs.updatedAt < lastActionTimeRef.current) {
+            return;
+          }
+
           // 1. Sync active card modal index (open or close)
           if (gs.activeModalIndex !== undefined && gs.activeModalIndex !== activeModalIndexRef.current) {
             setActiveModalIndex(gs.activeModalIndex);

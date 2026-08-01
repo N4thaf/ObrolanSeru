@@ -79,8 +79,8 @@ const PASS_PACKAGES = [
     id: "pass_1bulan",
     name: "Pass 1 Bulan",
     subtitle: "Akses Penuh 30 Hari (VIP)",
-    price: "Rp 50.000",
-    numericPrice: 50000,
+    price: "Rp 40.000",
+    numericPrice: 40000,
     badge: "Akses Terbaik",
     icon: Crown,
     features: [

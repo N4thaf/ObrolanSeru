@@ -21,17 +21,17 @@ const C = {
 
 const CARD_COLORS = [
   "linear-gradient(150deg, #FD8B51 0%, #E25E3E 100%)", // 1. Sunset Orange to Terracotta
-  "linear-gradient(150deg, #257180 0%, #1A525E 100%)", // 2. Deep Elegance Teal
-  "linear-gradient(150deg, #FFBB5C 0%, #D97706 100%)", // 3. Warm Honey Gold
-  "linear-gradient(150deg, #CB6040 0%, #9E2B1E 100%)", // 4. Rich Terracotta Rust
-  "linear-gradient(150deg, #2E8A73 0%, #175243 100%)", // 5. Royal Emerald Green
-  "linear-gradient(150deg, #C63D2F 0%, #801C12 100%)", // 6. Deep Vintage Crimson
-  "linear-gradient(150deg, #7C3AED 0%, #4C1D95 100%)", // 7. Deep Royal Violet
-  "linear-gradient(150deg, #F97316 0%, #C2410C 100%)", // 8. Vibrant Coral Orange
-  "linear-gradient(150deg, #0284C7 0%, #075985 100%)", // 9. Ocean Sapphire Blue
-  "linear-gradient(150deg, #E11D48 0%, #9F1239 100%)", // 10. Warm Rose Crimson
-  "linear-gradient(150deg, #D97706 0%, #92400E 100%)", // 11. Rich Amber Spice
-  "linear-gradient(150deg, #0D9488 0%, #115E59 100%)", // 12. Forest Sea Green
+  "linear-gradient(150deg, #257180 0%, #174E59 100%)", // 2. Deep Warm Teal
+  "linear-gradient(150deg, #FFBB5C 0%, #E68A00 100%)", // 3. Warm Honey Gold
+  "linear-gradient(150deg, #CB6040 0%, #A53E22 100%)", // 4. Rich Terracotta Rust
+  "linear-gradient(150deg, #C63D2F 0%, #8A2218 100%)", // 5. Deep Vintage Crimson
+  "linear-gradient(150deg, #FF9B50 0%, #D96B27 100%)", // 6. Warm Peach Amber
+  "linear-gradient(150deg, #3B828E 0%, #20555E 100%)", // 7. Muted Slate Teal
+  "linear-gradient(150deg, #B84A39 0%, #7E2B1E 100%)", // 8. Deep Cinnamon Clay
+  "linear-gradient(150deg, #F5A623 0%, #D47A00 100%)", // 9. Warm Golden Sand
+  "linear-gradient(150deg, #A8442A 0%, #6E2613 100%)", // 10. Warm Chestnut Wood
+  "linear-gradient(150deg, #FF8C32 0%, #DD5518 100%)", // 11. Vibrant Sunburst Orange
+  "linear-gradient(150deg, #1D5966 0%, #0F353D 100%)", // 12. Deep Forest Teal
 ];
 
 const TOD_TRUTH = [
@@ -169,11 +169,13 @@ function GameCard({
 }: {
   index: number; onClick: () => void; dismissed: boolean; playerCount: number;
 }) {
+  if (dismissed) return null;
+
   const { w, h, symbolSize, fontBtn } = getCardDimensions(playerCount);
   const bg = CARD_COLORS[index % CARD_COLORS.length];
 
   return (
-    <div className={`group cursor-pointer transition-all duration-300 hover:-translate-y-2.5 hover:scale-105 active:scale-95 flex flex-col items-center ${dismissed ? 'animate-shrink-out' : 'animate-pop-in'}`}
+    <div className="group cursor-pointer transition-all duration-300 hover:-translate-y-2.5 hover:scale-105 active:scale-95 flex flex-col items-center animate-pop-in"
       style={{ width: w }} onClick={onClick}>
       
       {/* Sleek Luxury Playing Card Back */}

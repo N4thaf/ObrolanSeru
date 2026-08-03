@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { Analytics } from "@vercel/analytics/next";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -40,6 +41,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <AuthProvider>{children}</AuthProvider>
+        <Analytics />
       </body>
     </html>
   );

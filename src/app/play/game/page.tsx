@@ -1018,6 +1018,8 @@ function OfflineGame() {
         console.warn("localStorage read error:", e);
       }
 
+      const seenSet = new Set(seen.map(s => String(s).trim().toLowerCase()));
+
       let selectedQuestions: string[] = [];
 
       try {
@@ -1025,11 +1027,11 @@ function OfflineGame() {
         const res = await fetch('/api/generate-questions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ topic, customPrompt: aiPromptParam, count: totalNeeded + 5, exclude: seen })
+          body: JSON.stringify({ topic, customPrompt: aiPromptParam, count: totalNeeded + 10, exclude: seen })
         });
         const data = await res.json();
         if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
-          const pool: string[] = cleanPool(shuffle(data.questions as string[]));
+          const pool: string[] = cleanPool(shuffle(data.questions as string[])).filter(q => !seenSet.has(q.trim().toLowerCase()));
           if (pool.length >= playerNames.length) {
             selectedQuestions = pool;
           }
@@ -1038,11 +1040,14 @@ function OfflineGame() {
         console.warn("Falling back to local pool:", e);
       }
 
-      // Fallback if API fails
+      // Fallback if API returned fewer questions: filter unseen from local bank
       if (selectedQuestions.length < totalNeeded) {
         const bank = cleanPool(QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan']);
+        let unseenBank = bank.filter(q => !seenSet.has(q.trim().toLowerCase()));
+        if (unseenBank.length === 0) unseenBank = bank;
+        
         const pool: string[] = [];
-        while (pool.length < totalNeeded) pool.push(...shuffle(bank));
+        while (pool.length < totalNeeded) pool.push(...shuffle(unseenBank));
         selectedQuestions = pool.slice(0, totalNeeded);
       }
 
@@ -1053,7 +1058,6 @@ function OfflineGame() {
       // Save seen questions permanently to localStorage to prevent duplicates across days
       try {
         const updatedSeen = Array.from(new Set([...seen, ...selectedQuestions]));
-        // Keep last 300 seen questions to prevent infinite memory growth while guaranteeing 0 repeats
         const trimmedSeen = updatedSeen.slice(-300);
         localStorage.setItem('obrolan_seen_questions', JSON.stringify(trimmedSeen));
       } catch (e) {}

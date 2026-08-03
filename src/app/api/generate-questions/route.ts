@@ -307,30 +307,58 @@ export async function POST(request: Request) {
   try {
     const { topic = 'kenalan', customPrompt = '', count = 20, exclude = [] } = await request.json();
 
-    // Handle Custom AI Prompt Topic
+    const excludeSet = new Set<string>(
+      Array.isArray(exclude) ? exclude.map((s: string) => String(s).trim().toLowerCase()) : []
+    );
+
+    const isExcluded = (q: string) => excludeSet.has(q.trim().toLowerCase());
+
+    // 1. Handle Custom AI Prompt Topic
     if (topic === 'ai_custom' && customPrompt) {
-      const generated = generateCustomQuestions(customPrompt, count);
-      const shuffledCustom = fisherYatesShuffle(generated);
+      const generated = generateCustomQuestions(customPrompt, count * 2);
+      const availableCustom = generated.filter(q => !isExcluded(q));
+      const shuffledCustom = fisherYatesShuffle(availableCustom.length > 0 ? availableCustom : generated);
       return NextResponse.json({
         success: true,
         topic: 'ai_custom',
         customPrompt,
-        questions: shuffledCustom,
+        questions: shuffledCustom.slice(0, count),
       });
     }
 
-    const bank = BASE_AI_BANKS[topic] || BASE_AI_BANKS['kenalan'];
-    
-    // Filter out previously seen/used questions
-    const excludeSet = new Set<string>(Array.isArray(exclude) ? exclude : []);
-    let availablePool = bank.filter(q => !excludeSet.has(q));
-
-    // Fallback if pool is depleted: use full bank
-    if (availablePool.length < count) {
-      availablePool = [...bank];
+    // 2. Select Primary Topic Bank or Mix All Banks
+    let primaryBank: string[] = [];
+    if (topic === 'mix') {
+      primaryBank = Object.values(BASE_AI_BANKS).flat();
+    } else {
+      primaryBank = BASE_AI_BANKS[topic] || BASE_AI_BANKS['kenalan'];
     }
 
-    // Shuffle available base questions with true Fisher-Yates algorithm
+    // 3. Filter unseen questions from primary bank
+    let availablePool = primaryBank.filter(q => !isExcluded(q));
+
+    // 4. If primary bank is depleted, supplement from ALL OTHER topics!
+    if (availablePool.length < count) {
+      const allOtherQuestions = Object.values(BASE_AI_BANKS).flat();
+      const extraPool = allOtherQuestions.filter(q => !isExcluded(q));
+      const combinedPool = Array.from(new Set([...availablePool, ...extraPool]));
+      if (combinedPool.length >= count) {
+        availablePool = combinedPool;
+      }
+    }
+
+    // 5. If STILL depleted, generate dynamic synthetic questions on the fly!
+    if (availablePool.length < count) {
+      const synthetic = generateCustomQuestions(topic, count * 3).filter(q => !isExcluded(q));
+      availablePool = Array.from(new Set([...availablePool, ...synthetic]));
+    }
+
+    // 6. Final fallback: if completely exhausted, shuffle entire primary bank
+    if (availablePool.length === 0) {
+      availablePool = primaryBank.length > 0 ? primaryBank : Object.values(BASE_AI_BANKS).flat();
+    }
+
+    // 7. Shuffle with true Fisher-Yates and slice requested count
     const shuffled = fisherYatesShuffle(availablePool);
     const selectedQuestions = shuffled.slice(0, Math.min(count, shuffled.length));
 

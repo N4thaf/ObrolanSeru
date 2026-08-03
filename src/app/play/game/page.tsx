@@ -1004,10 +1004,10 @@ function OfflineGame() {
       const totalNeeded = totalRounds * playerNames.length;
       let seen: string[] = [];
       try {
-        const stored = sessionStorage.getItem('obrolan_seen_questions');
+        const stored = localStorage.getItem('obrolan_seen_questions');
         if (stored) seen = JSON.parse(stored);
       } catch (e) {
-        console.warn("sessionStorage read error:", e);
+        console.warn("localStorage read error:", e);
       }
 
       let selectedQuestions: string[] = [];
@@ -1042,10 +1042,12 @@ function OfflineGame() {
       setAllQuestions(selectedQuestions);
       setRoundQuestions(firstRoundQs);
 
-      // Save seen questions to prevent duplicates across rounds & games
+      // Save seen questions permanently to localStorage to prevent duplicates across days
       try {
         const updatedSeen = Array.from(new Set([...seen, ...selectedQuestions]));
-        sessionStorage.setItem('obrolan_seen_questions', JSON.stringify(updatedSeen));
+        // Keep last 300 seen questions to prevent infinite memory growth while guaranteeing 0 repeats
+        const trimmedSeen = updatedSeen.slice(-300);
+        localStorage.setItem('obrolan_seen_questions', JSON.stringify(trimmedSeen));
       } catch (e) {}
 
       // Broadcast questions to room so ALL devices get 100% identical questions!

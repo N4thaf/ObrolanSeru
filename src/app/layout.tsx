@@ -23,6 +23,9 @@ export const metadata: Metadata = {
     shortcut: "/favicon.png?v=10",
     apple: "/apple-touch-icon.png?v=10",
   },
+  verification: {
+    google: "dqwSBKGQVrOZZeC7OxJ675M5hsV-05fnAWfA0xDKvBw",
+  },
 };
 
 export default function RootLayout({
@@ -33,6 +36,7 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${nunito.variable} h-full antialiased`}>
       <head>
+        <meta name="google-site-verification" content="dqwSBKGQVrOZZeC7OxJ675M5hsV-05fnAWfA0xDKvBw" />
         <link rel="icon" href="/favicon-192.png?v=10" sizes="192x192" type="image/png" />
         <link rel="icon" href="/favicon.png?v=10" sizes="32x32" type="image/png" />
         <link rel="shortcut icon" href="/favicon.png?v=10" />

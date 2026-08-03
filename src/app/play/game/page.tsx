@@ -20,12 +20,18 @@ const C = {
 };
 
 const CARD_COLORS = [
-  "linear-gradient(150deg, #FFBB5C 0%, #FF9B50 100%)", // Honey Gold to Sunset Orange
-  "linear-gradient(150deg, #FF9B50 0%, #E25E3E 100%)", // Sunset Orange to Terracotta Coral
-  "linear-gradient(150deg, #E25E3E 0%, #C63D2F 100%)", // Terracotta Coral to Crimson Rust
-  "linear-gradient(150deg, #C63D2F 0%, #9E2B1E 100%)", // Deep Vintage Crimson
-  "linear-gradient(150deg, #FFBB5C 0%, #E25E3E 100%)", // Warm Peach to Terracotta
-  "linear-gradient(150deg, #FF9B50 0%, #C63D2F 100%)", // Vibrant Sunset to Crimson
+  "linear-gradient(150deg, #FD8B51 0%, #E25E3E 100%)", // 1. Sunset Orange to Terracotta
+  "linear-gradient(150deg, #257180 0%, #1A525E 100%)", // 2. Deep Elegance Teal
+  "linear-gradient(150deg, #FFBB5C 0%, #D97706 100%)", // 3. Warm Honey Gold
+  "linear-gradient(150deg, #CB6040 0%, #9E2B1E 100%)", // 4. Rich Terracotta Rust
+  "linear-gradient(150deg, #2E8A73 0%, #175243 100%)", // 5. Royal Emerald Green
+  "linear-gradient(150deg, #C63D2F 0%, #801C12 100%)", // 6. Deep Vintage Crimson
+  "linear-gradient(150deg, #7C3AED 0%, #4C1D95 100%)", // 7. Deep Royal Violet
+  "linear-gradient(150deg, #F97316 0%, #C2410C 100%)", // 8. Vibrant Coral Orange
+  "linear-gradient(150deg, #0284C7 0%, #075985 100%)", // 9. Ocean Sapphire Blue
+  "linear-gradient(150deg, #E11D48 0%, #9F1239 100%)", // 10. Warm Rose Crimson
+  "linear-gradient(150deg, #D97706 0%, #92400E 100%)", // 11. Rich Amber Spice
+  "linear-gradient(150deg, #0D9488 0%, #115E59 100%)", // 12. Forest Sea Green
 ];
 
 const TOD_TRUTH = [

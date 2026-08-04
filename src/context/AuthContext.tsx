@@ -57,31 +57,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Instant 0ms cache for isPremium to prevent refresh flickers
   const [isPremium, setIsPremiumState] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("obrolan_is_premium") === "true";
+      const globalPrem = localStorage.getItem("obrolan_is_premium") === "true";
+      return globalPrem;
     }
     return false;
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const setIsPremium = (val: boolean) => {
+  const setIsPremium = (val: boolean, email?: string) => {
     setIsPremiumState(val);
     try {
       if (val) {
         localStorage.setItem("obrolan_is_premium", "true");
+        if (email) localStorage.setItem(`obrolan_is_premium_${email.toLowerCase().trim()}`, "true");
       } else {
         localStorage.removeItem("obrolan_is_premium");
+        if (email) localStorage.removeItem(`obrolan_is_premium_${email.toLowerCase().trim()}`);
       }
     } catch (e) {}
   };
 
   // Helper to fetch user premium status & sync cloud seen questions from server database
   const syncAccountData = async (email: string) => {
+    const cleanEmail = email.toLowerCase().trim();
+    
+    // Check if locally cached as premium
+    let isLocallyPremium = false;
     try {
-      const res = await fetch(`/api/user?email=${encodeURIComponent(email)}`);
+      isLocallyPremium = localStorage.getItem(`obrolan_is_premium_${cleanEmail}`) === "true";
+    } catch (e) {}
+
+    try {
+      const res = await fetch(`/api/user?email=${encodeURIComponent(cleanEmail)}`);
       const data = await res.json();
       if (data.success && data.user) {
-        setIsPremium(!!data.user.isPremium);
+        const hasServerPremium = !!data.user.isPremium;
+        const activePrem = hasServerPremium || isLocallyPremium;
+        setIsPremium(activePrem, cleanEmail);
 
         // Sync Cloud Account Seen Questions to local device storage
         if (Array.isArray(data.user.seenQuestions) && data.user.seenQuestions.length > 0) {
@@ -97,10 +110,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(prev => prev ? { ...prev, seenQuestions: merged } : prev);
         }
       } else {
-        setIsPremium(false);
+        if (isLocallyPremium) {
+          setIsPremium(true, cleanEmail);
+        } else {
+          setIsPremium(false, cleanEmail);
+        }
       }
     } catch (e) {
-      // Retain existing local premium status on network errors
+      if (isLocallyPremium) setIsPremium(true, cleanEmail);
     }
   };
 
@@ -126,6 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email: user.email,
+            isPremium: isPremium,
             newSeenQuestions: merged
           })
         });
@@ -177,20 +195,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     sound.playChime();
     setUser(profile);
 
+    const cleanEmail = profile.email.toLowerCase().trim();
+
     try {
       localStorage.setItem("obrolan_user_session", JSON.stringify(profile));
       sessionStorage.setItem("my_name", profile.name.split(" ")[0]);
+
+      let isLocallyPremium = false;
+      try {
+        isLocallyPremium = localStorage.getItem(`obrolan_is_premium_${cleanEmail}`) === "true";
+      } catch (e) {}
 
       // Sync user profile to backend server database & check premium status
       const res = await fetch("/api/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profile),
+        body: JSON.stringify({
+          ...profile,
+          isPremium: isPremium || isLocallyPremium
+        }),
       });
 
       const data = await res.json();
       if (data.success && data.user) {
-        setIsPremium(!!data.user.isPremium);
+        const activePrem = !!data.user.isPremium || isLocallyPremium;
+        setIsPremium(activePrem, cleanEmail);
         if (Array.isArray(data.user.seenQuestions)) {
           setUser(prev => prev ? { ...prev, seenQuestions: data.user.seenQuestions } : prev);
         }
@@ -207,17 +236,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
     }
 
-    if (isPremium) {
-      sound.playClick();
-      return {
-        success: false,
-        message: "Akun kamu sudah menjadi VIP Premium Aktif! Kode promo tidak perlu digunakan lagi karena kamu sudah memiliki akses penuh.",
-      };
-    }
+    const cleanEmail = user.email.toLowerCase().trim();
+    const cleanCode = code.trim().toUpperCase();
 
-    const clean = code.trim().toUpperCase();
-
-    if (!clean) {
+    if (!cleanCode) {
       sound.playClick();
       return {
         success: false,
@@ -225,7 +247,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
     }
 
-    if (clean === "OS4FREE") {
+    // Check if code was already redeemed locally on this account
+    let isAlreadyRedeemedLocally = false;
+    try {
+      isAlreadyRedeemedLocally = localStorage.getItem(`obrolan_redeemed_${cleanCode}_${cleanEmail}`) === "true";
+    } catch (e) {}
+
+    if (isAlreadyRedeemedLocally || (isPremium && localStorage.getItem(`obrolan_redeemed_${cleanCode}_${cleanEmail}`) === "true")) {
+      sound.playClick();
+      return {
+        success: false,
+        message: `Kode promo ${cleanCode} sudah pernah kamu gunakan di akun email ${cleanEmail}. Setiap akun hanya dapat menggunakan 1x.`,
+      };
+    }
+
+    if (cleanCode === "OS4FREE") {
       sound.playChime();
 
       try {
@@ -234,7 +270,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            email: user.email,
+            email: cleanEmail,
             redeemCode: "OS4FREE",
             isPremium: true,
             activePass: {
@@ -246,13 +282,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const data = await res.json();
         if (data.success && data.user) {
-          setIsPremium(true);
+          setIsPremium(true, cleanEmail);
+          try {
+            localStorage.setItem(`obrolan_redeemed_${cleanCode}_${cleanEmail}`, "true");
+          } catch (e) {}
           return {
             success: true,
             message: `Selamat ${user.name}! Kode OS4FREE berhasil mengaktifkan Pass Gratis 3 Jam untuk akun ${user.email}. Seluruh topik terbuka selama 3 jam!`,
           };
         } else {
           sound.playClick();
+          if (data.alreadyRedeemed) {
+            try {
+              localStorage.setItem(`obrolan_redeemed_${cleanCode}_${cleanEmail}`, "true");
+            } catch (e) {}
+          }
           return {
             success: false,
             message: data.message || `Kode promo OS4FREE sudah pernah kamu gunakan di akun email ${user.email}. Setiap akun hanya dapat menggunakan 1x.`
@@ -270,14 +314,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     sound.playClick();
     return {
       success: false,
-      message: `Kode promo "${clean}" tidak terdaftar. Periksa kembali kode yang kamu ketik!`,
+      message: `Kode promo "${cleanCode}" tidak terdaftar. Periksa kembali kode yang kamu ketik!`,
     };
   };
 
   const logout = () => {
     sound.playClick();
+    const cleanEmail = user?.email?.toLowerCase()?.trim();
     setUser(null);
-    setIsPremium(false);
+    setIsPremium(false, cleanEmail);
     try {
       localStorage.removeItem("obrolan_user_session");
       localStorage.removeItem("obrolan_is_premium");

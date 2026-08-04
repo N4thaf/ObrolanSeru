@@ -25,7 +25,7 @@ const userDatabase: Record<string, {
     provider: "google",
     createdAt: Date.now(),
     isPremium: true,
-    redeemedCodes: ["DOKU_PAYMENT_SUCCESS"],
+    redeemedCodes: ["DOKU_PAYMENT_SUCCESS", "OS4FREE"],
     seenQuestions: [],
     activePasses: [{ type: "pass_10jam", expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000 }],
     roomsJoined: 1
@@ -53,7 +53,7 @@ export async function GET(req: Request) {
         provider: "google",
         createdAt: Date.now(),
         isPremium: true,
-        redeemedCodes: ["DOKU_PAYMENT_SUCCESS"],
+        redeemedCodes: ["DOKU_PAYMENT_SUCCESS", "OS4FREE"],
         seenQuestions: [],
         activePasses: [{ type: "pass_10jam", expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000 }],
         roomsJoined: 1
@@ -90,6 +90,9 @@ export async function POST(req: Request) {
       mergedSeen = Array.from(new Set([...existingSeen, ...normalizedNew])).slice(-500);
     }
 
+    const existingRedeemed = existing.redeemedCodes || [];
+    const isAlreadyPremium = cleanEmail === "chunleon13@gmail.com" || existing.isPremium === true || isPremium === true;
+
     const updatedUser = {
       id: id || existing.id || `user_${Date.now()}`,
       name: name || existing.name || cleanEmail.split("@")[0],
@@ -97,8 +100,8 @@ export async function POST(req: Request) {
       avatar: avatar || existing.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanEmail)}`,
       provider: "google" as const,
       createdAt: existing.createdAt || Date.now(),
-      isPremium: cleanEmail === "chunleon13@gmail.com" ? true : (isPremium !== undefined ? isPremium : (existing.isPremium || false)),
-      redeemedCodes: existing.redeemedCodes || [],
+      isPremium: isAlreadyPremium,
+      redeemedCodes: existingRedeemed,
       seenQuestions: mergedSeen,
       activePasses: existing.activePasses || [],
       roomsJoined: (existing.roomsJoined || 0) + 1,
@@ -106,7 +109,7 @@ export async function POST(req: Request) {
 
     if (redeemCode) {
       const cleanCode = redeemCode.trim().toUpperCase();
-      if (existing.redeemedCodes && existing.redeemedCodes.includes(cleanCode)) {
+      if (existingRedeemed.includes(cleanCode)) {
         return NextResponse.json({
           success: false,
           alreadyRedeemed: true,

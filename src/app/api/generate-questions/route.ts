@@ -326,10 +326,15 @@ export async function POST(request: Request) {
       });
     }
 
-    // 2. Select Primary Topic Bank or Mix All Banks
+    const REGULAR_KEYS = ['kenalan', 'absurd', 'deep', 'pasangan', 'nostalgia', 'keluarga', 'whatif', 'karir'];
+    const TOD_KEYS = ['tod_truth', 'tod_dare_offline', 'tod_dare_online'];
+
+    const isTodTopic = TOD_KEYS.includes(topic);
+
+    // 2. Select Primary Topic Bank or Mix All Regular Banks
     let primaryBank: string[] = [];
     if (topic === 'mix') {
-      primaryBank = Object.values(BASE_AI_BANKS).flat();
+      primaryBank = REGULAR_KEYS.flatMap(k => BASE_AI_BANKS[k] || []);
     } else {
       primaryBank = BASE_AI_BANKS[topic] || BASE_AI_BANKS['kenalan'];
     }
@@ -337,10 +342,11 @@ export async function POST(request: Request) {
     // 3. Filter unseen questions from primary bank
     let availablePool = primaryBank.filter(q => !isExcluded(q));
 
-    // 4. If primary bank is depleted, supplement from ALL OTHER topics!
+    // 4. If primary bank is depleted, supplement strictly from SAME TYPE of topics (No cross-mixing Dare into Questions!)
     if (availablePool.length < count) {
-      const allOtherQuestions = Object.values(BASE_AI_BANKS).flat();
-      const extraPool = allOtherQuestions.filter(q => !isExcluded(q));
+      const allowedKeys = isTodTopic ? TOD_KEYS : REGULAR_KEYS;
+      const allCategoryQuestions = allowedKeys.flatMap(k => BASE_AI_BANKS[k] || []);
+      const extraPool = allCategoryQuestions.filter(q => !isExcluded(q));
       const combinedPool = Array.from(new Set([...availablePool, ...extraPool]));
       if (combinedPool.length >= count) {
         availablePool = combinedPool;
@@ -353,9 +359,10 @@ export async function POST(request: Request) {
       availablePool = Array.from(new Set([...availablePool, ...synthetic]));
     }
 
-    // 6. Final fallback: if completely exhausted, shuffle entire primary bank
+    // 6. Final fallback: if completely exhausted, shuffle primary category bank
     if (availablePool.length === 0) {
-      availablePool = primaryBank.length > 0 ? primaryBank : Object.values(BASE_AI_BANKS).flat();
+      const allowedKeys = isTodTopic ? TOD_KEYS : REGULAR_KEYS;
+      availablePool = primaryBank.length > 0 ? primaryBank : allowedKeys.flatMap(k => BASE_AI_BANKS[k] || []);
     }
 
     // 7. Shuffle with true Fisher-Yates and slice requested count

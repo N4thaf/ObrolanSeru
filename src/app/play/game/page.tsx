@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { RotateCcw, CheckSquare, Volume2, VolumeX, Check } from 'lucide-react';
 import { QUESTION_BANKS } from '../offline/page';
 import { sound } from '@/utils/sound';
+import { useAuth } from '@/context/AuthContext';
 
 /* Official User Color Palette (Warm Sunset Tones - Zero Cold White) */
 const C = {
@@ -942,6 +943,7 @@ function SpinnerWheelFlow({
 function OfflineGame() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user, getMergedSeenQuestions, syncSeenQuestions } = useAuth();
 
   const mode = searchParams.get('mode') as 'pertanyaan'|'tod' || 'pertanyaan';
   const todType = searchParams.get('todType') || 'tatapmuka';
@@ -1010,14 +1012,7 @@ function OfflineGame() {
       const cleanPool = (list: string[]) => list.filter(q => q && !BAD_PHRASES.some(b => q.toLowerCase().includes(b)));
 
       const totalNeeded = totalRounds * playerNames.length;
-      let seen: string[] = [];
-      try {
-        const stored = localStorage.getItem('obrolan_seen_questions');
-        if (stored) seen = JSON.parse(stored);
-      } catch (e) {
-        console.warn("localStorage read error:", e);
-      }
-
+      const seen: string[] = getMergedSeenQuestions();
       const seenSet = new Set(seen.map(s => String(s).trim().toLowerCase()));
 
       let selectedQuestions: string[] = [];
@@ -1055,11 +1050,9 @@ function OfflineGame() {
       setAllQuestions(selectedQuestions);
       setRoundQuestions(firstRoundQs);
 
-      // Save seen questions permanently to localStorage to prevent duplicates across days
+      // Sync seen questions across devices and upload to Cloud Account
       try {
-        const updatedSeen = Array.from(new Set([...seen, ...selectedQuestions]));
-        const trimmedSeen = updatedSeen.slice(-300);
-        localStorage.setItem('obrolan_seen_questions', JSON.stringify(trimmedSeen));
+        await syncSeenQuestions(selectedQuestions);
       } catch (e) {}
 
       // Broadcast questions to room so ALL devices get 100% identical questions!

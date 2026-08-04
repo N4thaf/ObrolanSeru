@@ -10,6 +10,7 @@ const userDatabase: Record<string, {
   createdAt: number;
   isPremium: boolean;
   redeemedCodes: string[];
+  seenQuestions: string[];
   activePasses: {
     type: string;
     expiresAt: number;
@@ -25,6 +26,7 @@ const userDatabase: Record<string, {
     createdAt: Date.now(),
     isPremium: true,
     redeemedCodes: ["DOKU_PAYMENT_SUCCESS"],
+    seenQuestions: [],
     activePasses: [{ type: "pass_10jam", expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000 }],
     roomsJoined: 1
   }
@@ -52,6 +54,7 @@ export async function GET(req: Request) {
         createdAt: Date.now(),
         isPremium: true,
         redeemedCodes: ["DOKU_PAYMENT_SUCCESS"],
+        seenQuestions: [],
         activePasses: [{ type: "pass_10jam", expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000 }],
         roomsJoined: 1
       };
@@ -71,7 +74,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { id, name, email, avatar, isPremium, redeemCode, activePass } = body;
+    const { id, name, email, avatar, isPremium, redeemCode, activePass, newSeenQuestions } = body;
 
     if (!email) {
       return NextResponse.json({ success: false, message: "Email is required" }, { status: 400 });
@@ -79,6 +82,13 @@ export async function POST(req: Request) {
 
     const cleanEmail = email.toLowerCase().trim();
     const existing = userDatabase[cleanEmail] || {};
+
+    const existingSeen = existing.seenQuestions || [];
+    let mergedSeen = existingSeen;
+    if (Array.isArray(newSeenQuestions) && newSeenQuestions.length > 0) {
+      const normalizedNew = newSeenQuestions.map((q: string) => String(q).trim());
+      mergedSeen = Array.from(new Set([...existingSeen, ...normalizedNew])).slice(-500);
+    }
 
     const updatedUser = {
       id: id || existing.id || `user_${Date.now()}`,
@@ -89,6 +99,7 @@ export async function POST(req: Request) {
       createdAt: existing.createdAt || Date.now(),
       isPremium: cleanEmail === "chunleon13@gmail.com" ? true : (isPremium !== undefined ? isPremium : (existing.isPremium || false)),
       redeemedCodes: existing.redeemedCodes || [],
+      seenQuestions: mergedSeen,
       activePasses: existing.activePasses || [],
       roomsJoined: (existing.roomsJoined || 0) + 1,
     };

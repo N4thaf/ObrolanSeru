@@ -9,6 +9,7 @@ export interface UserProfile {
   email: string;
   avatar: string;
   provider: "google";
+  seenQuestions?: string[];
 }
 
 interface AuthContextType {
@@ -17,6 +18,8 @@ interface AuthContextType {
   isPremium: boolean;
   setUserProfile: (profile: UserProfile) => void;
   redeemCode: (code: string) => Promise<{ success: boolean; message: string }>;
+  syncSeenQuestions: (newQuestions: string[]) => Promise<void>;
+  getMergedSeenQuestions: () => string[];
   logout: () => void;
 }
 
@@ -26,6 +29,8 @@ const AuthContext = createContext<AuthContextType>({
   isPremium: false,
   setUserProfile: () => {},
   redeemCode: async () => ({ success: false, message: "" }),
+  syncSeenQuestions: async () => {},
+  getMergedSeenQuestions: () => [],
   logout: () => {},
 });
 
@@ -70,13 +75,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {}
   };
 
-  // Helper to fetch user premium status from server database
-  const syncAccountPremiumStatus = async (email: string) => {
+  // Helper to fetch user premium status & sync cloud seen questions from server database
+  const syncAccountData = async (email: string) => {
     try {
       const res = await fetch(`/api/user?email=${encodeURIComponent(email)}`);
       const data = await res.json();
       if (data.success && data.user) {
         setIsPremium(!!data.user.isPremium);
+
+        // Sync Cloud Account Seen Questions to local device storage
+        if (Array.isArray(data.user.seenQuestions) && data.user.seenQuestions.length > 0) {
+          let localSeen: string[] = [];
+          try {
+            const stored = localStorage.getItem("obrolan_seen_questions");
+            if (stored) localSeen = JSON.parse(stored);
+          } catch (e) {}
+
+          const merged = Array.from(new Set([...localSeen, ...data.user.seenQuestions])).slice(-500);
+          localStorage.setItem("obrolan_seen_questions", JSON.stringify(merged));
+          
+          setUser(prev => prev ? { ...prev, seenQuestions: merged } : prev);
+        }
       } else {
         setIsPremium(false);
       }
@@ -85,7 +104,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Load existing session & sync Google account premium status on mount
+  // Helper to merge and upload new seen questions to Cloud Account
+  const syncSeenQuestions = async (newQuestions: string[]) => {
+    if (!newQuestions || newQuestions.length === 0) return;
+
+    let localSeen: string[] = [];
+    try {
+      const stored = localStorage.getItem("obrolan_seen_questions");
+      if (stored) localSeen = JSON.parse(stored);
+    } catch (e) {}
+
+    const merged = Array.from(new Set([...localSeen, ...newQuestions])).slice(-500);
+    try {
+      localStorage.setItem("obrolan_seen_questions", JSON.stringify(merged));
+    } catch (e) {}
+
+    if (user && user.email) {
+      try {
+        await fetch("/api/user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: user.email,
+            newSeenQuestions: merged
+          })
+        });
+      } catch (e) {}
+    }
+  };
+
+  const getMergedSeenQuestions = (): string[] => {
+    let localSeen: string[] = [];
+    try {
+      const stored = localStorage.getItem("obrolan_seen_questions");
+      if (stored) localSeen = JSON.parse(stored);
+    } catch (e) {}
+
+    const userSeen = user?.seenQuestions || [];
+    return Array.from(new Set([...localSeen, ...userSeen]));
+  };
+
+  // Load existing session & sync Google account data on mount
   useEffect(() => {
     async function initSession() {
       try {
@@ -99,7 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setIsPremium(false);
           } else {
             setUser(parsed);
-            await syncAccountPremiumStatus(parsed.email);
+            await syncAccountData(parsed.email);
           }
         } else {
           setIsPremium(false);
@@ -132,6 +191,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       if (data.success && data.user) {
         setIsPremium(!!data.user.isPremium);
+        if (Array.isArray(data.user.seenQuestions)) {
+          setUser(prev => prev ? { ...prev, seenQuestions: data.user.seenQuestions } : prev);
+        }
       }
     } catch (e) {}
   };
@@ -223,7 +285,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, isPremium, setUserProfile, redeemCode, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, isPremium, setUserProfile, redeemCode, syncSeenQuestions, getMergedSeenQuestions, logout }}>
       {children}
     </AuthContext.Provider>
   );

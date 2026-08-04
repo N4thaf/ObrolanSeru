@@ -135,13 +135,26 @@ export const QUESTION_BANKS: Record<string, string[]> = {
   ],
   karir: [
     "Apa cita-cita atau mimpi terbesar kamu yang belum sempat diwujudkan sampai sekarang?",
-    "Kalau uang bukan lagi masalah dan finansial kamu sudah terjamin 100 percent, pekerjaan apa yang kamu tekuni?",
-    "Pencapaian atau karya apa yang paling membuat kamu merasa puas dalam perjalanan karir atau perkuliahan?",
-    "Apa tantangan pekerjaan/studi terbesar yang sedang kamu hadapi saat ini dan bagaimana cara kamu menghadapinya?",
-    "Siapa role model atau sosok profesional yang paling menginspirasi kamu dalam berkarya?",
-    "Skill baru apa yang paling ingin kamu kuasai dalam 1 tahun ke depan untuk mendukung karir kamu?",
-    "Momen kegagalan dalam pekerjaan/studi apa yang pada akhirnya malah membuka kesempatan baru yang lebih baik?",
-    "Lingkungan kerja atau budaya tim impian yang paling ideal menurut kamu seperti apa?"
+    "Kalau uang bukan lagi masalah dan finansial kamu sudah terjamin 100%, pekerjaan atau karya apa yang akan kamu tekuni?",
+    "Pencapaian atau karya apa dalam karir/perkuliahan yang paling membuat kamu merasa puas dan bangga?",
+    "Nasihat karir atau pelajaran pekerjaan terbaik apa yang paling mengubah cara pandang kamu?",
+    "Apa pengorbanan terbesar yang pernah kamu lakukan demi meraih posisi atau impian kamu saat ini?",
+    "Kalau kamu punya modal bebas untuk buka bisnis sendiri esok hari, bidang usaha apa yang ingin kamu bangun?",
+    "Momen ketika kamu merasa paling burnout atau lelah dalam bekerja/kuliah, dan bagaimana kamu melewatinya?",
+    "Siapa sosok profesional atau pengusaha yang paling menginspirasi etos kerja dan cara berpikir kamu?",
+    "Apa skill atau keahlian baru yang paling ingin kamu kuasai dalam 1 tahun ke depan untuk mendukung karir kamu?",
+    "Bagaimana definisi keseimbangan hidup (*work-life balance*) yang ideal versi kamu pribadi?",
+    "Momen ketika kamu pernah gagal dalam suatu wawancara atau proyek, tapi hasilnya malah membuka jalan yang lebih baik?",
+    "Kalau kamu bisa memutar waktu ke hari pertama kamu mulai bekerja/kuliah, nasihat apa yang ingin kamu sampaikan ke diri sendiri?",
+    "Apa prinsip atau nilai kejujuran dalam bekerja yang tidak akan pernah kamu kompromikan demi uang?",
+    "Pernahkah kamu mengambil risiko besar dalam keputusan karir atau studi? Bagaimana hasilnya?",
+    "Apa proyek atau target kerja terbesar yang sedang kamu perjuangkan dan ingin kamu selesaikan tahun ini?",
+    "Lingkungan kerja atau budaya tim impian yang paling membuat kamu merasa bersemangat seperti apa?",
+    "Kalau kamu diundang berbicara di panggung seminar internasional, topik keahlian apa yang ingin kamu bawakan?",
+    "Gaji atau pendapatan pertama dalam hidup kamu dulu kamu pakai untuk membeli apa?",
+    "Apa pencapaian finansial atau tabungan terkecil yang pernah membuat kamu tersenyum lega?",
+    "Bagaimana cara kamu menghadapi rekan kerja atau atasan yang punya karakter sulit diajak kerja sama?",
+    "Apa impian terbesar kamu untuk masa pensiun atau masa tua kelak?"
   ]
 };
 

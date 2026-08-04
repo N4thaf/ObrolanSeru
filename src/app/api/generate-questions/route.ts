@@ -81,9 +81,26 @@ const BASE_AI_BANKS: Record<string, string[]> = {
   ],
   karir: [
     "Apa cita-cita atau mimpi terbesar kamu yang belum sempat diwujudkan sampai sekarang?",
-    "Kalau uang bukan lagi masalah dan finansial kamu sudah terjamin 100 percent, pekerjaan apa yang kamu tekuni?",
-    "Pencapaian atau karya apa yang paling membuat kamu merasa puas dalam perjalanan karir atau perkuliahan?",
-    "Nasihat karir atau pelajaran pekerjaan terbaik apa yang paling mengubah cara pandang kamu?"
+    "Kalau uang bukan lagi masalah dan finansial kamu sudah terjamin 100%, pekerjaan atau karya apa yang akan kamu tekuni?",
+    "Pencapaian atau karya apa dalam karir/perkuliahan yang paling membuat kamu merasa puas dan bangga?",
+    "Nasihat karir atau pelajaran pekerjaan terbaik apa yang paling mengubah cara pandang kamu?",
+    "Apa pengorbanan terbesar yang pernah kamu lakukan demi meraih posisi atau impian kamu saat ini?",
+    "Kalau kamu punya modal bebas untuk buka bisnis sendiri esok hari, bidang usaha apa yang ingin kamu bangun?",
+    "Momen ketika kamu merasa paling burnout atau lelah dalam bekerja/kuliah, dan bagaimana kamu melewatinya?",
+    "Siapa sosok profesional atau pengusaha yang paling menginspirasi etos kerja dan cara berpikir kamu?",
+    "Apa skill atau keahlian baru yang paling ingin kamu kuasai dalam 1 tahun ke depan untuk mendukung karir kamu?",
+    "Bagaimana definisi keseimbangan hidup (*work-life balance*) yang ideal versi kamu pribadi?",
+    "Momen ketika kamu pernah gagal dalam suatu wawancara atau proyek, tapi hasilnya malah membuka jalan yang lebih baik?",
+    "Kalau kamu bisa memutar waktu ke hari pertama kamu mulai bekerja/kuliah, nasihat apa yang ingin kamu sampaikan ke diri sendiri?",
+    "Apa prinsip atau nilai kejujuran dalam bekerja yang tidak akan pernah kamu kompromikan demi uang?",
+    "Pernahkah kamu mengambil risiko besar dalam keputusan karir atau studi? Bagaimana hasilnya?",
+    "Apa proyek atau target kerja terbesar yang sedang kamu perjuangkan dan ingin kamu selesaikan tahun ini?",
+    "Lingkungan kerja atau budaya tim impian yang paling membuat kamu merasa bersemangat seperti apa?",
+    "Kalau kamu diundang berbicara di panggung seminar internasional, topik keahlian apa yang ingin kamu bawakan?",
+    "Gaji atau pendapatan pertama dalam hidup kamu dulu kamu pakai untuk membeli apa?",
+    "Apa pencapaian finansial atau tabungan terkecil yang pernah membuat kamu tersenyum lega?",
+    "Bagaimana cara kamu menghadapi rekan kerja atau atasan yang punya karakter sulit diajak kerja sama?",
+    "Apa impian terbesar kamu untuk masa pensiun atau masa tua kelak?"
   ],
   tod_truth: [
     "Siapa orang yang paling kamu sukai atau taksir secara diam-diam saat masa sekolah dulu?",
@@ -216,45 +233,8 @@ function generateCustomQuestions(rawPrompt: string, count: number = 20): string[
     ];
   }
 
-  // Intent 5: Deep Talk / Rahasia / Pribadi / Filosofis / Kehidupan
-  if (p.includes("deep") || p.includes("rahasia") || p.includes("pribadi") || p.includes("filosofis") || p.includes("hidup") || p.includes("prinsip") || p.includes("mindset")) {
-    return [
-      "Apa ketakutan terbesar dalam hidup kamu yang jarang banget kamu ceritakan ke teman dekat sekali pun?",
-      "Siapa satu sosok dalam hidup kamu yang paling banyak membentuk cara berpikir dan prinsip kamu sampai hari ini?",
-      "Kalau kamu bisa kirim satu kalimat pesan singkat ke diri kamu sendiri 10 tahun lalu, apa pesan utamanya?",
-      "Menurut pandangan kamu pribadi, definisi bahagia dan tenang yang sesungguhnya itu seperti apa?",
-      "Pernahkah kamu merasa berada di titik terendah dalam hidup dan apa hal yang bikin kamu bangkit kembali?",
-      "Apa pencapaian terkecil kamu yang orang lain sepelekan tapi sebenarnya paling kamu syukuri?",
-      "Siapa orang pertama yang paling kamu inginkan hadir saat kamu sedang merasa sedih atau lelah?",
-      "Satu hal apa dari diri kamu sendiri yang sampai sekarang masih berusaha kamu maafi dan ikhlaskan?",
-      "Kalau kamu melihat kehidupan kamu 5 tahun ke depan, suasana seperti apa yang ingin kamu capai?",
-      "Apa nilai kebaikan atau prinsip hidup yang tidak akan pernah kamu kompromikan demi apapun?"
-    ];
-  }
-
-  // Intent 6: Liburan / Trip / Traveling / Pantai / Gunung / Jalan-Jalan
-  if (p.includes("liburan") || p.includes("trip") || p.includes("traveling") || p.includes("pantai") || p.includes("gunung") || p.includes("jalan") || p.includes("wisata") || p.includes("kuliner")) {
-    return [
-      "Momen liburan atau perjalanan mana yang paling berkesan dan paling membuat kamu bahagia sepanjang hidup?",
-      "Makanan lokal atau kuliner paling enak dan unik yang wajib dicoba kalau berkunjung ke tempat favorit kamu?",
-      "Seandainya kita buat trip impulsif bareng esok hari, destinasi impian pertama yang ingin kamu tuju ke mana?",
-      "Ceritakan pengalaman paling konyol atau kejadian salah rencana saat kamu sedang liburan bareng teman!",
-      "Kalau kamu disuruh memilih 1 teman di meja ini untuk jadi tour guide liburan, kamu bakal pilih siapa dan kenapa?",
-      "Apa barang paling wajib dan ga boleh ketinggalan sama sekali di dalam tas kamu pas lagi traveling?",
-      "Koleksi foto atau kenangan mana yang menurut kamu paling estetik dari semua perjalanan yang pernah kamu lakukan?",
-      "Pernahkah kamu tersesat atau mengalami hal tak terduga saat liburan? Ceritakan pengalamannya!",
-      "Lagu atau playlist musik apa yang paling pas diputar saat perjalanan road trip atau liburan?",
-      "Kalau kamu diberikan budget unlimited untuk jalan-jalan sebulan penuh, destinasi impian kamu di mana?",
-      "Siapa teman di lingkaran kamu yang paling heboh dan paling riweh kalau diajak koordinasi liburan?",
-      "Oleh-oleh atau cenderamata paling unik yang pernah kamu beli atau dapatkan dari suatu tempat?",
-      "Momen pemandangan alam mana (sunrise/sunset/gunung/pantai) yang paling membuat kamu terpukau sampai tidak bisa lupa?",
-      "Kalau kamu harus tinggal selama 3 bulan di lokasi wisata impian kamu, aktivitas apa yang bakal kamu lakukan?",
-      "Hal apa yang paling kamu kangenin saat perjalanan liburan selesai dan harus kembali ke rutinitas harian?"
-    ];
-  }
-
-  // Intent 7: Karir / Uang / Bisnis / Kerja / Finansial / Masa Depan
-  if (p.includes("karir") || p.includes("uang") || p.includes("bisnis") || p.includes("kerja") || p.includes("finansial") || p.includes("masa depan") || p.includes("investasi")) {
+  // Intent 5: Karir / Uang / Bisnis / Kerja / Finansial / Masa Depan / Mimpi
+  if (p.includes("karir") || p.includes("uang") || p.includes("bisnis") || p.includes("kerja") || p.includes("finansial") || p.includes("masa depan") || p.includes("investasi") || p.includes("mimpi")) {
     return [
       "Menurut pandangan kamu pribadi, pencapaian finansial atau karir terbesar apa yang paling membuat kamu bangga?",
       "Apa pengeluaran atau keputusan finansial paling impulsif yang pernah kamu pelajari dalam hidup?",
@@ -265,11 +245,16 @@ function generateCustomQuestions(rawPrompt: string, count: number = 20): string[
       "Apa tantangan atau tekanan terbesar yang sedang kamu perjuangkan dalam perjalanan karir saat ini?",
       "Barang atau barang bernilai apa yang pernah kamu beli dan ternyata paling meningkatkan kualitas hidup kamu?",
       "Kebiasaan hemat atau strategi mengelola keuangan seperti apa yang paling konsisten kamu terapkan?",
-      "Siapa sosok profesional atau pengusaha inspiratif yang paling banyak memotivasi cara berpikir kamu?"
+      "Siapa sosok profesional atau pengusaha inspiratif yang paling banyak memotivasi cara berpikir kamu?",
+      "Apa cita-cita atau mimpi terbesar kamu yang belum sempat diwujudkan sampai sekarang?",
+      "Pencapaian atau karya apa yang paling membuat kamu merasa puas dalam perjalanan karir atau perkuliahan?",
+      "Skill baru apa yang paling ingin kamu kuasai dalam 1 tahun ke depan untuk mendukung karir kamu?",
+      "Momen ketika kamu merasa paling burnout atau lelah dalam bekerja/kuliah, dan bagaimana kamu melewatinya?",
+      "Kalau kamu diundang berbicara di panggung seminar internasional, topik keahlian apa yang ingin kamu bawakan?"
     ];
   }
 
-  // Universal Fallback: Clean Natural Subject Questions (Zero "seputar pertanyaan..." prefixes)
+  // Universal Fallback: Clean Natural Subject Questions
   const cleanSubject = rawPrompt.replace(/["']/g, '').trim();
   return [
     `Apa momen paling tak terlupakan yang pernah kamu alami saat membahas tentang ${cleanSubject}?`,
@@ -283,13 +268,7 @@ function generateCustomQuestions(rawPrompt: string, count: number = 20): string[
     `Momen paling membuat kamu bangga atau bersyukur dalam hidup kamu terkait ${cleanSubject}?`,
     `Saran atau tips terbaik apa yang ingin kamu bagikan ke teman-teman tentang ${cleanSubject}?`,
     `Apa hal yang paling sering membuat kamu merasa bersemangat saat berdiskusi tentang ${cleanSubject}?`,
-    `Kalau kamu bisa mewujudkan impian terbesar kamu esok hari tentang ${cleanSubject}, impian seperti apa itu?`,
-    `Satu kata yang paling pas menggambarkan pengalaman dan pandangan kamu tentang ${cleanSubject}?`,
-    `Pernahkah kamu mengambil keputusan besar terkait ${cleanSubject}? Bagaimana hasilnya?`,
-    `Sosok mana yang paling banyak memberikan inspirasi bagi kamu saat mendalami ${cleanSubject}?`,
-    `Apa tantangan terbesar yang pernah kamu lalui dan berhasil kamu lewati terkait ${cleanSubject}?`,
-    `Hal baru apa yang baru kamu sadari dan kamu syukuri belakangan ini tentang ${cleanSubject}?`,
-    `Pesan positif apa yang ingin kamu tinggalkan untuk semua orang tentang ${cleanSubject}?`
+    `Kalau kamu bisa mewujudkan impian terbesar kamu esok hari tentang ${cleanSubject}, impian seperti apa itu?`
   ];
 }
 
@@ -342,30 +321,25 @@ export async function POST(request: Request) {
     // 3. Filter unseen questions from primary bank
     let availablePool = primaryBank.filter(q => !isExcluded(q));
 
-    // 4. If primary bank is depleted, supplement strictly from SAME TYPE of topics (No cross-mixing Dare into Questions!)
+    // 4. STRICT TOPIC INTEGRITY: If primary bank is depleted for a specific topic, generate AI synthetic questions STRICTLY FOR THAT TOPIC!
     if (availablePool.length < count) {
-      const allowedKeys = isTodTopic ? TOD_KEYS : REGULAR_KEYS;
-      const allCategoryQuestions = allowedKeys.flatMap(k => BASE_AI_BANKS[k] || []);
-      const extraPool = allCategoryQuestions.filter(q => !isExcluded(q));
-      const combinedPool = Array.from(new Set([...availablePool, ...extraPool]));
-      if (combinedPool.length >= count) {
-        availablePool = combinedPool;
+      if (topic === 'mix') {
+        const allRegular = REGULAR_KEYS.flatMap(k => BASE_AI_BANKS[k] || []);
+        const extraPool = allRegular.filter(q => !isExcluded(q));
+        availablePool = Array.from(new Set([...availablePool, ...extraPool]));
+      } else {
+        // Generate AI synthetic questions strictly tailored to this specific topic!
+        const synthetic = generateCustomQuestions(topic, count * 3).filter(q => !isExcluded(q));
+        availablePool = Array.from(new Set([...availablePool, ...synthetic]));
       }
     }
 
-    // 5. If STILL depleted, generate dynamic synthetic questions on the fly!
-    if (availablePool.length < count) {
-      const synthetic = generateCustomQuestions(topic, count * 3).filter(q => !isExcluded(q));
-      availablePool = Array.from(new Set([...availablePool, ...synthetic]));
-    }
-
-    // 6. Final fallback: if completely exhausted, shuffle primary category bank
+    // 5. Final fallback: if completely exhausted, reset to primary bank for THAT topic only
     if (availablePool.length === 0) {
-      const allowedKeys = isTodTopic ? TOD_KEYS : REGULAR_KEYS;
-      availablePool = primaryBank.length > 0 ? primaryBank : allowedKeys.flatMap(k => BASE_AI_BANKS[k] || []);
+      availablePool = primaryBank.length > 0 ? primaryBank : (BASE_AI_BANKS[topic] || BASE_AI_BANKS['kenalan']);
     }
 
-    // 7. Shuffle with true Fisher-Yates and slice requested count
+    // 6. Shuffle with true Fisher-Yates and slice requested count
     const shuffled = fisherYatesShuffle(availablePool);
     const selectedQuestions = shuffled.slice(0, Math.min(count, shuffled.length));
 

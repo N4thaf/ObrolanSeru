@@ -318,28 +318,25 @@ export async function POST(request: Request) {
       primaryBank = BASE_AI_BANKS[topic] || BASE_AI_BANKS['kenalan'];
     }
 
-    // 3. Filter unseen questions from primary bank
-    let availablePool = primaryBank.filter(q => !isExcluded(q));
+    // 3. ALWAYS generate fresh real-time AI questions to combine with base bank on EVERY request
+    const realTimeAiQuestions = generateCustomQuestions(topic, count * 2);
+    const combinedFullPool = Array.from(new Set([...primaryBank, ...realTimeAiQuestions]));
 
-    // 4. STRICT TOPIC INTEGRITY: If primary bank is depleted for a specific topic, generate AI synthetic questions STRICTLY FOR THAT TOPIC!
+    // 4. Filter out any questions already seen by this user/account
+    let availablePool = combinedFullPool.filter(q => !isExcluded(q));
+
+    // 5. If available pool is depleted, generate extra dynamic synthetic questions
     if (availablePool.length < count) {
-      if (topic === 'mix') {
-        const allRegular = REGULAR_KEYS.flatMap(k => BASE_AI_BANKS[k] || []);
-        const extraPool = allRegular.filter(q => !isExcluded(q));
-        availablePool = Array.from(new Set([...availablePool, ...extraPool]));
-      } else {
-        // Generate AI synthetic questions strictly tailored to this specific topic!
-        const synthetic = generateCustomQuestions(topic, count * 3).filter(q => !isExcluded(q));
-        availablePool = Array.from(new Set([...availablePool, ...synthetic]));
-      }
+      const extraSynthetic = generateCustomQuestions(`${topic} ${Date.now()}`, count * 3).filter(q => !isExcluded(q));
+      availablePool = Array.from(new Set([...availablePool, ...extraSynthetic]));
     }
 
-    // 5. Final fallback: if completely exhausted, reset to primary bank for THAT topic only
+    // 6. Final fallback if 100% exhausted
     if (availablePool.length === 0) {
-      availablePool = primaryBank.length > 0 ? primaryBank : (BASE_AI_BANKS[topic] || BASE_AI_BANKS['kenalan']);
+      availablePool = combinedFullPool.length > 0 ? combinedFullPool : (BASE_AI_BANKS[topic] || BASE_AI_BANKS['kenalan']);
     }
 
-    // 6. Shuffle with true Fisher-Yates and slice requested count
+    // 7. Shuffle with true Fisher-Yates (Randomized per request) and slice requested count
     const shuffled = fisherYatesShuffle(availablePool);
     const selectedQuestions = shuffled.slice(0, Math.min(count, shuffled.length));
 

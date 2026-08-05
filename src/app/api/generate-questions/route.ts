@@ -125,13 +125,15 @@ const BASE_AI_BANKS: Record<string, string[]> = {
   ]
 };
 
-// Natural Custom AI Question Synthesizer (Zero robotic prefixes)
-function generateCustomQuestions(rawPrompt: string, count: number = 20): string[] {
+// Natural Custom AI Question Synthesizer with Infinite Matrix Scaling
+function generateCustomQuestions(rawPrompt: string, count: number = 50): string[] {
   const p = rawPrompt.trim().toLowerCase();
+
+  let baseList: string[] = [];
 
   // Intent 1: Konyol / Lucu / Receh / Teman Lama / Sekolah / Alumni / Reuni / Aib / Memalukan
   if (p.includes("konyol") || p.includes("lucu") || p.includes("receh") || p.includes("aib") || p.includes("memalukan") || p.includes("teman lama") || p.includes("sekolah") || p.includes("alumni") || p.includes("reuni") || p.includes("gokil") || p.includes("ngakak")) {
-    return [
+    baseList = [
       "Siapa teman lama di sini yang paling sering janji 'otw' padahal sebenarnya baru banget bangun tidur?",
       "Foto jaman sekolah atau gaya rambut masa lalu mana yang kalau kamu lihat lagi sekarang bikin tengsin setengah mati?",
       "Hal paling konyol atau bodoh yang pernah kalian lakukan bareng pas bolos sekolah atau nongkrong dulu?",
@@ -154,10 +156,9 @@ function generateCustomQuestions(rawPrompt: string, count: number = 20): string[
       "Kalau ada lomba kelakuan paling receh, siapa di antara kalian yang pasti menang juara 1?"
     ];
   }
-
   // Intent 2: Sedih / Galau / Emosional / Tangis / Duka / Patah Hati / Kesepian / Kecewa
-  if (p.includes("sedih") || p.includes("galau") || p.includes("emosional") || p.includes("tangis") || p.includes("duka") || p.includes("patah hati") || p.includes("kecewa") || p.includes("sepi") || p.includes("kesepian") || p.includes("luka") || p.includes("nangis")) {
-    return [
+  else if (p.includes("sedih") || p.includes("galau") || p.includes("emosional") || p.includes("tangis") || p.includes("duka") || p.includes("patah hati") || p.includes("kecewa") || p.includes("sepi") || p.includes("kesepian") || p.includes("luka") || p.includes("nangis")) {
+    baseList = [
       "Apa momen dalam hidup kamu yang paling membuat kamu menangis sesenggukan dan merasa sangat terpukul?",
       "Kapan kali terakhir kamu merasa benar-benar kesepian dan merasa tidak ada satu orang pun yang mengerti perasaanmu?",
       "Apa kekecewaan atau rasa sakit masa lalu yang sampai hari ini masih sering membekas di hati kamu?",
@@ -180,10 +181,9 @@ function generateCustomQuestions(rawPrompt: string, count: number = 20): string[
       "Apa pesan tulus yang ingin kamu sampaikan ke diri sendiri agar tetap kuat menghadapi hari esok?"
     ];
   }
-
   // Intent 3: Horor / Mistis / Takut / Angker / Hantu / Gaib
-  if (p.includes("horor") || p.includes("mistis") || p.includes("takut") || p.includes("angker") || p.includes("hantu") || p.includes("gaib") || p.includes("seram") || p.includes("setan")) {
-    return [
+  else if (p.includes("horor") || p.includes("mistis") || p.includes("takut") || p.includes("angker") || p.includes("hantu") || p.includes("gaib") || p.includes("seram") || p.includes("setan")) {
+    baseList = [
       "Pernahkah kamu mengalami kejadian mistis atau melihat penampakan aneh secara langsung? Ceritakan!",
       "Tempat atau lokasi mana yang pernah kamu datangi dan punya aura paling merinding dan angker?",
       "Mimpi buruk atau kejadian tindihan (*sleep paralysis*) paling seram yang pernah bikin kamu kebangun panik?",
@@ -206,10 +206,9 @@ function generateCustomQuestions(rawPrompt: string, count: number = 20): string[
       "Hal horor apa yang menurut kamu paling menakutkan: hantu visual, suara ghaib, atau teror psikologis?"
     ];
   }
-
   // Intent 4: Romantis / Cinta / Couple / Pacar / Gebetan / PDKT / Crush
-  if (p.includes("romantis") || p.includes("cinta") || p.includes("couple") || p.includes("pacar") || p.includes("gebetan") || p.includes("pdkt") || p.includes("crush") || p.includes("pasangan")) {
-    return [
+  else if (p.includes("romantis") || p.includes("cinta") || p.includes("couple") || p.includes("pacar") || p.includes("gebetan") || p.includes("pdkt") || p.includes("crush") || p.includes("pasangan")) {
+    baseList = [
       "Momen manis atau perhatian kecil seperti apa dari seseorang yang paling cepat membuat hati kamu meleleh?",
       "Apa kriteria atau nilai utama yang paling kamu prioritaskan saat mencari sosok pasangan hidup?",
       "Ceritakan pengalaman PDKT paling lucu, salah tingkah, atau paling canggung yang pernah kamu alami!",
@@ -232,10 +231,9 @@ function generateCustomQuestions(rawPrompt: string, count: number = 20): string[
       "Pesan terbaik apa yang ingin kamu sampaikan tentang arti saling melengkapi dalam sebuah pasangan?"
     ];
   }
-
   // Intent 5: Karir / Uang / Bisnis / Kerja / Finansial / Masa Depan / Mimpi
-  if (p.includes("karir") || p.includes("uang") || p.includes("bisnis") || p.includes("kerja") || p.includes("finansial") || p.includes("masa depan") || p.includes("investasi") || p.includes("mimpi")) {
-    return [
+  else if (p.includes("karir") || p.includes("uang") || p.includes("bisnis") || p.includes("kerja") || p.includes("finansial") || p.includes("masa depan") || p.includes("investasi") || p.includes("mimpi")) {
+    baseList = [
       "Menurut pandangan kamu pribadi, pencapaian finansial atau karir terbesar apa yang paling membuat kamu bangga?",
       "Apa pengeluaran atau keputusan finansial paling impulsif yang pernah kamu pelajari dalam hidup?",
       "Seandainya kamu punya dana dingin 500 juta esok hari, instrumen atau proyek bisnis apa yang bakal kamu pilih?",
@@ -252,24 +250,71 @@ function generateCustomQuestions(rawPrompt: string, count: number = 20): string[
       "Momen ketika kamu merasa paling burnout atau lelah dalam bekerja/kuliah, dan bagaimana kamu melewatinya?",
       "Kalau kamu diundang berbicara di panggung seminar internasional, topik keahlian apa yang ingin kamu bawakan?"
     ];
+  } else {
+    const cleanSubject = rawPrompt.replace(/["']/g, '').trim();
+    baseList = [
+      `Apa momen paling tak terlupakan yang pernah kamu alami saat membahas tentang ${cleanSubject}?`,
+      `Menurut sudut pandang kamu pribadi, apa hal paling menarik dari ${cleanSubject}?`,
+      `Kalau kamu diberi kesempatan bebas menjelajahi ${cleanSubject}, hal pertama yang ingin kamu lakukan apa?`,
+      `Ceritakan pengalaman paling lucu atau tak terduga yang pernah kamu alami terkait ${cleanSubject}!`,
+      `Siapa orang di meja ini yang menurut kamu punya pengalaman paling seru tentang ${cleanSubject}?`,
+      `Pelajaran hidup atau hikmah terpenting apa yang pernah kamu dapatkan dari ${cleanSubject}?`,
+      `Seandainya kamu membuat buku atau karya tentang ${cleanSubject}, judul unik apa yang bakal kamu pilih?`,
+      `Apa persepsi salah atau anggapan keliru yang sering dipikirkan orang lain tentang ${cleanSubject}?`,
+      `Momen paling membuat kamu bangga atau bersyukur dalam hidup kamu terkait ${cleanSubject}?`,
+      `Saran atau tips terbaik apa yang ingin kamu bagikan ke teman-teman tentang ${cleanSubject}?`
+    ];
   }
 
-  // Universal Fallback: Clean Natural Subject Questions
-  const cleanSubject = rawPrompt.replace(/["']/g, '').trim();
-  return [
-    `Apa momen paling tak terlupakan yang pernah kamu alami saat membahas tentang ${cleanSubject}?`,
-    `Menurut sudut pandang kamu pribadi, apa hal paling menarik dari ${cleanSubject}?`,
-    `Kalau kamu diberi kesempatan bebas menjelajahi ${cleanSubject}, hal pertama yang ingin kamu lakukan apa?`,
-    `Ceritakan pengalaman paling lucu atau tak terduga yang pernah kamu alami terkait ${cleanSubject}!`,
-    `Siapa orang di meja ini yang menurut kamu punya pengalaman paling seru tentang ${cleanSubject}?`,
-    `Pelajaran hidup atau hikmah terpenting apa yang pernah kamu dapatkan dari ${cleanSubject}?`,
-    `Seandainya kamu membuat buku atau karya tentang ${cleanSubject}, judul unik apa yang bakal kamu pilih?`,
-    `Apa persepsi salah atau anggapan keliru yang sering dipikirkan orang lain tentang ${cleanSubject}?`,
-    `Momen paling membuat kamu bangga atau bersyukur dalam hidup kamu terkait ${cleanSubject}?`,
-    `Saran atau tips terbaik apa yang ingin kamu bagikan ke teman-teman tentang ${cleanSubject}?`,
-    `Apa hal yang paling sering membuat kamu merasa bersemangat saat berdiskusi tentang ${cleanSubject}?`,
-    `Kalau kamu bisa mewujudkan impian terbesar kamu esok hari tentang ${cleanSubject}, impian seperti apa itu?`
+  // Infinite Matrix Combinator for Large Games (8+ Players x 20+ Rounds = 160-300+ Questions)
+  const result: string[] = [...baseList];
+
+  const STARTERS = [
+    "Apa sudut pandang atau opini unik kamu seputar",
+    "Ceritakan pengalamaan terlucu atau tak terduga yang pernah terjadi terkait",
+    "Kalau waktu bisa diputar balik, apa satu hal yang ingin kamu ubah tentang",
+    "Siapa sosok yang paling menginspirasi kamu dalam konteks",
+    "Apa tantangan atau rintangan terbesar yang pernah kamu lewati seputar",
+    "Momen ketika kamu merasa paling bersyukur dan bahagia saat mengingat tentang",
+    "Pelajaran hidup atau prinsip berharga apa yang kamu petik dari",
+    "Bagaimana cara kamu menangani situasi paling sulit terkait",
+    "Apa hal yang paling sering bikin kamu tersenyum saat memikirkan",
+    "Seandainya kamu bisa merancang masa depan impian kamu seputar",
+    "Apa nasihat atau saran terbaik yang pernah kamu terima seputar",
+    "Hal paling berani atau impulsif apa yang pernah kamu lakukan demi",
+    "Apa persepsi salah yang sering dipikirkan orang lain seputar",
+    "Kapan momen terakhir kali kamu merasa sangat lega tentang",
+    "Apa harapan atau target terbesar yang ingin kamu capai terkait"
   ];
+
+  const ANGLES = [
+    "dalam 5 tahun ke depan?",
+    "yang paling mengubah jalan hidup kamu?",
+    "saat kamu sedang berada di titik paling lelah?",
+    "yang paling jarang kamu ceritakan ke orang lain?",
+    "yang membuat kamu merasa sangat bangga pada diri sendiri?",
+    "saat kamu sedang kumpul bersama orang-orang terdekat?",
+    "yang paling memberikan kedamaian di pikiran kamu?",
+    "yang menjadi titik balik utama dalam perjalanan hidup kamu?",
+    "yang menurut kamu paling penting untuk masa depan?",
+    "yang kalau diingat lagi bikin kamu senyum-senyum sendiri?"
+  ];
+
+  const topicKeywords = p.includes("karir") ? "karir & impian masa depan" :
+                       p.includes("romantis") ? "hubungan & kisah cinta" :
+                       p.includes("horor") ? "kejadian misterius & dunia gaib" :
+                       p.includes("sedih") ? "proses kedewasaan & perjalanan emosional" :
+                       p.includes("konyol") ? "momen kocak & nostalgia nongkrong" :
+                       rawPrompt.replace(/["']/g, '').trim();
+
+  for (let s of STARTERS) {
+    for (let a of ANGLES) {
+      if (result.length >= count * 2) break;
+      result.push(`${s} ${topicKeywords} ${a}`);
+    }
+  }
+
+  return fisherYatesShuffle(result);
 }
 
 // Fisher-Yates Shuffle algorithm for true uniform randomness across all accounts & devices

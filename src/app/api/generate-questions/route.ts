@@ -300,12 +300,37 @@ function generateCustomQuestions(rawPrompt: string, count: number = 50): string[
     "yang kalau diingat lagi bikin kamu senyum-senyum sendiri?"
   ];
 
-  const topicKeywords = p.includes("karir") ? "karir & impian masa depan" :
-                       p.includes("romantis") ? "hubungan & kisah cinta" :
-                       p.includes("horor") ? "kejadian misterius & dunia gaib" :
-                       p.includes("sedih") ? "proses kedewasaan & perjalanan emosional" :
-                       p.includes("konyol") ? "momen kocak & nostalgia nongkrong" :
-                       rawPrompt.replace(/["']/g, '').trim();
+  let topicKeywords = "kehidupan & obrolan seru";
+  if (p.includes("mix")) {
+    topicKeywords = "kehidupan & pengalaman menarik";
+  } else if (p.includes("kenalan")) {
+    topicKeywords = "pengalaman diri & cerita hidup";
+  } else if (p.includes("absurd")) {
+    topicKeywords = "hal-hal unik & imajinasi konyol";
+  } else if (p.includes("deep")) {
+    topicKeywords = "perjalanan hidup & perenungan diri";
+  } else if (p.includes("pasangan")) {
+    topicKeywords = "hubungan & dunia percintaan";
+  } else if (p.includes("nostalgia")) {
+    topicKeywords = "kenangan sekolah & masa lalu";
+  } else if (p.includes("keluarga")) {
+    topicKeywords = "kehangatan keluarga & kedekatan";
+  } else if (p.includes("whatif")) {
+    topicKeywords = "pengandaian & skenario unik";
+  } else if (p.includes("karir")) {
+    topicKeywords = "karir & impian masa depan";
+  } else if (p.includes("romantis")) {
+    topicKeywords = "hubungan & kisah cinta";
+  } else if (p.includes("horor")) {
+    topicKeywords = "kejadian misterius & dunia gaib";
+  } else if (p.includes("sedih")) {
+    topicKeywords = "proses kedewasaan & perjalanan emosional";
+  } else if (p.includes("konyol")) {
+    topicKeywords = "momen kocak & kebiasaan receh";
+  } else {
+    const cleaned = rawPrompt.replace(/["']/g, '').trim();
+    topicKeywords = cleaned ? cleaned : "kehidupan & momen-momen berharga";
+  }
 
   for (let s of STARTERS) {
     for (let a of ANGLES) {

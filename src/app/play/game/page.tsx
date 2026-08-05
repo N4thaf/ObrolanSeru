@@ -1019,9 +1019,13 @@ function OfflineGame() {
 
       try {
         const aiPromptParam = searchParams.get('aiPrompt') || '';
-        const res = await fetch('/api/generate-questions', {
+        const res = await fetch(`/api/generate-questions?_t=${Date.now()}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          },
+          cache: 'no-store',
           body: JSON.stringify({ topic, customPrompt: aiPromptParam, count: totalNeeded + 10, exclude: seen })
         });
         const data = await res.json();

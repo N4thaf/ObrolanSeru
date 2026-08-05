@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // 100% Natural, Authentic, Grammatically Flawless Indonesian Question Database (Zero Synthetic Mad-Libs)
 const BASE_AI_BANKS: Record<string, string[]> = {
   kenalan: [

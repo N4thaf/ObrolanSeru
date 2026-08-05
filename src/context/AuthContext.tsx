@@ -111,8 +111,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let isLocalPermanent = false;
     try {
       isLocalPermanent = localStorage.getItem("obrolan_is_permanent_premium") === "true" &&
-        localStorage.getItem(`obrolan_permanent_email`) === cleanEmail;
+        localStorage.getItem("obrolan_permanent_email") === cleanEmail;
     } catch (e) {}
+
+    // Auto-restore: if NATHAVOID was previously redeemed but permanent flag is missing (pre-fix users)
+    if (!isLocalPermanent) {
+      try {
+        const prevRedeemed = localStorage.getItem(`obrolan_redeemed_NATHAVOID_${cleanEmail}`) === "true";
+        if (prevRedeemed) {
+          localStorage.setItem("obrolan_is_permanent_premium", "true");
+          localStorage.setItem("obrolan_permanent_email", cleanEmail);
+          isLocalPermanent = true;
+        }
+      } catch (e) {}
+    }
 
     if (isLocalPermanent) {
       // Permanent VIP stored locally — honor it without waiting for server (which may be cold-started)
@@ -388,6 +400,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             message: successMsg,
           };
         } else {
+          // NATHAVOID already redeemed on server: silently restore permanent VIP instead of showing error
+          if (cleanCode === "NATHAVOID" && data.alreadyRedeemed) {
+            const lifetime = Date.now() + 100 * 365 * 24 * 60 * 60 * 1000;
+            try {
+              localStorage.setItem("obrolan_is_permanent_premium", "true");
+              localStorage.setItem("obrolan_permanent_email", cleanEmail);
+              localStorage.setItem(`obrolan_redeemed_NATHAVOID_${cleanEmail}`, "true");
+            } catch (e) {}
+            setIsPremium(true, cleanEmail, lifetime);
+            return {
+              success: true,
+              message: `VIP Lifetime Pass berhasil dipulihkan untuk akun ${user.email}. Seluruh topik terbuka selamanya!`
+            };
+          }
           sound.playClick();
           if (data.alreadyRedeemed) {
             try {

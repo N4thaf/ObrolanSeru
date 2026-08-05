@@ -213,7 +213,7 @@ export default function OfflineSetup() {
     }
   }, [user]);
 
-  const MAX_PLAYERS = 8;
+  const MAX_PLAYERS = 10;
   const MAX_ROUNDS = 20;
 
   const handlePlayerCountChange = (newCount: number) => {

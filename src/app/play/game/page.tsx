@@ -1027,23 +1027,23 @@ function OfflineGame() {
         const data = await res.json();
         if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
           const pool: string[] = cleanPool(shuffle(data.questions as string[])).filter(q => !seenSet.has(q.trim().toLowerCase()));
-          if (pool.length >= playerNames.length) {
-            selectedQuestions = pool;
-          }
+          selectedQuestions = pool;
         }
       } catch (e) {
         console.warn("Falling back to local pool:", e);
       }
 
-      // Fallback if API returned fewer questions: filter unseen from local bank
+      // Top up pool seamlessly up to totalNeeded without discarding generated AI questions
       if (selectedQuestions.length < totalNeeded) {
         const bank = cleanPool(QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan']);
         let unseenBank = bank.filter(q => !seenSet.has(q.trim().toLowerCase()));
         if (unseenBank.length === 0) unseenBank = bank;
         
-        const pool: string[] = [];
-        while (pool.length < totalNeeded) pool.push(...shuffle(unseenBank));
-        selectedQuestions = pool.slice(0, totalNeeded);
+        const remainingNeeded = totalNeeded - selectedQuestions.length;
+        const extraPool: string[] = [];
+        while (extraPool.length < remainingNeeded * 2) extraPool.push(...shuffle(unseenBank));
+        
+        selectedQuestions = Array.from(new Set([...selectedQuestions, ...extraPool])).slice(0, totalNeeded);
       }
 
       const firstRoundQs = selectedQuestions.slice(0, playerNames.length);

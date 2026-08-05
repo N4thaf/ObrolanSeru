@@ -117,7 +117,14 @@ export default function StorePage() {
         fetch("/api/user", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: finalEmail, isPremium: true }),
+          body: JSON.stringify({
+            email: finalEmail,
+            isPermanentPremium: true,
+            activePass: {
+              type: "doku_pass_paid",
+              expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000
+            }
+          }),
         }).then(() => {
           if (user) {
             setUserProfile({ ...user });

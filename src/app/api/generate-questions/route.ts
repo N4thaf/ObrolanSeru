@@ -363,15 +363,20 @@ export async function POST(request: Request) {
       primaryBank = BASE_AI_BANKS[topic] || BASE_AI_BANKS['kenalan'];
     }
 
-    // 3. ALWAYS generate fresh real-time AI questions to combine with base bank on EVERY request
-    const realTimeAiQuestions = generateCustomQuestions(topic, count * 2);
-    const combinedFullPool = Array.from(new Set([...primaryBank, ...realTimeAiQuestions]));
+    // 3. Generate fresh real-time AI questions for regular topics, while keeping TOD topics strictly isolated
+    let combinedFullPool: string[] = [];
+    if (isTodTopic) {
+      combinedFullPool = primaryBank;
+    } else {
+      const realTimeAiQuestions = generateCustomQuestions(topic, count * 2);
+      combinedFullPool = Array.from(new Set([...primaryBank, ...realTimeAiQuestions]));
+    }
 
     // 4. Filter out any questions already seen by this user/account
     let availablePool = combinedFullPool.filter(q => !isExcluded(q));
 
-    // 5. If available pool is depleted, generate extra dynamic synthetic questions
-    if (availablePool.length < count) {
+    // 5. If available pool is depleted for regular topics, generate extra dynamic synthetic questions
+    if (availablePool.length < count && !isTodTopic) {
       const extraSynthetic = generateCustomQuestions(`${topic} ${Date.now()}`, count * 3).filter(q => !isExcluded(q));
       availablePool = Array.from(new Set([...availablePool, ...extraSynthetic]));
     }

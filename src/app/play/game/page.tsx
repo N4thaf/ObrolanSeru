@@ -219,12 +219,12 @@ function GameCard({
 /* ── All Cards Display & Spotlight 3D Flip Question Modal ────────────────── */
 function AllCardsDisplay({
   playerNames, questions, onRoundComplete, round, totalRounds,
-  activePlayerIndex, setActivePlayerIndex, roomCode
+  activePlayerIndex, setActivePlayerIndex, roomCode, topic
 }: {
   playerNames: string[]; questions: string[];
   onRoundComplete: () => void; round: number; totalRounds: number;
   activePlayerIndex: number; setActivePlayerIndex: React.Dispatch<React.SetStateAction<number>>;
-  roomCode?: string;
+  roomCode?: string; topic?: string;
 }) {
   const playerCount = playerNames.length;
   const [dismissed, setDismissed] = useState<boolean[]>(new Array(playerCount).fill(false));
@@ -356,7 +356,10 @@ function AllCardsDisplay({
     if (dismissed[index]) return;
     sound.playFlip();
 
-    const selectedQuestion = questions[index] || "Ceritakan satu momen paling berkesan dalam hidup kamu!";
+    // Use question from questions array, with fallback to a random local bank question (never a hardcoded static string)
+    const fallbackBank = QUESTION_BANKS[topic as string] || QUESTION_BANKS['kenalan'];
+    const fallbackQ = fallbackBank[Math.floor(Math.random() * fallbackBank.length)] || "Apa hal yang paling membuat kamu bersemangat hari ini?";
+    const selectedQuestion = (questions && questions[index]) ? questions[index] : fallbackQ;
     const now = Date.now();
     lastLocalOpenTimeRef.current = now;
     lastActionTimeRef.current = now;
@@ -1058,13 +1061,14 @@ function OfflineGame() {
         const data = await res.json();
         if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
           const pool: string[] = cleanPool(shuffle(data.questions as string[])).filter(q => !seenSet.has(q.trim().toLowerCase()));
-          selectedQuestions = pool;
+          if (pool.length > 0) selectedQuestions = pool;
         }
       } catch (e) {
-        console.warn("Falling back to local pool:", e);
+        console.warn("API call failed, using local pool:", e);
       }
 
-      // Top up pool seamlessly up to totalNeeded with strict topic isolation (Zero cross-topic bleeding)
+      // GUARANTEED FALLBACK: Always ensure selectedQuestions has enough questions
+      // This runs whether API succeeded-but-returned-empty, timed out, or threw
       if (selectedQuestions.length < totalNeeded) {
         const primaryBank = cleanPool(QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan']);
         
@@ -1185,6 +1189,7 @@ function OfflineGame() {
             activePlayerIndex={activePlayerIndex}
             setActivePlayerIndex={setActivePlayerIndex}
             roomCode={roomCode}
+            topic={topic}
           />
         ) : (
           <SpinnerWheelFlow

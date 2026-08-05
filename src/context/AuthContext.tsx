@@ -118,7 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const serverExp = data.user.passExpiresAt || 0;
         const maxExp = Math.max(serverExp, localPassExp);
 
-        const hasValidPremium = data.user.isPremium && (maxExp > Date.now() || data.user.isPermanentPremium || cleanEmail === "chunleon13@gmail.com");
+        const hasValidPremium = data.user.isPremium && (maxExp > Date.now() || data.user.isPermanentPremium);
         
         if (hasValidPremium) {
           setIsPremium(true, cleanEmail, maxExp);
@@ -198,7 +198,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Periodic pass expiration checker (every 30 seconds)
   useEffect(() => {
     const checkInterval = setInterval(() => {
-      if (isPremium && passExpiresAt > 0 && Date.now() >= passExpiresAt && user?.email !== "chunleon13@gmail.com") {
+      if (isPremium && passExpiresAt > 0 && Date.now() >= passExpiresAt) {
         setIsPremium(false, user?.email);
       }
     }, 30000);
@@ -258,7 +258,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       if (data.success && data.user) {
         const serverExp = data.user.passExpiresAt || 0;
-        const hasValidPremium = !!data.user.isPremium && (serverExp > Date.now() || data.user.isPermanentPremium || cleanEmail === "chunleon13@gmail.com");
+        const hasValidPremium = !!data.user.isPremium && (serverExp > Date.now() || data.user.isPermanentPremium);
         setIsPremium(hasValidPremium, cleanEmail, serverExp);
         if (Array.isArray(data.user.seenQuestions)) {
           setUser(prev => prev ? { ...prev, seenQuestions: data.user.seenQuestions } : prev);

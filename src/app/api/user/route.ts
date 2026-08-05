@@ -16,26 +16,13 @@ const userDatabase: Record<string, {
     expiresAt: number;
   }[];
   roomsJoined: number;
-}> = {
-  "chunleon13@gmail.com": {
-    id: "user_chunleon13",
-    name: "Chunleon",
-    email: "chunleon13@gmail.com",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=chunleon13%40gmail.com",
-    provider: "google",
-    createdAt: Date.now(),
-    isPermanentPremium: true,
-    redeemedCodes: ["DOKU_PAYMENT_SUCCESS", "OS4FREE"],
-    seenQuestions: [],
-    activePasses: [{ type: "pass_permanent", expiresAt: Date.now() + 100 * 365 * 24 * 60 * 60 * 1000 }],
-    roomsJoined: 1
-  }
-};
+}> = {};
 
-// Helper to evaluate active premium status & max expiry timestamp
+// Helper to evaluate active premium status & max expiry timestamp strictly by time
 function checkUserPremiumStatus(user: any) {
   if (!user) return { isPremium: false, passExpiresAt: 0 };
-  if (user.email === "chunleon13@gmail.com" || user.isPermanentPremium) {
+  
+  if (user.isPermanentPremium) {
     return { isPremium: true, passExpiresAt: Date.now() + 100 * 365 * 24 * 60 * 60 * 1000 };
   }
 
@@ -57,27 +44,6 @@ export async function GET(req: Request) {
   }
 
   let user = userDatabase[email];
-
-  if (email === "chunleon13@gmail.com") {
-    if (!user) {
-      userDatabase[email] = {
-        id: "user_chunleon13",
-        name: "Chunleon",
-        email: "chunleon13@gmail.com",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=chunleon13%40gmail.com",
-        provider: "google",
-        createdAt: Date.now(),
-        isPermanentPremium: true,
-        redeemedCodes: ["DOKU_PAYMENT_SUCCESS", "OS4FREE"],
-        seenQuestions: [],
-        activePasses: [{ type: "pass_permanent", expiresAt: Date.now() + 100 * 365 * 24 * 60 * 60 * 1000 }],
-        roomsJoined: 1
-      };
-      user = userDatabase[email];
-    } else {
-      user.isPermanentPremium = true;
-    }
-  }
 
   if (!user) {
     return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
@@ -124,7 +90,7 @@ export async function POST(req: Request) {
       avatar: avatar || existing.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanEmail)}`,
       provider: "google" as const,
       createdAt: existing.createdAt || Date.now(),
-      isPermanentPremium: cleanEmail === "chunleon13@gmail.com" ? true : (isPermanentPremium || existing.isPermanentPremium || false),
+      isPermanentPremium: isPermanentPremium || existing.isPermanentPremium || false,
       redeemedCodes: existingRedeemed,
       seenQuestions: mergedSeen,
       activePasses: activePasses,

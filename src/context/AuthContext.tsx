@@ -16,6 +16,7 @@ interface AuthContextType {
   user: UserProfile | null;
   isLoading: boolean;
   isPremium: boolean;
+  passExpiresAt: number;
   setUserProfile: (profile: UserProfile) => void;
   redeemCode: (code: string) => Promise<{ success: boolean; message: string }>;
   syncSeenQuestions: (newQuestions: string[]) => Promise<void>;
@@ -27,6 +28,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
   isPremium: false,
+  passExpiresAt: 0,
   setUserProfile: () => {},
   redeemCode: async () => ({ success: false, message: "" }),
   syncSeenQuestions: async () => {},
@@ -53,27 +55,45 @@ export function parseGoogleJwt(token: string): any {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [passExpiresAt, setPassExpiresAt] = useState<number>(0);
   
-  // Instant 0ms cache for isPremium to prevent refresh flickers
+  // Instant 0ms cache for isPremium to prevent refresh flickers, checking time-expiration
   const [isPremium, setIsPremiumState] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
-      const globalPrem = localStorage.getItem("obrolan_is_premium") === "true";
-      return globalPrem;
+      const storedExp = localStorage.getItem("obrolan_pass_expires_at");
+      if (storedExp) {
+        const expTime = parseInt(storedExp, 10);
+        if (expTime > Date.now()) return true;
+        // Expired
+        localStorage.removeItem("obrolan_is_premium");
+        localStorage.removeItem("obrolan_pass_expires_at");
+        return false;
+      }
+      return localStorage.getItem("obrolan_is_premium") === "true";
     }
     return false;
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const setIsPremium = (val: boolean, email?: string) => {
+  const setIsPremium = (val: boolean, email?: string, expiresAt: number = 0) => {
     setIsPremiumState(val);
+    setPassExpiresAt(expiresAt);
     try {
       if (val) {
         localStorage.setItem("obrolan_is_premium", "true");
+        if (expiresAt > 0) {
+          localStorage.setItem("obrolan_pass_expires_at", expiresAt.toString());
+          if (email) localStorage.setItem(`obrolan_pass_expires_at_${email.toLowerCase().trim()}`, expiresAt.toString());
+        }
         if (email) localStorage.setItem(`obrolan_is_premium_${email.toLowerCase().trim()}`, "true");
       } else {
         localStorage.removeItem("obrolan_is_premium");
-        if (email) localStorage.removeItem(`obrolan_is_premium_${email.toLowerCase().trim()}`);
+        localStorage.removeItem("obrolan_pass_expires_at");
+        if (email) {
+          localStorage.removeItem(`obrolan_is_premium_${email.toLowerCase().trim()}`);
+          localStorage.removeItem(`obrolan_pass_expires_at_${email.toLowerCase().trim()}`);
+        }
       }
     } catch (e) {}
   };
@@ -82,19 +102,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const syncAccountData = async (email: string) => {
     const cleanEmail = email.toLowerCase().trim();
     
-    // Check if locally cached as premium
-    let isLocallyPremium = false;
+    // Check local pass expiration
+    let localPassExp = 0;
     try {
-      isLocallyPremium = localStorage.getItem(`obrolan_is_premium_${cleanEmail}`) === "true";
+      const storedExp = localStorage.getItem(`obrolan_pass_expires_at_${cleanEmail}`) || localStorage.getItem("obrolan_pass_expires_at");
+      if (storedExp) localPassExp = parseInt(storedExp, 10);
     } catch (e) {}
+
+    const isLocalPassValid = localPassExp > Date.now();
 
     try {
       const res = await fetch(`/api/user?email=${encodeURIComponent(cleanEmail)}`);
       const data = await res.json();
       if (data.success && data.user) {
-        const hasServerPremium = !!data.user.isPremium;
-        const activePrem = hasServerPremium || isLocallyPremium;
-        setIsPremium(activePrem, cleanEmail);
+        const serverExp = data.user.passExpiresAt || 0;
+        const maxExp = Math.max(serverExp, localPassExp);
+
+        const hasValidPremium = data.user.isPremium && (maxExp > Date.now() || data.user.isPermanentPremium || cleanEmail === "chunleon13@gmail.com");
+        
+        if (hasValidPremium) {
+          setIsPremium(true, cleanEmail, maxExp);
+        } else {
+          setIsPremium(false, cleanEmail);
+        }
 
         // Sync Cloud Account Seen Questions to local device storage
         if (Array.isArray(data.user.seenQuestions) && data.user.seenQuestions.length > 0) {
@@ -110,14 +140,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(prev => prev ? { ...prev, seenQuestions: merged } : prev);
         }
       } else {
-        if (isLocallyPremium) {
-          setIsPremium(true, cleanEmail);
+        if (isLocalPassValid) {
+          setIsPremium(true, cleanEmail, localPassExp);
         } else {
           setIsPremium(false, cleanEmail);
         }
       }
     } catch (e) {
-      if (isLocallyPremium) setIsPremium(true, cleanEmail);
+      if (isLocalPassValid) {
+        setIsPremium(true, cleanEmail, localPassExp);
+      } else {
+        setIsPremium(false, cleanEmail);
+      }
     }
   };
 
@@ -143,7 +177,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email: user.email,
-            isPremium: isPremium,
             newSeenQuestions: merged
           })
         });
@@ -162,6 +195,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return Array.from(new Set([...localSeen, ...userSeen]));
   };
 
+  // Periodic pass expiration checker (every 30 seconds)
+  useEffect(() => {
+    const checkInterval = setInterval(() => {
+      if (isPremium && passExpiresAt > 0 && Date.now() >= passExpiresAt && user?.email !== "chunleon13@gmail.com") {
+        setIsPremium(false, user?.email);
+      }
+    }, 30000);
+
+    return () => clearInterval(checkInterval);
+  }, [isPremium, passExpiresAt, user]);
+
   // Load existing session & sync Google account data on mount
   useEffect(() => {
     async function initSession() {
@@ -172,6 +216,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (parsed.email === "nathaf@gmail.com" || parsed.email === "pemain@gmail.com") {
             localStorage.removeItem("obrolan_user_session");
             localStorage.removeItem("obrolan_is_premium");
+            localStorage.removeItem("obrolan_pass_expires_at");
             setUser(null);
             setIsPremium(false);
           } else {
@@ -201,25 +246,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("obrolan_user_session", JSON.stringify(profile));
       sessionStorage.setItem("my_name", profile.name.split(" ")[0]);
 
-      let isLocallyPremium = false;
-      try {
-        isLocallyPremium = localStorage.getItem(`obrolan_is_premium_${cleanEmail}`) === "true";
-      } catch (e) {}
-
       // Sync user profile to backend server database & check premium status
       const res = await fetch("/api/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...profile,
-          isPremium: isPremium || isLocallyPremium
+          ...profile
         }),
       });
 
       const data = await res.json();
       if (data.success && data.user) {
-        const activePrem = !!data.user.isPremium || isLocallyPremium;
-        setIsPremium(activePrem, cleanEmail);
+        const serverExp = data.user.passExpiresAt || 0;
+        const hasValidPremium = !!data.user.isPremium && (serverExp > Date.now() || data.user.isPermanentPremium || cleanEmail === "chunleon13@gmail.com");
+        setIsPremium(hasValidPremium, cleanEmail, serverExp);
         if (Array.isArray(data.user.seenQuestions)) {
           setUser(prev => prev ? { ...prev, seenQuestions: data.user.seenQuestions } : prev);
         }
@@ -253,7 +293,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isAlreadyRedeemedLocally = localStorage.getItem(`obrolan_redeemed_${cleanCode}_${cleanEmail}`) === "true";
     } catch (e) {}
 
-    if (isAlreadyRedeemedLocally || (isPremium && localStorage.getItem(`obrolan_redeemed_${cleanCode}_${cleanEmail}`) === "true")) {
+    if (isAlreadyRedeemedLocally) {
       sound.playClick();
       return {
         success: false,
@@ -265,6 +305,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       sound.playChime();
 
       try {
+        const targetExpiry = Date.now() + 3 * 60 * 60 * 1000; // Exact 3 hours from now
+
         // Send redeem request to backend database bound to this Google email (Pass 3 Jam)
         const res = await fetch("/api/user", {
           method: "POST",
@@ -272,17 +314,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           body: JSON.stringify({
             email: cleanEmail,
             redeemCode: "OS4FREE",
-            isPremium: true,
             activePass: {
               type: "pass_3jam_promo",
-              expiresAt: Date.now() + 3 * 60 * 60 * 1000 // Pass 3 Jam
+              expiresAt: targetExpiry
             }
           }),
         });
 
         const data = await res.json();
         if (data.success && data.user) {
-          setIsPremium(true, cleanEmail);
+          const finalExp = data.user.passExpiresAt || targetExpiry;
+          setIsPremium(true, cleanEmail, finalExp);
           try {
             localStorage.setItem(`obrolan_redeemed_${cleanCode}_${cleanEmail}`, "true");
           } catch (e) {}
@@ -326,11 +368,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.removeItem("obrolan_user_session");
       localStorage.removeItem("obrolan_is_premium");
+      localStorage.removeItem("obrolan_pass_expires_at");
     } catch (e) {}
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, isPremium, setUserProfile, redeemCode, syncSeenQuestions, getMergedSeenQuestions, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, isPremium, passExpiresAt, setUserProfile, redeemCode, syncSeenQuestions, getMergedSeenQuestions, logout }}>
       {children}
     </AuthContext.Provider>
   );

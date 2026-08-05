@@ -8,7 +8,7 @@ const userDatabase: Record<string, {
   avatar: string;
   provider: "google";
   createdAt: number;
-  isPremium: boolean;
+  isPermanentPremium?: boolean;
   redeemedCodes: string[];
   seenQuestions: string[];
   activePasses: {
@@ -24,13 +24,29 @@ const userDatabase: Record<string, {
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=chunleon13%40gmail.com",
     provider: "google",
     createdAt: Date.now(),
-    isPremium: true,
+    isPermanentPremium: true,
     redeemedCodes: ["DOKU_PAYMENT_SUCCESS", "OS4FREE"],
     seenQuestions: [],
-    activePasses: [{ type: "pass_10jam", expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000 }],
+    activePasses: [{ type: "pass_permanent", expiresAt: Date.now() + 100 * 365 * 24 * 60 * 60 * 1000 }],
     roomsJoined: 1
   }
 };
+
+// Helper to evaluate active premium status & max expiry timestamp
+function checkUserPremiumStatus(user: any) {
+  if (!user) return { isPremium: false, passExpiresAt: 0 };
+  if (user.email === "chunleon13@gmail.com" || user.isPermanentPremium) {
+    return { isPremium: true, passExpiresAt: Date.now() + 100 * 365 * 24 * 60 * 60 * 1000 };
+  }
+
+  const validPasses = (user.activePasses || []).filter((p: any) => p.expiresAt > Date.now());
+  if (validPasses.length > 0) {
+    const maxExpiresAt = Math.max(...validPasses.map((p: any) => p.expiresAt));
+    return { isPremium: true, passExpiresAt: maxExpiresAt };
+  }
+
+  return { isPremium: false, passExpiresAt: 0 };
+}
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -42,7 +58,6 @@ export async function GET(req: Request) {
 
   let user = userDatabase[email];
 
-  // Auto grant premium if email is chunleon13@gmail.com
   if (email === "chunleon13@gmail.com") {
     if (!user) {
       userDatabase[email] = {
@@ -52,15 +67,15 @@ export async function GET(req: Request) {
         avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=chunleon13%40gmail.com",
         provider: "google",
         createdAt: Date.now(),
-        isPremium: true,
+        isPermanentPremium: true,
         redeemedCodes: ["DOKU_PAYMENT_SUCCESS", "OS4FREE"],
         seenQuestions: [],
-        activePasses: [{ type: "pass_10jam", expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000 }],
+        activePasses: [{ type: "pass_permanent", expiresAt: Date.now() + 100 * 365 * 24 * 60 * 60 * 1000 }],
         roomsJoined: 1
       };
       user = userDatabase[email];
     } else {
-      user.isPremium = true;
+      user.isPermanentPremium = true;
     }
   }
 
@@ -68,13 +83,22 @@ export async function GET(req: Request) {
     return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ success: true, user });
+  const { isPremium, passExpiresAt } = checkUserPremiumStatus(user);
+
+  return NextResponse.json({
+    success: true,
+    user: {
+      ...user,
+      isPremium,
+      passExpiresAt
+    }
+  });
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { id, name, email, avatar, isPremium, redeemCode, activePass, newSeenQuestions } = body;
+    const { id, name, email, avatar, isPermanentPremium, redeemCode, activePass, newSeenQuestions } = body;
 
     if (!email) {
       return NextResponse.json({ success: false, message: "Email is required" }, { status: 400 });
@@ -91,7 +115,7 @@ export async function POST(req: Request) {
     }
 
     const existingRedeemed = existing.redeemedCodes || [];
-    const isAlreadyPremium = cleanEmail === "chunleon13@gmail.com" || existing.isPremium === true || isPremium === true;
+    const activePasses = existing.activePasses || [];
 
     const updatedUser = {
       id: id || existing.id || `user_${Date.now()}`,
@@ -100,10 +124,10 @@ export async function POST(req: Request) {
       avatar: avatar || existing.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanEmail)}`,
       provider: "google" as const,
       createdAt: existing.createdAt || Date.now(),
-      isPremium: isAlreadyPremium,
+      isPermanentPremium: cleanEmail === "chunleon13@gmail.com" ? true : (isPermanentPremium || existing.isPermanentPremium || false),
       redeemedCodes: existingRedeemed,
       seenQuestions: mergedSeen,
-      activePasses: existing.activePasses || [],
+      activePasses: activePasses,
       roomsJoined: (existing.roomsJoined || 0) + 1,
     };
 
@@ -118,7 +142,10 @@ export async function POST(req: Request) {
       }
       updatedUser.redeemedCodes.push(cleanCode);
       if (cleanCode === "OS4FREE") {
-        updatedUser.isPremium = true;
+        updatedUser.activePasses.push({
+          type: "pass_3jam_promo",
+          expiresAt: Date.now() + 3 * 60 * 60 * 1000 // Exact 3 hours from now
+        });
       }
     }
 
@@ -128,7 +155,16 @@ export async function POST(req: Request) {
 
     userDatabase[cleanEmail] = updatedUser;
 
-    return NextResponse.json({ success: true, user: updatedUser });
+    const { isPremium, passExpiresAt } = checkUserPremiumStatus(updatedUser);
+
+    return NextResponse.json({
+      success: true,
+      user: {
+        ...updatedUser,
+        isPremium,
+        passExpiresAt
+      }
+    });
   } catch (e) {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }

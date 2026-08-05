@@ -1043,7 +1043,9 @@ function OfflineGame() {
 
       const totalNeeded = totalRounds * playerNames.length;
       const seen: string[] = getMergedSeenQuestions();
-      const seenSet = new Set(seen.map(s => String(s).trim().toLowerCase()));
+      // Normalize: strip quotes, punctuation, extra spaces for fuzzy dedup
+      const normalizeQ = (s: string) => s.trim().toLowerCase().replace(/["""'']/g, '').replace(/[?.!,]/g, '').replace(/\s+/g, ' ');
+      const seenSet = new Set(seen.map(s => normalizeQ(String(s))));
 
       // ── Gemini cache helpers ─────────────────────────────────────────────
       const CACHE_KEY = `obrolan_q_cache_${topic}`;
@@ -1080,7 +1082,7 @@ function OfflineGame() {
         });
         const data = await res.json();
         if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
-          const pool: string[] = cleanPool(data.questions as string[]).filter(q => !seenSet.has(q.trim().toLowerCase()));
+          const pool: string[] = cleanPool(data.questions as string[]).filter(q => !seenSet.has(normalizeQ(q)));
           if (pool.length > 0) {
             selectedQuestions = shuffle(pool);
             // 🔑 Always save fresh Gemini results to self-growing cache
@@ -1096,7 +1098,7 @@ function OfflineGame() {
       // questions accumulated across every play session by any user on this device.
       if (selectedQuestions.length < totalNeeded) {
         const cachedPool = cleanPool(readCache());
-        const unseenCached = cachedPool.filter(q => !seenSet.has(q.trim().toLowerCase()));
+        const unseenCached = cachedPool.filter(q => !seenSet.has(normalizeQ(q)));
         const merged = Array.from(new Set([...selectedQuestions, ...unseenCached, ...cachedPool]));
         if (merged.length >= totalNeeded) {
           selectedQuestions = shuffle(merged).slice(0, totalNeeded);

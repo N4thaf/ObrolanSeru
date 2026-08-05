@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+export const maxDuration = 60; // Vercel: allow up to 60s for Gemini to respond
 
 // ─── Fallback Static Banks (used when Gemini API is unavailable) ───────────────
 const BASE_AI_BANKS: Record<string, string[]> = {
@@ -192,8 +193,9 @@ async function generateWithGemini(topic: string, customPrompt: string, count: nu
     ? customPrompt
     : (TOPIC_PROMPTS[topic] || TOPIC_PROMPTS['kenalan']);
 
+  // Send up to 80 excluded questions to Gemini to minimize repeats
   const excludeSnippet = exclude.length > 0
-    ? `\n\nJANGAN gunakan atau parafrase pertanyaan-pertanyaan berikut:\n${exclude.slice(0, 30).map(q => `- ${q}`).join('\n')}`
+    ? `\n\nJANGAN gunakan atau parafrase pertanyaan-pertanyaan berikut (sudah pernah keluar sebelumnya):\n${exclude.slice(0, 80).map(q => `- ${q}`).join('\n')}`
     : '';
 
   const prompt = `Kamu adalah kreator konten game obrolan sosial Indonesia yang berpengalaman. 

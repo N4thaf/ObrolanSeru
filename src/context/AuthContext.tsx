@@ -305,21 +305,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
     }
 
-    if (cleanCode === "OS4FREE") {
+    if (cleanCode === "NATHAVOID" || cleanCode === "THANKS4COMING" || cleanCode === "OS4FREE") {
       sound.playChime();
 
-      try {
-        const targetExpiry = Date.now() + 3 * 60 * 60 * 1000; // Exact 3 hours from now
+      let targetExpiry = Date.now() + 3 * 60 * 60 * 1000;
+      let passType = "pass_3jam_promo";
+      let successMsg = `Selamat ${user.name}! Kode ${cleanCode} berhasil mengaktifkan Pass Gratis 3 Jam untuk akun ${user.email}. Seluruh topik terbuka selama 3 jam!`;
 
-        // Send redeem request to backend database bound to this Google email (Pass 3 Jam)
+      if (cleanCode === "NATHAVOID") {
+        targetExpiry = Date.now() + 100 * 365 * 24 * 60 * 60 * 1000;
+        passType = "pass_lifetime_secret";
+        successMsg = `Selamat ${user.name}! Kode Rahasia NATHAVOID berhasil mengaktifkan VIP Lifetime Pass (Permanen) untuk akun ${user.email}. Seluruh topik terbuka selamanya!`;
+      } else if (cleanCode === "THANKS4COMING") {
+        targetExpiry = Date.now() + 365 * 24 * 60 * 60 * 1000;
+        passType = "pass_1tahun_secret";
+        successMsg = `Selamat ${user.name}! Kode Rahasia THANKS4COMING berhasil mengaktifkan VIP Pass 1 Tahun untuk akun ${user.email}. Seluruh topik terbuka selama 1 tahun penuh!`;
+      }
+
+      try {
+        // Send redeem request to backend database bound to this Google email
         const res = await fetch("/api/user", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email: cleanEmail,
-            redeemCode: "OS4FREE",
+            redeemCode: cleanCode,
+            isPermanentPremium: cleanCode === "NATHAVOID",
             activePass: {
-              type: "pass_3jam_promo",
+              type: passType,
               expiresAt: targetExpiry
             }
           }),
@@ -328,13 +341,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         if (data.success && data.user) {
           const finalExp = data.user.passExpiresAt || targetExpiry;
+          if (cleanCode === "NATHAVOID") {
+            try { localStorage.setItem("obrolan_is_permanent_premium", "true"); } catch (e) {}
+          }
           setIsPremium(true, cleanEmail, finalExp);
           try {
             localStorage.setItem(`obrolan_redeemed_${cleanCode}_${cleanEmail}`, "true");
           } catch (e) {}
           return {
             success: true,
-            message: `Selamat ${user.name}! Kode OS4FREE berhasil mengaktifkan Pass Gratis 3 Jam untuk akun ${user.email}. Seluruh topik terbuka selama 3 jam!`,
+            message: successMsg,
           };
         } else {
           sound.playClick();
@@ -345,7 +361,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
           return {
             success: false,
-            message: data.message || `Kode promo OS4FREE sudah pernah kamu gunakan di akun email ${user.email}. Setiap akun hanya dapat menggunakan 1x.`
+            message: data.message || `Kode promo ${cleanCode} sudah pernah kamu gunakan di akun email ${user.email}. Setiap akun hanya dapat menggunakan 1x.`
           };
         }
       } catch (e) {

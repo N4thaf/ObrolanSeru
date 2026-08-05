@@ -107,10 +107,22 @@ export async function POST(req: Request) {
         }, { status: 400 });
       }
       updatedUser.redeemedCodes.push(cleanCode);
-      if (cleanCode === "OS4FREE") {
+
+      if (cleanCode === "NATHAVOID") {
+        updatedUser.isPermanentPremium = true;
+        updatedUser.activePasses.push({
+          type: "pass_lifetime_secret",
+          expiresAt: Date.now() + 100 * 365 * 24 * 60 * 60 * 1000 // 100 Years / Lifetime
+        });
+      } else if (cleanCode === "THANKS4COMING") {
+        updatedUser.activePasses.push({
+          type: "pass_1tahun_secret",
+          expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000 // 1 Year
+        });
+      } else if (cleanCode === "OS4FREE") {
         updatedUser.activePasses.push({
           type: "pass_3jam_promo",
-          expiresAt: Date.now() + 3 * 60 * 60 * 1000 // Exact 3 hours from now
+          expiresAt: Date.now() + 3 * 60 * 60 * 1000 // 3 Hours
         });
       }
     }

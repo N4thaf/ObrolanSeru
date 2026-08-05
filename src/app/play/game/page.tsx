@@ -1242,15 +1242,8 @@ function OfflineGame() {
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-2 relative z-10 w-full max-w-5xl mx-auto my-auto">
         {isQuestionsLoading && mode === 'pertanyaan' ? (
-          <div className="flex flex-col items-center justify-center space-y-4 my-auto py-16 animate-fade-in">
-            <div className="relative flex items-center justify-center">
-              <div className="w-14 h-14 border-4 border-[#257180]/20 border-t-[#FD8B51] rounded-full animate-spin" />
-              <Wand2 className="w-6 h-6 text-[#FD8B51] absolute animate-pulse" />
-            </div>
-            <div className="text-center space-y-1">
-              <p className="font-black text-[#257180] text-lg tracking-wide">Meracik Kartu Obrolan Fresh...</p>
-              <p className="text-xs font-bold text-[#257180]/60">Menyiapkan pertanyaan unik yang belum pernah kamu lihat</p>
-            </div>
+          <div className="flex flex-col items-center justify-center my-auto py-16">
+            <div className="w-10 h-10 border-3 border-[#257180]/20 border-t-[#FD8B51] rounded-full animate-spin" />
           </div>
         ) : mode === 'pertanyaan' ? (
           <AllCardsDisplay

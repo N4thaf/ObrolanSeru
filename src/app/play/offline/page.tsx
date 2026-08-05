@@ -60,7 +60,7 @@ export const QUESTION_BANKS: Record<string, string[]> = {
     "Kalau kamu berubah menjadi varian makanan atau minuman, kamu jadi rasa apa dan kenapa?",
     "Hal paling konyol yang pernah kamu percayai 100 persen saat masih berumur 7 tahun?",
     "Kalau kucing & anjing bisa bicara bahasa Indonesia, apa hal pertama yang bakalan mereka protes?",
-    "Pilih mana: kentut bunyi terompet setiap kali tertawa, atau bersin warna pelangi setiap kali kaget?",
+    "Pilih mana: bisa mengerti bahasa semua hewan di bumi, atau bisa memainkan seluruh alat musik di dunia secara instan?",
     "Kalau kamu jadi presiden selama 1 hari saja, peraturan aneh apa yang wajib dipatuhi semua orang?",
     "Kalau alien datang ke bumi dan kamu harus kasih 1 makanan Indonesia untuk mewakili bumi, kamu kasih apa?",
     "Pilih mana: harus jalan mundur sepanjang hari atau harus ngomong bernyanyi setiap kali bicara?",

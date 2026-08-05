@@ -1064,23 +1064,28 @@ function OfflineGame() {
         console.warn("Falling back to local pool:", e);
       }
 
-      // Top up pool seamlessly up to totalNeeded with zero duplicate questions
+      // Top up pool seamlessly up to totalNeeded with strict topic isolation (Zero cross-topic bleeding)
       if (selectedQuestions.length < totalNeeded) {
         const primaryBank = cleanPool(QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan']);
-        const allBanks = cleanPool(Object.values(QUESTION_BANKS).flat());
-
-        const unseenPrimary = primaryBank.filter(q => !seenSet.has(q.trim().toLowerCase()));
-        const unseenGlobal = allBanks.filter(q => !seenSet.has(q.trim().toLowerCase()));
-
-        const fullMasterSet = Array.from(new Set([
-          ...selectedQuestions,
-          ...unseenPrimary,
-          ...unseenGlobal,
-          ...primaryBank,
-          ...allBanks
-        ]));
-
-        selectedQuestions = shuffle(fullMasterSet).slice(0, totalNeeded);
+        
+        if (topic === 'mix') {
+          const allBanks = cleanPool(Object.values(QUESTION_BANKS).flat());
+          const unseenGlobal = allBanks.filter(q => !seenSet.has(q.trim().toLowerCase()));
+          const fullMasterSet = Array.from(new Set([...selectedQuestions, ...unseenGlobal, ...allBanks]));
+          selectedQuestions = shuffle(fullMasterSet).slice(0, totalNeeded);
+        } else {
+          // Strictly top up and recycle from the SAME TOPIC bank to prevent gross / unrelated topic leaks!
+          const unseenPrimary = primaryBank.filter(q => !seenSet.has(q.trim().toLowerCase()));
+          let topicPool = Array.from(new Set([...selectedQuestions, ...unseenPrimary, ...primaryBank]));
+          
+          let fillIdx = 0;
+          const recycledBank = shuffle(primaryBank.length > 0 ? primaryBank : QUESTION_BANKS['kenalan']);
+          while (topicPool.length < totalNeeded && recycledBank.length > 0) {
+            topicPool.push(recycledBank[fillIdx % recycledBank.length]);
+            fillIdx++;
+          }
+          selectedQuestions = topicPool.slice(0, totalNeeded);
+        }
       }
 
       const firstRoundQs = selectedQuestions.slice(0, playerNames.length);

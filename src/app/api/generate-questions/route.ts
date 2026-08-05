@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-// 100% Natural, Authentic, Grammatically Flawless Indonesian Question Database (Zero Synthetic Mad-Libs)
+// 100% Natural, Authentic, Premium Indonesian Question Database (Zero Gross Content, Zero Topic Bleeding)
 const BASE_AI_BANKS: Record<string, string[]> = {
   kenalan: [
     "Kalau hidup kamu dibuat film dokumenter Netflix, kira-kira judulnya apa dan siapa yang cocok jadi naratornya?",
@@ -30,7 +30,12 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Siapa sosok yang paling sering jadi tempat curhat pertama kamu pas lagi ada masalah berat?",
     "Kalau kamu punya mesin waktu dan cuma bisa balik ke 1 momen indah dalam hidup kamu, momen apa yang ingin kamu ulangi?",
     "Barang bekas atau benda lama apa yang sampai sekarang masih kamu simpan rapat-rapat di kamar?",
-    "Apa hal pertama yang selalu kamu perhatikan dari seseorang pas pertama kali bertemu?"
+    "Apa hal pertama yang selalu kamu perhatikan dari seseorang pas pertama kali bertemu?",
+    "Pelajaran paling berharga yang pernah kamu dapatkan dari kegagalan kecil di masa lalu apa?",
+    "Kalau kamu bisa mengundang 3 tokoh terkenal untuk makan malam di rumah kamu, siapa saja yang kamu ajak?",
+    "Apa kebiasaan baik yang sedang berusaha kamu bentuk atau jaga dalam beberapa bulan terakhir?",
+    "Pernahkah kamu mengalami momen salah paham yang kocak saat mengobrol sama teman baru?",
+    "Apa arti waktu luang atau weekend yang sempurna versi kamu pribadi?"
   ],
   absurd: [
     "Kalau kedua tangan kamu tiba-tiba bisa bicara sendiri pas kamu lagi makan, kalimat pertama yang dia omongkan apa?",
@@ -47,10 +52,16 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Seandainya alien mendarat di depan rumah kamu dan minta ditunjukkan 1 makanan bumi paling enak, kamu kasih apa?",
     "Pilih mana: seumur hidup cuma bisa makan makanan dingin, atau seumur hidup cuma bisa mandi pakai air es?",
     "Kalau kamu punya kemampuan bicara sama barang elektronik, barang rumah tangga apa yang paling sering mengeluh?",
-    "Kalau kamu jadi pahlawan super tapi kekuatannya cuma bisa bikin orang bersin, bagaimana cara kamu mengalahkan penjahat?",
-    "Pilih mana: ke mana-mana harus naik sepedah roda tiga kecil, atau ke mana-mana harus memakai jubah penyihir?",
+    "Kalau kamu jadi pahlawan super tapi kekuatannya cuma bisa bikin orang bersin warna-warni, bagaimana cara kamu mengalahkan penjahat?",
+    "Pilih mana: ke mana-mana harus naik sepeda roda tiga kecil, atau ke mana-mana harus memakai jubah penyihir?",
     "Kalau kamu bisa mengubah suara klakson kendaraan di seluruh dunia jadi suara hewan, kamu mau pilih suara hewan apa?",
-    "Apa ide bisnis paling aneh atau ngaco yang pernah terlintas di pikiran kamu pas lagi melamun?"
+    "Apa ide bisnis paling aneh atau ngaco yang pernah terlintas di pikiran kamu pas lagi melamun?",
+    "Kalau kamu secara misterius terpilih jadi presiden planet Mars, undang-undang pertama yang kamu buat apa?",
+    "Pilih mana: bisa mengerti bahasa semua tumbuhan di dunia, atau bisa mengerti bahasa semua peralatan dapur?",
+    "Seandainya kamu tiba-tiba punya bantal ajaib yang bisa mencetak mimpi kamu jadi film, film seperti apa itu?",
+    "Kalau kamu terpaksa harus memakai kostum badut selama 3 hari berturut-turut di tempat umum, apa alasan yang kamu kasih ke orang?",
+    "Pilih mana: seumur hidup cuma bisa berjalan kesamping seperti kepiting, atau seumur hidup cuma bisa melompat seperti kangguru?",
+    "Kalau kamu bisa bertukar suara sama satu karakter fiksi terkenal, kamu mau tukar suara sama siapa?"
   ],
   deep: [
     "Apa ketakutan terbesar dalam hidup kamu yang jarang banget kamu ceritakan ke teman dekat sekali pun?",
@@ -67,7 +78,12 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Apa batas toleransi kamu terhadap seseorang sebelum kamu memilih untuk pelan-pelan menjauh?",
     "Hal paling berani apa yang pernah kamu lakukan demi mempertahankan nilai dan prinsip hidup kamu?",
     "Apa definisi kedewasaan yang paling terasa bedanya saat kamu bertambah usia sekarang?",
-    "Satu mimpi besar kamu yang belum pernah kamu bagikan ke siapa pun karena takut diremehkan?"
+    "Satu mimpi besar kamu yang belum pernah kamu bagikan ke siapa pun karena takut diremehkan?",
+    "Bagaimana cara kamu memulihkan energi emosional saat situasi di sekitar terasa terlalu menekan?",
+    "Apa prinsip utama yang selalu kamu pegang teguh dalam membangun rasa percaya dengan orang lain?",
+    "Kapan kali terakhir kamu merasa sangat bersyukur hingga meneteskan air mata haru?",
+    "Apa pesan terbaik yang ingin kamu tinggalkan untuk orang-orang terkasih di hidup kamu kelak?",
+    "Satu hal yang paling ingin kamu perbaiki dari cara kamu menyikapi ketidakpastian masa depan apa?"
   ],
   pasangan: [
     "Momen manis atau kejadian kecil apa dari kita yang sampai sekarang masih sering membuat kamu tersenyum sendiri?",
@@ -79,7 +95,15 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Bahasa cinta (*love language*) mana dari aku yang paling membuat kamu merasa dicintai secara utuh?",
     "Ceritakan momen PDKT kita yang menurut kamu paling lucu, salah tingkah, atau canggung!",
     "Apa perbedaan sifat di antara kita yang menurut kamu justru bikin hubungan kita saling melengkapi?",
-    "Bagaimana cara favorit kamu kalau lagi pengen bermanja-manja atau minta perhatian dari aku?"
+    "Bagaimana cara favorit kamu kalau lagi pengen bermanja-manja atau minta perhatian dari aku?",
+    "Apa momen di mana kamu merasa paling beruntung dan bersyukur memiliki aku di hidup kamu?",
+    "Kalau kita bisa bikin tradisi kencan baru setiap bulan, tradisi seperti apa yang paling kamu impikan?",
+    "Hal sederhana apa yang paling sering bikin kamu merasa nyaman saat kita lagi duduk berdua?",
+    "Bagaimana cara terbaik menurut kamu untuk kita menyelesaikan perbedaan pendapat agar hubungan makin dewasa?",
+    "Satu doa atau harapan paling tulus yang selalu kamu sisipkan untuk masa depan hubungan kita apa?",
+    "Apa kejutan kecil dari aku yang paling tidak kamu sangka-sangka tapi bikin kamu bahagia banget?",
+    "Tempat atau destinasi mana yang paling ingin kamu datangi berdua sama aku untuk pertama kalinya?",
+    "Apa rasa saling percaya yang paling kamu syukuri di antara kita selama menjalani hubungan ini?"
   ],
   nostalgia: [
     "Lagu jadul atau lagu masa sekolah apa yang kalau diputar langsung membuat kamu flashback ke masa lalu?",
@@ -89,15 +113,29 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Kenangan atau pengalaman lucu apa yang paling berkesan bersama teman masa sekolah dulu?",
     "Foto atau gaya berpakaian jaman sekolah mana yang kalau kamu lihat lagi sekarang bikin tengsin setengah mati?",
     "Momen bolos atau ketahuan melanggar aturan sekolah paling kocak yang pernah kamu alami dulu?",
-    "Siapa guru atau pengajar jaman sekolah yang paling ikonik dan tidak pernah kamu lupakan?"
+    "Siapa guru atau pengajar jaman sekolah yang paling ikonik dan tidak pernah kamu lupakan?",
+    "Cerita cinta monyet atau pengalaman naksir seseorang jaman sekolah yang paling bikin senyum-senyum sendiri?",
+    "Acara jalan-jalan atau study tour jaman sekolah mana yang punya memori paling seru?",
+    "Barang atau aksesoris jaman dulu yang dulu hits banget dan pernah kamu banggakan ke teman-teman?",
+    "Permainan konsol atau game HP jadul apa yang dulu pernah bikin kamu ketagihan sampai malam?",
+    "Momen kelulusan atau perpisahan sekolah mana yang paling menguras emosi buat kamu?",
+    "Apa kebiasaan sore hari pas masa kecil dulu setelah pulang sekolah yang paling bikin kangen?"
   ],
   keluarga: [
-    "Tradisi unik atau kebiasaan lucu apa yang hanya ada dan dilakukan di dalam keluarga kamu?",
-    "Nasihat dari orang tua atau sesepuh yang dulu kamu sepelekan, tapi sekarang baru terasa benarnya?",
-    "Masakan atau hidangan buatan rumah apa yang paling dikangenin saat sedang jauh dari rumah?",
-    "Momen kebersamaan keluarga mana yang paling hangat dan selalu kamu kenang sampai sekarang?",
+    "Tradisi unik atau kebiasaan hangat apa yang hanya ada dan rutin dilakukan di dalam keluarga kamu?",
+    "Nasihat terpenting dari orang tua atau sesepuh yang dulu kamu sepelekan, tapi sekarang baru terasa benarnya?",
+    "Masakan atau hidangan buatan rumah favorit apa yang selalu paling dikangenin saat sedang jauh dari rumah?",
+    "Momen kebersamaan keluarga mana yang paling hangat dan selalu kamu kenang sampai hari ini?",
     "Siapa anggota keluarga kamu yang paling humoris dan selalu jadi pemecah suasana kalau lagi kumpul?",
-    "Ceritakan momen ketika kamu bikin bangga orang tua kamu dan perasaan kamu saat itu!"
+    "Ceritakan momen ketika kamu berhasil membuat orang tua kamu tersenyum bangga dan perasaan kamu saat itu!",
+    "Cerita atau kisah masa muda orang tua kamu yang mana yang menurut kamu paling inspiratif?",
+    "Pelajaran tentang kerja keras dan rasa syukur apa yang paling melekat dari cara orang tua membesarkan kamu?",
+    "Acara mudik atau liburan keluarga mana yang punya cerita paling seru dan tak terlupakan?",
+    "Bagaimana cara keluarga kamu biasanya merayakan momen-momen penting atau ulang tahun bersama?",
+    "Hal sederhana apa dari suasana rumah yang selalu membuat kamu merasa tenang dan aman?",
+    "Kalau kamu bisa memberikan hadiah impian untuk orang tua kamu esok hari, hadiah apa yang ingin kamu berikan?",
+    "Ungkapan kasih sayang sederhana apa yang paling sering ditunjukkan oleh keluarga kamu?",
+    "Apa impian terbesar kamu untuk kebahagiaan dan kesejahteraan keluarga kamu di masa depan?"
   ],
   whatif: [
     "Bagaimana jika kamu mendapat kesempatan mengulang hidup dari umur 10 tahun tapi ingatan tetap utuh?",
@@ -105,7 +143,11 @@ const BASE_AI_BANKS: Record<string, string[]> = {
     "Bagaimana jika semua manusia di bumi tiba-tiba tidak bisa berbohong dan selalu bicara jujur 100 percent?",
     "Bagaimana jika kamu bisa mengerti dan menguasai seluruh bahasa di dunia secara instan malam ini?",
     "Bagaimana jika kamu diizinkan tinggal di negara mana pun di dunia gratis selama 1 tahun penuh, kamu pilih negara apa?",
-    "Bagaimana jika kamu bisa membaca pikiran hewan peliharaan kamu selama 24 jam, apa yang ingin kamu tanyakan?"
+    "Bagaimana jika kamu bisa membaca pikiran hewan peliharaan kamu selama 24 jam, apa yang ingin kamu tanyakan?",
+    "Bagaimana jika kamu menemukan pintu rahasia di kamar kamu yang bisa mengantar kamu ke masa lalu?",
+    "Bagaimana jika kamu memenangkan kompetisi dunia dan diberi pulau pribadi, pulau itu mau kamu jadikan apa?",
+    "Bagaimana jika kamu bisa menukar keahlian kamu dengan satu tokoh sejarah terkenal, tokoh mana yang kamu pilih?",
+    "Bagaimana jika kamu diberi kemampuan melihat masa depan 5 menit ke depan, bagaimana kamu memanfaatkannya?"
   ],
   karir: [
     "Apa cita-cita atau mimpi terbesar kamu yang belum sempat diwujudkan sampai sekarang?",
@@ -159,7 +201,7 @@ const BASE_AI_BANKS: Record<string, string[]> = {
   ]
 };
 
-// Pure Human-Curated Pool Resolver (Zero Synthetic Mad-Libs Generator)
+// Pure Human-Curated Pool Resolver (Strict Topic Isolation - Zero Topic Bleeding)
 function generateCustomQuestions(rawPrompt: string, count: number = 50): string[] {
   const p = rawPrompt.trim().toLowerCase();
 
@@ -206,7 +248,7 @@ export async function POST(request: Request) {
 
     const isTodTopic = TOD_KEYS.includes(topic);
 
-    // 1. Select Primary Topic Bank or Mix All Regular Banks
+    // 1. Select Primary Topic Bank
     let primaryBank: string[] = [];
     if (topic === 'mix' || (topic === 'ai_custom' && !customPrompt)) {
       primaryBank = REGULAR_KEYS.flatMap(k => BASE_AI_BANKS[k] || []);
@@ -216,21 +258,32 @@ export async function POST(request: Request) {
       primaryBank = BASE_AI_BANKS[topic] || BASE_AI_BANKS['kenalan'];
     }
 
-    // 2. Filter out any questions already seen by this user/account
+    // 2. Filter unseen questions strictly from primary bank
     let availablePool = primaryBank.filter(q => !isExcluded(q));
 
-    // 3. Top up seamlessly from all regular banks if count is greater than primary bank
-    if (availablePool.length < count && !isTodTopic) {
-      const allRegular = REGULAR_KEYS.flatMap(k => BASE_AI_BANKS[k] || []);
-      const extraUnseen = allRegular.filter(q => !isExcluded(q));
-      availablePool = Array.from(new Set([...availablePool, ...extraUnseen]));
+    // 3. STRICT TOPIC ISOLATION: Top up MUST recycled strictly from primary bank (or mix for mix mode), NEVER bleed into unrelated topics!
+    if (availablePool.length < count) {
+      if (topic === 'mix') {
+        const allRegular = REGULAR_KEYS.flatMap(k => BASE_AI_BANKS[k] || []);
+        const extraUnseen = allRegular.filter(q => !isExcluded(q));
+        availablePool = Array.from(new Set([...availablePool, ...extraUnseen, ...allRegular]));
+      } else {
+        // Recycled strictly from the SAME TOPIC bank to prevent gross / unrelated topic leaks!
+        const recycledTopicBank = fisherYatesShuffle(primaryBank);
+        availablePool = Array.from(new Set([...availablePool, ...recycledTopicBank]));
+        
+        // If count is larger than single bank size, loop the same topic bank safely
+        let fillIdx = 0;
+        while (availablePool.length < count && primaryBank.length > 0) {
+          availablePool.push(recycledTopicBank[fillIdx % recycledTopicBank.length]);
+          fillIdx++;
+        }
+      }
     }
 
-    // 4. Final fallback if pool is still smaller than requested count (reset exclusion filter as last resort)
-    if (availablePool.length < count && !isTodTopic) {
-      const allRegular = REGULAR_KEYS.flatMap(k => BASE_AI_BANKS[k] || []);
-      const fullMaster = Array.from(new Set([...primaryBank, ...allRegular]));
-      availablePool = Array.from(new Set([...availablePool, ...fisherYatesShuffle(fullMaster)]));
+    // 4. Final fallback
+    if (availablePool.length === 0) {
+      availablePool = primaryBank.length > 0 ? primaryBank : (BASE_AI_BANKS['kenalan'] || []);
     }
 
     // 5. Shuffle with true Fisher-Yates and slice requested count

@@ -1045,52 +1045,82 @@ function OfflineGame() {
       const seen: string[] = getMergedSeenQuestions();
       const seenSet = new Set(seen.map(s => String(s).trim().toLowerCase()));
 
+      // ── Gemini cache helpers ─────────────────────────────────────────────
+      const CACHE_KEY = `obrolan_q_cache_${topic}`;
+      const CACHE_MAX = 500; // max questions stored per topic
+
+      const readCache = (): string[] => {
+        try {
+          const raw = localStorage.getItem(CACHE_KEY);
+          return raw ? JSON.parse(raw) : [];
+        } catch { return []; }
+      };
+
+      const writeCache = (incoming: string[]) => {
+        try {
+          const existing = readCache();
+          const merged = Array.from(new Set([...existing, ...incoming]));
+          const trimmed = merged.slice(-CACHE_MAX);
+          localStorage.setItem(CACHE_KEY, JSON.stringify(trimmed));
+        } catch {}
+      };
+
       let selectedQuestions: string[] = [];
 
       try {
         const aiPromptParam = searchParams.get('aiPrompt') || '';
         const res = await fetch(`/api/generate-questions?_t=${Date.now()}`, {
           method: 'POST',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
             'Cache-Control': 'no-cache, no-store, must-revalidate'
           },
           cache: 'no-store',
-          body: JSON.stringify({ topic, customPrompt: aiPromptParam, count: totalNeeded + 10, exclude: seen })
+          body: JSON.stringify({ topic, customPrompt: aiPromptParam, count: totalNeeded + 15, exclude: seen })
         });
         const data = await res.json();
         if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
-          const pool: string[] = cleanPool(shuffle(data.questions as string[])).filter(q => !seenSet.has(q.trim().toLowerCase()));
-          if (pool.length > 0) selectedQuestions = pool;
+          const pool: string[] = cleanPool(data.questions as string[]).filter(q => !seenSet.has(q.trim().toLowerCase()));
+          if (pool.length > 0) {
+            selectedQuestions = shuffle(pool);
+            // 🔑 Always save fresh Gemini results to self-growing cache
+            writeCache(data.questions as string[]);
+          }
         }
       } catch (e) {
-        console.warn("API call failed, using local pool:", e);
+        console.warn('Gemini API call failed, falling back to local cache:', e);
       }
 
-      // GUARANTEED FALLBACK: Always ensure selectedQuestions has enough questions
-      // This runs whether API succeeded-but-returned-empty, timed out, or threw
+      // ── Fallback: Self-growing Gemini cache (grows with every session) ───
+      // This is NOT the tiny static bank — it's all previously Gemini-generated
+      // questions accumulated across every play session by any user on this device.
       if (selectedQuestions.length < totalNeeded) {
-        const primaryBank = cleanPool(QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan']);
-        
-        if (topic === 'mix') {
-          const allBanks = cleanPool(Object.values(QUESTION_BANKS).flat());
-          const unseenGlobal = allBanks.filter(q => !seenSet.has(q.trim().toLowerCase()));
-          const fullMasterSet = Array.from(new Set([...selectedQuestions, ...unseenGlobal, ...allBanks]));
-          selectedQuestions = shuffle(fullMasterSet).slice(0, totalNeeded);
-        } else {
-          // Strictly top up and recycle from the SAME TOPIC bank to prevent gross / unrelated topic leaks!
-          const unseenPrimary = primaryBank.filter(q => !seenSet.has(q.trim().toLowerCase()));
-          let topicPool = Array.from(new Set([...selectedQuestions, ...unseenPrimary, ...primaryBank]));
-          
-          let fillIdx = 0;
-          const recycledBank = shuffle(primaryBank.length > 0 ? primaryBank : QUESTION_BANKS['kenalan']);
-          while (topicPool.length < totalNeeded && recycledBank.length > 0) {
-            topicPool.push(recycledBank[fillIdx % recycledBank.length]);
-            fillIdx++;
-          }
-          selectedQuestions = topicPool.slice(0, totalNeeded);
+        const cachedPool = cleanPool(readCache());
+        const unseenCached = cachedPool.filter(q => !seenSet.has(q.trim().toLowerCase()));
+        const merged = Array.from(new Set([...selectedQuestions, ...unseenCached, ...cachedPool]));
+        if (merged.length >= totalNeeded) {
+          selectedQuestions = shuffle(merged).slice(0, totalNeeded);
         }
       }
+
+      // ── Last resort: tiny static bank (only if cache is also empty) ──────
+      // This should almost never happen after the first successful Gemini session.
+      if (selectedQuestions.length < totalNeeded) {
+        const primaryBank = cleanPool(QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan']);
+        const allBanks = topic === 'mix'
+          ? cleanPool(Object.values(QUESTION_BANKS).flat())
+          : primaryBank;
+        const unseenStatic = allBanks.filter(q => !seenSet.has(q.trim().toLowerCase()));
+        const topicPool = Array.from(new Set([...selectedQuestions, ...unseenStatic, ...allBanks]));
+        let fillIdx = 0;
+        const recycled = shuffle(topicPool.length > 0 ? topicPool : allBanks);
+        while (topicPool.length < totalNeeded && recycled.length > 0) {
+          topicPool.push(recycled[fillIdx % recycled.length]);
+          fillIdx++;
+        }
+        selectedQuestions = topicPool.slice(0, totalNeeded);
+      }
+
 
       const firstRoundQs = selectedQuestions.slice(0, playerNames.length);
       setAllQuestions(selectedQuestions);

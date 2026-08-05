@@ -244,9 +244,9 @@ FORMAT OUTPUT (WAJIB DIIKUTI PERSIS):
 export async function POST(request: Request) {
   try {
     const { topic = 'kenalan', customPrompt = '', count = 20, exclude = [] } = await request.json();
-
     const excludeArr: string[] = Array.isArray(exclude) ? exclude.map((s: string) => String(s).trim()) : [];
-    const excludeSet = new Set(excludeArr.map(s => s.toLowerCase()));
+    const normalizeStr = (s: string) => s.trim().toLowerCase().replace(/["'"'`”«»]/g, '').replace(/[?.!,;]/g, '').replace(/\s+/g, ' ');
+    const excludeSet = new Set(excludeArr.map(s => normalizeStr(String(s))));
 
     const REGULAR_KEYS = ['kenalan', 'absurd', 'deep', 'pasangan', 'nostalgia', 'keluarga', 'whatif', 'karir'];
     const TOD_KEYS = ['tod_truth', 'tod_dare_offline', 'tod_dare_online'];
@@ -255,20 +255,22 @@ export async function POST(request: Request) {
     // ToD topics always use static banks (too specific for AI)
     if (isTodTopic) {
       const bank = fisherYatesShuffle(BASE_AI_BANKS[topic] || BASE_AI_BANKS['tod_truth']);
-      return NextResponse.json({ success: true, topic, questions: bank.slice(0, count) });
+      const filteredBank = bank.filter(q => !excludeSet.has(normalizeStr(q)));
+      const poolToUse = filteredBank.length >= count ? filteredBank : bank;
+      return NextResponse.json({ success: true, topic, questions: fisherYatesShuffle(poolToUse).slice(0, count) });
     }
 
     // ── Try Gemini AI first ────────────────────────────────────────────────────
     try {
-      const aiQuestions = await generateWithGemini(topic, customPrompt, count + 5, excludeArr);
+      const aiQuestions = await generateWithGemini(topic, customPrompt, count + 15, excludeArr);
 
       if (aiQuestions.length >= Math.min(count, 5)) {
-        // Deduplicate against seen questions
-        const fresh = aiQuestions.filter(q => !excludeSet.has(q.toLowerCase()));
+        // Deduplicate against seen questions using fuzzy normalization
+        const fresh = aiQuestions.filter(q => !excludeSet.has(normalizeStr(q)));
         const finalPool = fresh.length >= count ? fresh : [...fresh, ...aiQuestions];
         const unique = Array.from(new Set(finalPool)).slice(0, count);
 
-        return NextResponse.json({ success: true, topic, questions: unique, source: 'gemini' });
+        return NextResponse.json({ success: true, topic, questions: fisherYatesShuffle(unique), source: 'gemini' });
       }
     } catch (geminiError) {
       console.warn('[generate-questions] Gemini failed, using static fallback:', geminiError);
@@ -279,7 +281,7 @@ export async function POST(request: Request) {
       ? REGULAR_KEYS.flatMap(k => BASE_AI_BANKS[k] || [])
       : (BASE_AI_BANKS[topic] || BASE_AI_BANKS['kenalan']);
 
-    let available = primaryBank.filter(q => !excludeSet.has(q.toLowerCase()));
+    let available = primaryBank.filter(q => !excludeSet.has(normalizeStr(q)));
 
     // Strict topic isolation — recycle same bank, NEVER bleed to other topics
     if (available.length < count) {

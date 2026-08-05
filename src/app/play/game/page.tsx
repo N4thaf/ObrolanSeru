@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import { RotateCcw, CheckSquare, Volume2, VolumeX, Check } from 'lucide-react';
+import { RotateCcw, CheckSquare, Volume2, VolumeX, Check, Wand2 } from 'lucide-react';
 import { QUESTION_BANKS } from '../offline/page';
 import { sound } from '@/utils/sound';
 import { useAuth } from '@/context/AuthContext';
@@ -1005,6 +1005,7 @@ function OfflineGame() {
   const [activePlayerIndex, setActivePlayerIndex] = useState(0);
   const [roundQuestions, setRoundQuestions] = useState<string[]>([]);
   const [allQuestions, setAllQuestions] = useState<string[]>([]);
+  const [isQuestionsLoading, setIsQuestionsLoading] = useState<boolean>(mode === 'pertanyaan');
 
   // Poll room questions & round state for room players
   useEffect(() => {
@@ -1032,6 +1033,8 @@ function OfflineGame() {
 
   useEffect(() => {
     async function loadFreshAIQuestions() {
+      setIsQuestionsLoading(true);
+
       // If playing in an online room, check if room already has questions broadcasted
       if (roomCode) {
         try {
@@ -1041,6 +1044,7 @@ function OfflineGame() {
             const gs = roomData.room.gameState;
             setRoundQuestions(gs.roundQuestions);
             if (gs.allQuestions) setAllQuestions(gs.allQuestions);
+            setIsQuestionsLoading(false);
             return;
           }
         } catch (e) {}
@@ -1061,7 +1065,7 @@ function OfflineGame() {
       const totalNeeded = totalRounds * playerNames.length;
       const seen: string[] = getMergedSeenQuestions();
       // Normalize: strip quotes, punctuation, extra spaces for fuzzy dedup
-      const normalizeQ = (s: string) => s.trim().toLowerCase().replace(/["""'']/g, '').replace(/[?.!,]/g, '').replace(/\s+/g, ' ');
+      const normalizeQ = (s: string) => s.trim().toLowerCase().replace(/["'"'`”«»]/g, '').replace(/[?.!,;]/g, '').replace(/\s+/g, ' ');
       const seenSet = new Set(seen.map(s => normalizeQ(String(s))));
 
       // ── Gemini cache helpers ─────────────────────────────────────────────
@@ -1110,40 +1114,49 @@ function OfflineGame() {
         console.warn('Gemini API call failed, falling back to local cache:', e);
       }
 
-      // ── Fallback: Self-growing Gemini cache (grows with every session) ───
-      // This is NOT the tiny static bank — it's all previously Gemini-generated
-      // questions accumulated across every play session by any user on this device.
+      // ── Fallback 1: Self-growing Gemini cache (grows with every session) ──
       if (selectedQuestions.length < totalNeeded) {
         const cachedPool = cleanPool(readCache());
         const unseenCached = cachedPool.filter(q => !seenSet.has(normalizeQ(q)));
-        const merged = Array.from(new Set([...selectedQuestions, ...unseenCached, ...cachedPool]));
-        if (merged.length >= totalNeeded) {
-          selectedQuestions = shuffle(merged).slice(0, totalNeeded);
+        const merged = Array.from(new Set([...selectedQuestions, ...unseenCached]));
+        if (merged.length > 0) {
+          selectedQuestions = shuffle(merged);
         }
       }
 
-      // ── Last resort: tiny static bank (only if cache is also empty) ──────
-      // This should almost never happen after the first successful Gemini session.
+      // ── Fallback 2: Static bank (ONLY unseen questions, ALWAYS SHUFFLED) ─
       if (selectedQuestions.length < totalNeeded) {
         const primaryBank = cleanPool(QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan']);
         const allBanks = topic === 'mix'
           ? cleanPool(Object.values(QUESTION_BANKS).flat())
           : primaryBank;
-        const unseenStatic = allBanks.filter(q => !seenSet.has(q.trim().toLowerCase()));
-        const topicPool = Array.from(new Set([...selectedQuestions, ...unseenStatic, ...allBanks]));
-        let fillIdx = 0;
-        const recycled = shuffle(topicPool.length > 0 ? topicPool : allBanks);
-        while (topicPool.length < totalNeeded && recycled.length > 0) {
-          topicPool.push(recycled[fillIdx % recycled.length]);
-          fillIdx++;
+        
+        // Filter strictly unseen static questions with fuzzy normalizeQ
+        const unseenStatic = shuffle(allBanks.filter(q => !seenSet.has(normalizeQ(q))));
+        const mergedStatic = Array.from(new Set([...selectedQuestions, ...unseenStatic]));
+
+        if (mergedStatic.length >= totalNeeded) {
+          selectedQuestions = shuffle(mergedStatic).slice(0, totalNeeded);
+        } else {
+          // If all unseen static questions are exhausted, shuffle full pool
+          const recycled = shuffle(allBanks);
+          let fillIdx = 0;
+          const pool = [...mergedStatic];
+          while (pool.length < totalNeeded && recycled.length > 0) {
+            pool.push(recycled[fillIdx % recycled.length]);
+            fillIdx++;
+          }
+          selectedQuestions = shuffle(pool).slice(0, totalNeeded);
         }
-        selectedQuestions = topicPool.slice(0, totalNeeded);
       }
 
+      // Always ensure final pool is thoroughly shuffled
+      selectedQuestions = shuffle(selectedQuestions).slice(0, totalNeeded);
 
       const firstRoundQs = selectedQuestions.slice(0, playerNames.length);
       setAllQuestions(selectedQuestions);
       setRoundQuestions(firstRoundQs);
+      setIsQuestionsLoading(false);
 
       // Sync seen questions across devices and upload to Cloud Account
       try {
@@ -1228,7 +1241,18 @@ function OfflineGame() {
       />
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-2 relative z-10 w-full max-w-5xl mx-auto my-auto">
-        {mode === 'pertanyaan' ? (
+        {isQuestionsLoading && mode === 'pertanyaan' ? (
+          <div className="flex flex-col items-center justify-center space-y-4 my-auto py-16 animate-fade-in">
+            <div className="relative flex items-center justify-center">
+              <div className="w-14 h-14 border-4 border-[#257180]/20 border-t-[#FD8B51] rounded-full animate-spin" />
+              <Wand2 className="w-6 h-6 text-[#FD8B51] absolute animate-pulse" />
+            </div>
+            <div className="text-center space-y-1">
+              <p className="font-black text-[#257180] text-lg tracking-wide">Meracik Kartu Obrolan Fresh...</p>
+              <p className="text-xs font-bold text-[#257180]/60">Menyiapkan pertanyaan unik yang belum pernah kamu lihat</p>
+            </div>
+          </div>
+        ) : mode === 'pertanyaan' ? (
           <AllCardsDisplay
             playerNames={playerNames}
             questions={roundQuestions}

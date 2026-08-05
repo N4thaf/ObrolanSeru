@@ -202,9 +202,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Helper to merge and upload new seen questions to Cloud Account
+  // Helper to merge and upload new seen questions to Cloud Account bound to user email
   const syncSeenQuestions = async (newQuestions: string[]) => {
     if (!newQuestions || newQuestions.length === 0) return;
+
+    const cleanEmail = user?.email?.toLowerCase()?.trim();
 
     let localSeen: string[] = [];
     try {
@@ -212,18 +214,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (stored) localSeen = JSON.parse(stored);
     } catch (e) {}
 
-    const merged = Array.from(new Set([...localSeen, ...newQuestions])).slice(-1000);
+    let emailSeen: string[] = [];
+    if (cleanEmail) {
+      try {
+        const stored = localStorage.getItem(`obrolan_seen_questions_${cleanEmail}`);
+        if (stored) emailSeen = JSON.parse(stored);
+      } catch (e) {}
+    }
+
+    const merged = Array.from(new Set([...localSeen, ...emailSeen, ...newQuestions])).slice(-1000);
     try {
       localStorage.setItem("obrolan_seen_questions", JSON.stringify(merged));
+      if (cleanEmail) {
+        localStorage.setItem(`obrolan_seen_questions_${cleanEmail}`, JSON.stringify(merged));
+      }
     } catch (e) {}
 
-    if (user && user.email) {
+    // Update in-memory user state immediately
+    if (user) {
+      setUser(prev => prev ? { ...prev, seenQuestions: merged } : prev);
+    }
+
+    if (cleanEmail) {
       try {
         await fetch("/api/user", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            email: user.email,
+            email: cleanEmail,
             newSeenQuestions: merged
           })
         });
@@ -232,14 +250,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const getMergedSeenQuestions = (): string[] => {
+    const cleanEmail = user?.email?.toLowerCase()?.trim();
     let localSeen: string[] = [];
     try {
       const stored = localStorage.getItem("obrolan_seen_questions");
       if (stored) localSeen = JSON.parse(stored);
     } catch (e) {}
 
+    let emailSeen: string[] = [];
+    if (cleanEmail) {
+      try {
+        const stored = localStorage.getItem(`obrolan_seen_questions_${cleanEmail}`);
+        if (stored) emailSeen = JSON.parse(stored);
+      } catch (e) {}
+    }
+
     const userSeen = user?.seenQuestions || [];
-    return Array.from(new Set([...localSeen, ...userSeen]));
+    return Array.from(new Set([...localSeen, ...emailSeen, ...userSeen]));
   };
 
   // Periodic pass expiration checker (every 30 seconds)

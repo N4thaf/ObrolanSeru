@@ -226,6 +226,7 @@ function AllCardsDisplay({
   activePlayerIndex: number; setActivePlayerIndex: React.Dispatch<React.SetStateAction<number>>;
   roomCode?: string; topic?: string;
 }) {
+  const { syncSeenQuestions } = useAuth();
   const playerCount = playerNames.length;
   const [dismissed, setDismissed] = useState<boolean[]>(new Array(playerCount).fill(false));
   const [activeModalIndex, setActiveModalIndex] = useState<number | null>(null);
@@ -364,20 +365,9 @@ function AllCardsDisplay({
     lastLocalOpenTimeRef.current = now;
     lastActionTimeRef.current = now;
 
-    // ✅ IMMEDIATELY mark as seen the moment the card is opened.
-    // This fires before anything else so the question is NEVER repeated
-    // in any future game or topic, even if the user resets mid-game.
+    // ✅ IMMEDIATELY mark as seen the moment the card is opened bound to user email account!
     try {
-      const raw = localStorage.getItem('obrolan_seen_questions');
-      const existing: string[] = raw ? JSON.parse(raw) : [];
-      const normalizedNew = selectedQuestion.trim().toLowerCase().replace(/["""'']/g, '').replace(/[?.!,]/g, '').replace(/\s+/g, ' ');
-      const alreadyIn = existing.some(q =>
-        q.trim().toLowerCase().replace(/["""'']/g, '').replace(/[?.!,]/g, '').replace(/\s+/g, ' ') === normalizedNew
-      );
-      if (!alreadyIn) {
-        const updated = [...existing, selectedQuestion].slice(-1000);
-        localStorage.setItem('obrolan_seen_questions', JSON.stringify(updated));
-      }
+      syncSeenQuestions([selectedQuestion]);
     } catch {}
 
     setActiveQuestionText(selectedQuestion);

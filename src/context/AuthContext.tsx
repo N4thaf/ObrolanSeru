@@ -57,19 +57,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [passExpiresAt, setPassExpiresAt] = useState<number>(0);
   
-  // Instant 0ms cache for isPremium to prevent refresh flickers, checking time-expiration
+  // Instant 0ms cache for isPremium with strict expiration validation
   const [isPremium, setIsPremiumState] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
+      const isPerm = localStorage.getItem("obrolan_is_permanent_premium") === "true";
+      if (isPerm) return true;
+
       const storedExp = localStorage.getItem("obrolan_pass_expires_at");
       if (storedExp) {
         const expTime = parseInt(storedExp, 10);
         if (expTime > Date.now()) return true;
-        // Expired
-        localStorage.removeItem("obrolan_is_premium");
-        localStorage.removeItem("obrolan_pass_expires_at");
-        return false;
       }
-      return localStorage.getItem("obrolan_is_premium") === "true";
+      
+      // If no valid expiration timestamp or expired, purge stale cache
+      localStorage.removeItem("obrolan_is_premium");
+      localStorage.removeItem("obrolan_pass_expires_at");
+      return false;
     }
     return false;
   });
@@ -90,6 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         localStorage.removeItem("obrolan_is_premium");
         localStorage.removeItem("obrolan_pass_expires_at");
+        localStorage.removeItem("obrolan_is_permanent_premium");
         if (email) {
           localStorage.removeItem(`obrolan_is_premium_${email.toLowerCase().trim()}`);
           localStorage.removeItem(`obrolan_pass_expires_at_${email.toLowerCase().trim()}`);
@@ -369,6 +373,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("obrolan_user_session");
       localStorage.removeItem("obrolan_is_premium");
       localStorage.removeItem("obrolan_pass_expires_at");
+      localStorage.removeItem("obrolan_is_permanent_premium");
     } catch (e) {}
   };
 

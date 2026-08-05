@@ -106,6 +106,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const syncAccountData = async (email: string) => {
     const cleanEmail = email.toLowerCase().trim();
     
+    // CRITICAL: Always check localStorage permanent premium flag FIRST.
+    // Vercel serverless resets in-memory DB on cold starts — server 404 must NEVER wipe local permanent VIP.
+    let isLocalPermanent = false;
+    try {
+      isLocalPermanent = localStorage.getItem("obrolan_is_permanent_premium") === "true" &&
+        localStorage.getItem(`obrolan_permanent_email`) === cleanEmail;
+    } catch (e) {}
+
+    if (isLocalPermanent) {
+      // Permanent VIP stored locally — honor it without waiting for server (which may be cold-started)
+      const lifetime = Date.now() + 100 * 365 * 24 * 60 * 60 * 1000;
+      setIsPremiumState(true);
+      setPassExpiresAt(lifetime);
+      // Still try to re-register on server in background (best-effort, don't await)
+      fetch("/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: cleanEmail, isPermanentPremium: true,
+          activePass: { type: "pass_lifetime_secret", expiresAt: lifetime } })
+      }).catch(() => {});
+      return;
+    }
+    
     // Check local pass expiration
     let localPassExp = 0;
     try {
@@ -125,6 +148,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const hasValidPremium = data.user.isPremium && (maxExp > Date.now() || data.user.isPermanentPremium);
         
         if (hasValidPremium) {
+          if (data.user.isPermanentPremium) {
+            // Re-persist permanent flag locally in case it was lost
+            try {
+              localStorage.setItem("obrolan_is_permanent_premium", "true");
+              localStorage.setItem("obrolan_permanent_email", cleanEmail);
+            } catch (e) {}
+          }
           setIsPremium(true, cleanEmail, maxExp);
         } else {
           setIsPremium(false, cleanEmail);
@@ -144,6 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(prev => prev ? { ...prev, seenQuestions: merged } : prev);
         }
       } else {
+        // Server 404 (cold start reset) — fall back to local pass only, never wipe permanent
         if (isLocalPassValid) {
           setIsPremium(true, cleanEmail, localPassExp);
         } else {
@@ -342,7 +373,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data.success && data.user) {
           const finalExp = data.user.passExpiresAt || targetExpiry;
           if (cleanCode === "NATHAVOID") {
-            try { localStorage.setItem("obrolan_is_permanent_premium", "true"); } catch (e) {}
+            // Persist permanent VIP flag with email binding — survives Vercel cold starts & browser refreshes
+            try {
+              localStorage.setItem("obrolan_is_permanent_premium", "true");
+              localStorage.setItem("obrolan_permanent_email", cleanEmail);
+            } catch (e) {}
           }
           setIsPremium(true, cleanEmail, finalExp);
           try {
@@ -390,6 +425,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("obrolan_is_premium");
       localStorage.removeItem("obrolan_pass_expires_at");
       localStorage.removeItem("obrolan_is_permanent_premium");
+      localStorage.removeItem("obrolan_permanent_email");
     } catch (e) {}
   };
 

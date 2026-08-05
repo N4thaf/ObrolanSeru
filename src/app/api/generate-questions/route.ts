@@ -219,16 +219,18 @@ export async function POST(request: Request) {
     // 2. Filter out any questions already seen by this user/account
     let availablePool = primaryBank.filter(q => !isExcluded(q));
 
-    // 3. Top up seamlessly from all regular banks if depleted for regular topics
+    // 3. Top up seamlessly from all regular banks if count is greater than primary bank
     if (availablePool.length < count && !isTodTopic) {
       const allRegular = REGULAR_KEYS.flatMap(k => BASE_AI_BANKS[k] || []);
-      const extraPool = allRegular.filter(q => !isExcluded(q));
-      availablePool = Array.from(new Set([...availablePool, ...extraPool]));
+      const extraUnseen = allRegular.filter(q => !isExcluded(q));
+      availablePool = Array.from(new Set([...availablePool, ...extraUnseen]));
     }
 
-    // 4. Final fallback if 100% exhausted
-    if (availablePool.length === 0) {
-      availablePool = primaryBank.length > 0 ? primaryBank : (BASE_AI_BANKS['kenalan'] || []);
+    // 4. Final fallback if pool is still smaller than requested count (reset exclusion filter as last resort)
+    if (availablePool.length < count && !isTodTopic) {
+      const allRegular = REGULAR_KEYS.flatMap(k => BASE_AI_BANKS[k] || []);
+      const fullMaster = Array.from(new Set([...primaryBank, ...allRegular]));
+      availablePool = Array.from(new Set([...availablePool, ...fisherYatesShuffle(fullMaster)]));
     }
 
     // 5. Shuffle with true Fisher-Yates and slice requested count

@@ -1037,17 +1037,23 @@ function OfflineGame() {
         console.warn("Falling back to local pool:", e);
       }
 
-      // Top up pool seamlessly up to totalNeeded without discarding generated AI questions
+      // Top up pool seamlessly up to totalNeeded with zero duplicate questions
       if (selectedQuestions.length < totalNeeded) {
-        const bank = cleanPool(QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan']);
-        let unseenBank = bank.filter(q => !seenSet.has(q.trim().toLowerCase()));
-        if (unseenBank.length === 0) unseenBank = bank;
-        
-        const remainingNeeded = totalNeeded - selectedQuestions.length;
-        const extraPool: string[] = [];
-        while (extraPool.length < remainingNeeded * 2) extraPool.push(...shuffle(unseenBank));
-        
-        selectedQuestions = Array.from(new Set([...selectedQuestions, ...extraPool])).slice(0, totalNeeded);
+        const primaryBank = cleanPool(QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan']);
+        const allBanks = cleanPool(Object.values(QUESTION_BANKS).flat());
+
+        const unseenPrimary = primaryBank.filter(q => !seenSet.has(q.trim().toLowerCase()));
+        const unseenGlobal = allBanks.filter(q => !seenSet.has(q.trim().toLowerCase()));
+
+        const fullMasterSet = Array.from(new Set([
+          ...selectedQuestions,
+          ...unseenPrimary,
+          ...unseenGlobal,
+          ...primaryBank,
+          ...allBanks
+        ]));
+
+        selectedQuestions = shuffle(fullMasterSet).slice(0, totalNeeded);
       }
 
       const firstRoundQs = selectedQuestions.slice(0, playerNames.length);

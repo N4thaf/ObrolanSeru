@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generateProceduralQuestions } from '@/utils/proceduralQuestions';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -276,24 +277,25 @@ export async function POST(request: Request) {
       console.warn('[generate-questions] Gemini failed, using static fallback:', geminiError);
     }
 
-    // ── Static bank fallback ───────────────────────────────────────────────────
+    // ── Procedural & Static bank fallback ─────────────────────────────────────
     let primaryBank: string[] = topic === 'mix'
       ? REGULAR_KEYS.flatMap(k => BASE_AI_BANKS[k] || [])
       : (BASE_AI_BANKS[topic] || BASE_AI_BANKS['kenalan']);
 
     let available = primaryBank.filter(q => !excludeSet.has(normalizeStr(q)));
 
-    // Strict topic isolation — recycle same bank, NEVER bleed to other topics
-    if (available.length < count) {
-      const recycled = fisherYatesShuffle(primaryBank);
-      available = Array.from(new Set([...available, ...recycled]));
+    // Generate infinite procedural questions if static bank is exhausted or depleted
+    if (available.length < count && !isTodTopic) {
+      const needed = count - available.length;
+      const procedural = generateProceduralQuestions(topic, Math.max(needed, 10), excludeSet);
+      available = Array.from(new Set([...available, ...procedural]));
     }
 
     const shuffled = fisherYatesShuffle(available);
-    return NextResponse.json({ success: true, topic, questions: shuffled.slice(0, count), source: 'static' });
+    return NextResponse.json({ success: true, topic, questions: shuffled.slice(0, count), source: 'procedural' });
 
   } catch (error) {
-    const fallback = fisherYatesShuffle(BASE_AI_BANKS['kenalan'] || []);
-    return NextResponse.json({ success: true, topic: 'kenalan', questions: fallback.slice(0, 10), source: 'emergency' });
+    const proceduralFallback = generateProceduralQuestions('kenalan', 10, new Set());
+    return NextResponse.json({ success: true, topic: 'kenalan', questions: proceduralFallback, source: 'emergency' });
   }
 }

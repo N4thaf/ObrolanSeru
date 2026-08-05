@@ -7,6 +7,7 @@ import { RotateCcw, CheckSquare, Volume2, VolumeX, Check, Wand2 } from 'lucide-r
 import { QUESTION_BANKS } from '../offline/page';
 import { sound } from '@/utils/sound';
 import { useAuth } from '@/context/AuthContext';
+import { generateProceduralQuestions } from '@/utils/proceduralQuestions';
 
 /* Official User Color Palette (Warm Sunset Tones - Zero Cold White) */
 const C = {
@@ -357,10 +358,9 @@ function AllCardsDisplay({
     if (dismissed[index]) return;
     sound.playFlip();
 
-    // Use question from questions array, with fallback to a random local bank question (never a hardcoded static string)
-    const fallbackBank = QUESTION_BANKS[topic as string] || QUESTION_BANKS['kenalan'];
-    const fallbackQ = fallbackBank[Math.floor(Math.random() * fallbackBank.length)] || "Apa hal yang paling membuat kamu bersemangat hari ini?";
-    const selectedQuestion = (questions && questions[index]) ? questions[index] : fallbackQ;
+    // Use question from questions array, with fallback to procedurally generated question (never static string)
+    const proceduralFallback = generateProceduralQuestions(topic as string, 1, new Set())[0] || "Ceritakan satu pengalaman paling berkesan dalam hidup kamu!";
+    const selectedQuestion = (questions && questions[index]) ? questions[index] : proceduralFallback;
     const now = Date.now();
     lastLocalOpenTimeRef.current = now;
     lastActionTimeRef.current = now;
@@ -1128,15 +1128,10 @@ function OfflineGame() {
         if (mergedStatic.length >= totalNeeded) {
           selectedQuestions = shuffle(mergedStatic).slice(0, totalNeeded);
         } else {
-          // If all unseen static questions are exhausted, shuffle full pool
-          const recycled = shuffle(allBanks);
-          let fillIdx = 0;
-          const pool = [...mergedStatic];
-          while (pool.length < totalNeeded && recycled.length > 0) {
-            pool.push(recycled[fillIdx % recycled.length]);
-            fillIdx++;
-          }
-          selectedQuestions = shuffle(pool).slice(0, totalNeeded);
+          // If all unseen static questions are exhausted, generate 100% fresh procedural questions!
+          const needed = totalNeeded - mergedStatic.length;
+          const procedural = generateProceduralQuestions(topic, Math.max(needed, 10), seenSet);
+          selectedQuestions = shuffle([...mergedStatic, ...procedural]).slice(0, totalNeeded);
         }
       }
 

@@ -180,7 +180,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (stored) localSeen = JSON.parse(stored);
           } catch (e) {}
 
-          const merged = Array.from(new Set([...localSeen, ...data.user.seenQuestions])).slice(-500);
+          const merged = Array.from(new Set([...localSeen, ...data.user.seenQuestions])).slice(-1000);
           localStorage.setItem("obrolan_seen_questions", JSON.stringify(merged));
           
           setUser(prev => prev ? { ...prev, seenQuestions: merged } : prev);
@@ -212,7 +212,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (stored) localSeen = JSON.parse(stored);
     } catch (e) {}
 
-    const merged = Array.from(new Set([...localSeen, ...newQuestions])).slice(-500);
+    const merged = Array.from(new Set([...localSeen, ...newQuestions])).slice(-1000);
     try {
       localStorage.setItem("obrolan_seen_questions", JSON.stringify(merged));
     } catch (e) {}

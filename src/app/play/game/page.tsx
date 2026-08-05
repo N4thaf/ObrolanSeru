@@ -234,13 +234,20 @@ function AllCardsDisplay({
 
   // Timestamp guard & stable refs to prevent network race conditions from flickering local state
   const lastActionTimeRef = useRef<number>(0);
+  const lastLocalOpenTimeRef = useRef<number>(0);
+  const lastSyncedVersionRef = useRef<number>(0);
   const activeModalIndexRef = useRef<number | null>(activeModalIndex);
+  const activeQuestionTextRef = useRef<string>(activeQuestionText);
   const dismissedRef = useRef<boolean[]>(dismissed);
   const activePlayerIndexRef = useRef<number>(activePlayerIndex);
 
   useEffect(() => {
     activeModalIndexRef.current = activeModalIndex;
   }, [activeModalIndex]);
+
+  useEffect(() => {
+    activeQuestionTextRef.current = activeQuestionText;
+  }, [activeQuestionText]);
 
   useEffect(() => {
     dismissedRef.current = dismissed;
@@ -285,7 +292,7 @@ function AllCardsDisplay({
     } catch (e) {}
   };
 
-  // Poll room state in real-time (300ms) with strict timestamp guard (0 race flicker)
+  // Poll room state in real-time (400ms) with strict version & timestamp protection (Zero flicker)
   useEffect(() => {
     if (!roomCode) return;
     const interval = setInterval(async () => {
@@ -295,12 +302,28 @@ function AllCardsDisplay({
         if (data.success && data.room && data.room.gameState) {
           const gs = data.room.gameState;
           
-          // Ignore stale server responses if a newer local action occurred
+          // 1. Version Guard: Ignore stale or out-of-order server responses
+          if (gs.version && gs.version <= lastSyncedVersionRef.current) {
+            return;
+          }
+
+          // 2. Ignore stale server responses if a local user action occurred recently
           if (gs.updatedAt && gs.updatedAt < lastActionTimeRef.current) {
             return;
           }
 
-          // 1. Sync active card modal index (open or close)
+          // 3. Local Open Guard: Do not let stale server nulls close a card just opened locally
+          if (gs.activeModalIndex === null && activeModalIndexRef.current !== null) {
+            if (Date.now() - lastLocalOpenTimeRef.current < 2000) {
+              return;
+            }
+          }
+
+          if (gs.version) {
+            lastSyncedVersionRef.current = gs.version;
+          }
+
+          // Sync active card modal index (open or close)
           if (gs.activeModalIndex !== undefined && gs.activeModalIndex !== activeModalIndexRef.current) {
             setActiveModalIndex(gs.activeModalIndex);
             if (gs.activeModalIndex === null) {
@@ -308,32 +331,36 @@ function AllCardsDisplay({
             }
           }
 
-          // 2. Sync question text
-          if (gs.activeQuestionText && gs.activeQuestionText !== activeQuestionText) {
+          // Sync question text
+          if (gs.activeQuestionText && gs.activeQuestionText !== activeQuestionTextRef.current) {
             setActiveQuestionText(gs.activeQuestionText);
           }
 
-          // 3. Sync dismissed cards array across all devices
+          // Sync dismissed cards array across all devices
           if (Array.isArray(gs.dismissed) && JSON.stringify(gs.dismissed) !== JSON.stringify(dismissedRef.current)) {
             setDismissed(gs.dismissed);
           }
 
-          // 4. Sync active turn player index
+          // Sync active turn player index
           if (gs.activePlayerIndex !== undefined && gs.activePlayerIndex !== activePlayerIndexRef.current) {
             setActivePlayerIndex(gs.activePlayerIndex);
           }
         }
       } catch (e) {}
-    }, 300);
+    }, 400);
 
     return () => clearInterval(interval);
-  }, [roomCode, activeQuestionText, setActivePlayerIndex]);
+  }, [roomCode]);
 
   const handleOpenCard = (index: number) => {
     if (dismissed[index]) return;
     sound.playFlip();
 
     const selectedQuestion = questions[index] || "Ceritakan satu momen paling berkesan dalam hidup kamu!";
+    const now = Date.now();
+    lastLocalOpenTimeRef.current = now;
+    lastActionTimeRef.current = now;
+
     setActiveQuestionText(selectedQuestion);
     setActiveModalIndex(index);
 

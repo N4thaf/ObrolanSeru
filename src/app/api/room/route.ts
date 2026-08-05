@@ -11,6 +11,7 @@ const rooms: Record<string, {
   status: string;
   updatedAt: number;
   gameState?: {
+    version: number;
     activePlayerIndex: number;
     rotation: number;
     landedIndex: number | null;
@@ -19,6 +20,8 @@ const rooms: Record<string, {
     todContent: string;
     dismissed: boolean[];
     activeModalIndex: number | null;
+    activeQuestionText?: string;
+    updatedAt: number;
   };
 }> = {};
 
@@ -51,6 +54,9 @@ export async function POST(req: Request) {
     const existing = rooms[cleanCode] || {};
 
     const now = Date.now();
+    const currentGS: any = existing.gameState || {};
+    const nextVersion = (currentGS.version || 0) + 1;
+
     const updatedRoom = {
       code: cleanCode,
       host: host || existing.host || "Host",
@@ -61,8 +67,9 @@ export async function POST(req: Request) {
       status: status || existing.status || "lobby",
       updatedAt: now,
       gameState: {
-        ...(existing.gameState || {}),
+        ...currentGS,
         ...(gameState || {}),
+        version: nextVersion,
         updatedAt: now
       },
     };

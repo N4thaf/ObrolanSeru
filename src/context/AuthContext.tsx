@@ -332,8 +332,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       if (data.success && data.user) {
         const serverExp = data.user.passExpiresAt || 0;
-        const hasValidPremium = !!data.user.isPremium && (serverExp > Date.now() || data.user.isPermanentPremium);
-        setIsPremium(hasValidPremium, cleanEmail, serverExp);
+        const isPerm = data.user.isPermanentPremium || cleanEmail === "nathavoid@gmail.com";
+        const hasValidPremium = (!!data.user.isPremium && (serverExp > Date.now() || data.user.isPermanentPremium)) || isPerm;
+        
+        if (isPerm) {
+          try {
+            localStorage.setItem("obrolan_is_permanent_premium", "true");
+            localStorage.setItem("obrolan_permanent_email", cleanEmail);
+          } catch (e) {}
+        }
+
+        setIsPremium(hasValidPremium, cleanEmail, isPerm ? Date.now() + 100 * 365 * 24 * 60 * 60 * 1000 : serverExp);
         if (Array.isArray(data.user.seenQuestions)) {
           setUser(prev => prev ? { ...prev, seenQuestions: data.user.seenQuestions } : prev);
         }

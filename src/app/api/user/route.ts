@@ -18,11 +18,15 @@ const userDatabase: Record<string, {
   roomsJoined: number;
 }> = {};
 
+const LIFETIME_EMAILS = new Set([
+  "nathavoid@gmail.com"
+]);
+
 // Helper to evaluate active premium status & max expiry timestamp strictly by time
 function checkUserPremiumStatus(user: any) {
   if (!user) return { isPremium: false, passExpiresAt: 0 };
   
-  if (user.isPermanentPremium) {
+  if (user.isPermanentPremium || (user.email && LIFETIME_EMAILS.has(user.email.toLowerCase().trim()))) {
     return { isPremium: true, passExpiresAt: Date.now() + 100 * 365 * 24 * 60 * 60 * 1000 };
   }
 
@@ -45,6 +49,27 @@ export async function GET(req: Request) {
 
   let user = userDatabase[email];
 
+  if (!user && LIFETIME_EMAILS.has(email)) {
+    // Auto-create permanent user entry for lifetime VIP accounts on new serverless instances
+    user = {
+      id: `user_lifetime_${email}`,
+      name: email.split("@")[0],
+      email: email,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(email)}`,
+      provider: "google",
+      createdAt: Date.now(),
+      isPermanentPremium: true,
+      redeemedCodes: ["NATHAVOID"],
+      seenQuestions: [],
+      activePasses: [{
+        type: "pass_lifetime_secret",
+        expiresAt: Date.now() + 100 * 365 * 24 * 60 * 60 * 1000
+      }],
+      roomsJoined: 1
+    };
+    userDatabase[email] = user;
+  }
+
   if (!user) {
     return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
   }
@@ -55,6 +80,7 @@ export async function GET(req: Request) {
     success: true,
     user: {
       ...user,
+      isPermanentPremium: user.isPermanentPremium || LIFETIME_EMAILS.has(email),
       isPremium,
       passExpiresAt
     }
@@ -90,7 +116,7 @@ export async function POST(req: Request) {
       avatar: avatar || existing.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanEmail)}`,
       provider: "google" as const,
       createdAt: existing.createdAt || Date.now(),
-      isPermanentPremium: isPermanentPremium || existing.isPermanentPremium || false,
+      isPermanentPremium: isPermanentPremium || existing.isPermanentPremium || LIFETIME_EMAILS.has(cleanEmail) || false,
       redeemedCodes: existingRedeemed,
       seenQuestions: mergedSeen,
       activePasses: activePasses,

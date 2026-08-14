@@ -214,7 +214,7 @@ export const CURATED_BANKS: Record<string, string[]> = {
   ]
 };
 
-// Generates N guaranteed unique, natural, never-seen questions from curated pools
+// Generates N guaranteed unique questions with strict topic isolation
 export function generateProceduralQuestions(topic: string, count: number, excludeSet: Set<string>): string[] {
   const bank = CURATED_BANKS[topic] || CURATED_BANKS['kenalan'];
   const questions: string[] = [];
@@ -229,18 +229,23 @@ export function generateProceduralQuestions(topic: string, count: number, exclud
     excludeSet.add(normalizeQ(q));
   }
 
-  // 2. If unseen is exhausted, mix with other categories to maintain 100% uniqueness
+  // 2. Strict Topic Isolation: Only mix with other categories if topic === 'mix'
   if (questions.length < count) {
-    const allOtherCategories = Object.keys(CURATED_BANKS)
-      .filter(k => k !== topic)
-      .flatMap(k => CURATED_BANKS[k]);
-
-    const unseenOthers = shuffle(allOtherCategories.filter(q => !excludeSet.has(normalizeQ(q))));
-
-    for (const q of unseenOthers) {
-      if (questions.length >= count) break;
-      questions.push(q);
-      excludeSet.add(normalizeQ(q));
+    if (topic === 'mix') {
+      const allOtherCategories = Object.keys(CURATED_BANKS).flatMap(k => CURATED_BANKS[k]);
+      const unseenOthers = shuffle(allOtherCategories.filter(q => !excludeSet.has(normalizeQ(q))));
+      for (const q of unseenOthers) {
+        if (questions.length >= count) break;
+        questions.push(q);
+        excludeSet.add(normalizeQ(q));
+      }
+    } else {
+      // For specific topics (like pasangan, keluarga), strictly recycle from SAME TOPIC ONLY!
+      const recycled = shuffle(bank);
+      for (const q of recycled) {
+        if (questions.length >= count) break;
+        questions.push(q);
+      }
     }
   }
 

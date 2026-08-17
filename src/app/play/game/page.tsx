@@ -1135,8 +1135,29 @@ function OfflineGame() {
         }
       }
 
-      // Always ensure final pool is thoroughly shuffled
-      selectedQuestions = shuffle(selectedQuestions).slice(0, totalNeeded);
+      // Helper: Strict fuzzy deduplication within the single session array
+      const makeFuzzyUnique = (arr: string[]): string[] => {
+        const seenNorms = new Set<string>();
+        const result: string[] = [];
+        for (const q of arr) {
+          if (!q) continue;
+          const norm = normalizeQ(q);
+          if (!seenNorms.has(norm)) {
+            seenNorms.add(norm);
+            result.push(q);
+          }
+        }
+        return result;
+      };
+
+      // Always ensure final pool has 0 duplicates and is thoroughly shuffled
+      let uniquePool = makeFuzzyUnique(selectedQuestions);
+      if (uniquePool.length < totalNeeded) {
+        const fillProcedural = generateProceduralQuestions(topic, totalNeeded - uniquePool.length, seenSet);
+        uniquePool = makeFuzzyUnique([...uniquePool, ...fillProcedural]);
+      }
+
+      selectedQuestions = shuffle(uniquePool).slice(0, totalNeeded);
 
       const firstRoundQs = selectedQuestions.slice(0, playerNames.length);
       setAllQuestions(selectedQuestions);

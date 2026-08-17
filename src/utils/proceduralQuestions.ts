@@ -229,22 +229,35 @@ export function generateProceduralQuestions(topic: string, count: number, exclud
     excludeSet.add(normalizeQ(q));
   }
 
-  // 2. Strict Topic Isolation: Only mix with other categories if topic === 'mix'
+  // 2. Strict Topic Isolation & Intra-Session Deduplication
   if (questions.length < count) {
     if (topic === 'mix') {
       const allOtherCategories = Object.keys(CURATED_BANKS).flatMap(k => CURATED_BANKS[k]);
       const unseenOthers = shuffle(allOtherCategories.filter(q => !excludeSet.has(normalizeQ(q))));
       for (const q of unseenOthers) {
         if (questions.length >= count) break;
-        questions.push(q);
-        excludeSet.add(normalizeQ(q));
+        const norm = normalizeQ(q);
+        if (!questions.some(existing => normalizeQ(existing) === norm)) {
+          questions.push(q);
+          excludeSet.add(norm);
+        }
       }
     } else {
       // For specific topics (like pasangan, keluarga), strictly recycle from SAME TOPIC ONLY!
+      // But NEVER duplicate a question within the SAME session unless all bank items are used!
       const recycled = shuffle(bank);
       for (const q of recycled) {
         if (questions.length >= count) break;
-        questions.push(q);
+        const norm = normalizeQ(q);
+        if (!questions.some(existing => normalizeQ(existing) === norm)) {
+          questions.push(q);
+        }
+      }
+      // If count is greater than bank size, fill remaining with recycled items avoiding consecutive dupes
+      let fillIdx = 0;
+      while (questions.length < count && recycled.length > 0) {
+        questions.push(recycled[fillIdx % recycled.length]);
+        fillIdx++;
       }
     }
   }

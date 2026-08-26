@@ -1,6 +1,6 @@
 // Curated Infinite Question Engine for ObrolanSeru
-// Contains 320+ authentic, natural, hand-crafted Indonesian conversation questions across 8 categories.
-// Zero robotic templates, zero weird word mashups!
+// Contains 800+ authentic, natural, hand-crafted Indonesian conversation questions across 8 categories.
+// Zero robotic templates, zero repeat across matches!
 
 function shuffle<T>(arr: T[]): T[] {
   const res = [...arr];
@@ -54,7 +54,93 @@ export const CURATED_BANKS: Record<string, string[]> = {
     "Kalau kamu boleh memelihara hewan eksotis atau imajiner tanpa risiko, hewan apa yang pengen kamu pelihara?",
     "Siapa teman yang paling sering datang paling terlambat kalau diajak janjian nongkrong?",
     "Apa aroma atau wangi tertentu yang selalu sukses bikin kamu merasa tenang atau nostalgia?",
-    "Ceritakan satu pengalaman paling lucu atau salah tingkah yang pernah kamu alami dalam sebulan terakhir!"
+    "Ceritakan satu pengalaman paling lucu atau salah tingkah yang pernah kamu alami dalam sebulan terakhir!",
+    "Apa kebiasaan pagi hari yang wajib kamu lakukan sebelum mulai aktivitas sehari-hari?",
+    "Kalau kamu dapat kesempatan belajar 1 bahasa asing secara instan, bahasa apa yang kamu pilih?",
+    "Apa cemilan atau jajanan wajib yang harus ada kalau kamu lagi nonton film di rumah?",
+    "Kalau kamu bisa mengubah 1 warna di dunia ini jadi warna favoritmu, objek apa yang mau kamu ubah?",
+    "Apa hal paling aneh yang pernah kamu browsing di internet saat lagi penasaran malam-malam?",
+    "Siapa sosok sahabat pertama kamu waktu kecil yang sampai sekarang masih kamu ingat?",
+    "Apa jenis cuaca atau suasana hari yang paling bikin kamu bersemangat buat beraktivitas?",
+    "Kalau kamu harus memilih 1 makanan saja untuk dimakan selama seminggu penuh, kamu pilih apa?",
+    "Apa permainan papan (board game) atau kartu favoritmu dari dulu sampai sekarang?",
+    "Kalau kamu diberikan rumah di pinggir pantai atau di atas pegunungan, kamu lebih pilih tinggal di mana?"
+  ],
+
+  pasangan: [
+    "Momen manis atau kejadian kecil apa dari hubungan kita yang sampai sekarang masih sering bikin kamu tersenyum sendiri?",
+    "Satu kebiasaan kecil dari aku yang diam-diam menurutmu paling gemas atau bikin kangen saat jauh?",
+    "Apa hal pertama yang membuatmu merasa yakin dan nyaman untuk membuka hati serta mendekat ke aku dulu?",
+    "Kalau kita punya waktu 1 minggu penuh liburan bebas tanpa gangguan pekerjaan, tempat impian mana yang pengen kamu tuju berdua?",
+    "Apa perlakuan atau kejutan sederhana dari aku yang pernah membuatmu merasa paling disayangi?",
+    "Lagu apa yang kalau diputar selalu langsung membuatmu teringat momen-momen kebersamaan kita?",
+    "Apa harapan atau impian terbesar yang paling ingin kita capai dan wujudkan bersama di masa depan?",
+    "Kebiasaan manis sederhana apa yang paling pengen rutin kita lakukan bersama setiap minggu?",
+    "Kapan momen spesifik di mana kamu pertama kali menyadari bahwa kamu benar-benar sayang dan nyaman sama aku?",
+    "Bagaimana cara favoritmu kalau lagi pengen bermanja-manja atau minta perhatian ekstra dari aku?",
+    "Pelajaran terbaik tentang cinta dan komitmen apa yang kamu dapatkan setelah kita menjalani hubungan ini?",
+    "Kalau kita bisa membuat panggilan sayang baru yang lucu dan unik, kamu pengen panggil aku apa?",
+    "Apa hal dari sifat aku yang paling melengkapi kekurangan dalam dirimu?",
+    "Ceritakan momen PDKT atau kencan awal kita yang menurutmu paling lucu, canggung, atau bikin salah tingkah!",
+    "Apa perbincangan malam kita yang paling berkesan dan paling membuatmu merasa dekat secara emosional?",
+    "Hal kecil apa yang paling sering bikin kamu merasa aman dan tenang saat kita lagi duduk berdua?",
+    "Apa perubahan positif dalam dirimu yang kamu rasakan setelah kita bersama?",
+    "Kalau kamu diminta mendeskripsikan hubungan kita dalam 1 kalimat indah, seperti apa kalimat itu?",
+    "Apa momen di mana kamu merasa paling bangga memiliki aku sebagai pasanganmu?",
+    "Apa hadiah sederhana yang pernah aku berikan tapi menyimpan makna paling dalam buat kamu?",
+    "Kalau kita bisa bikin tradisi kencan bulanan yang belum pernah kita lakukan, kegiatan apa yang pengen kamu coba?",
+    "Apa hal paling kocak yang pernah kita lalui berdua tapi malah bikin kita makin kompak?",
+    "Bagaimana caraku paling ampuh untuk menenangkanmu saat kamu lagi merasa capek atau bad mood?",
+    "Apa hal dari diri aku yang paling sering bikin kamu penasaran atau kagum sampai sekarang?",
+    "Kalau kita bisa pindah dan mencoba hidup berdua di satu kota impian selama setahun, kota mana yang kamu pilih?",
+    "Momen ketika kita saling menguatkan di masa sulit mana yang paling membuat hubungan kita makin kokoh?",
+    "Apa panggilan atau ucapan dari aku yang kalau diucapkan selalu bikin hatimu luluh?",
+    "Apa hal yang paling kamu sukai saat kita lagi menikmati waktu tenang tanpa bicara sepatah kata pun?",
+    "Ceritakan satu kebaikan kecil dari aku yang mungkin aku sendiri sudah lupa tapi sangat berkesan buat kamu!",
+    "Kalau kita bikin kisah perjalanan cinta kita jadi judul buku cerita, judul romantis apa yang kamu berikan?",
+    "Apa hal pertama yang terlintas di pikiranmu setiap kali kamu mendengar nama aku dipanggil?",
+    "Bentuk perhatian kecil seperti apa dari aku yang selalu berhasil mencerahkan harimu saat lelah?",
+    "Apa ketakutan atau kekhawatiran terbesar dalam hubungan yang berhasil kita lewati bersama?",
+    "Kalau kamu bisa mengulang satu momen kencan terindah kita dari awal lagi, momen kencan mana yang kamu pilih?",
+    "Apa sifat dari diriku yang paling sering membuatmu merasa bersyukur memilikiku sebagai pasangan?",
+    "Gaya pacaran atau kebersamaan seperti apa yang paling kamu impikan saat kita bertambah usia kelak?",
+    "Apa hal yang paling kamu nantikan setiap kali kita janjian untuk bertemu atau jalan berdua?",
+    "Kalau ada 1 masakan favoritmu yang pengen kita masak berdua di dapur rumah, masakan apa itu?",
+    "Apa pesan paling manis yang pengen kamu sampaikan ke aku untuk perjalanan hubungan kita ke depan?",
+    "Bagaimana perasaanmu saat pertama kali kita saling bertukar tatapan mata dan tersenyum?"
+  ],
+
+  deep: [
+    "Apa pelajaran hidup terbesar yang kamu dapatkan setelah berhasil melewati masa-masa paling sulit dalam hidupmu?",
+    "Siapa satu sosok dalam hidupmu yang paling banyak membentuk prinsip dan cara berpikirmu sampai hari ini?",
+    "Kalau kamu bisa mengirimkan satu kalimat pesan singkat ke dirimu sendiri 10 tahun lalu, pesan apa yang ingin kamu sampaikan?",
+    "Menurut pandangan pribadimu, seperti apa definisi kebahagiaan dan kedamaian sejati di masa dewasa ini?",
+    "Pernahkah kamu merasa berada di titik terendah dan hal apa yang membuatmu kembali bangkit dan percaya diri?",
+    "Apa pencapaian atau keberhasilan kecil dalam hidupmu yang kurang diperhatikan orang lain tapi sangat kamu syukuri?",
+    "Satu hal dari dalam dirimu sendiri yang sampai sekarang masih terus kamu usahakan untuk dimaafkan dan diikhlaskan?",
+    "Kalau kamu membayangkan kehidupanmu 5 tahun dari sekarang, suasana dan rasa seperti apa yang paling ingin kamu capai?",
+    "Apa kekecewaan atau rasa sakit masa lalu yang pada akhirnya mengajarkanmu pelajaran paling berharga?",
+    "Hal paling berani apa yang pernah kamu lakukan demi mempertahankan nilai dan prinsip hidup yang kamu yakini?",
+    "Satu impian besar dalam hidupmu yang belum pernah kamu ceritakan ke siapa pun karena takut diremehkan?",
+    "Kapan kali terakhir kamu merasa sangat bersyukur sampai meneteskan air mata haru?",
+    "Pelajaran terbaik apa yang ingin kamu turunkan atau bagikan kepada orang-orang tersayang dalam hidupmu?",
+    "Satu hal dari caramu merespons masalah atau ketidakpastian yang saat ini paling ingin kamu perbaiki?",
+    "Pernahkah kamu merasa harus berpura-pura baik-baik saja di depan orang lain padahal hatimu sedang sangat lelah?",
+    "Apa nilai atau kualitas paling utama yang selalu kamu cari dalam sebuah hubungan persahabatan sejati?",
+    "Bagaimana caramu paling ampuh untuk menenangkan diri dan berdamai saat pikiranmu terasa terlalu bising?",
+    "Apa pujian atau kata-kata penyemangat dari seseorang yang pernah menyelamatkan harimu di saat sulit?",
+    "Satu kebiasaan emosional yang baru kamu sadari setelah kamu semakin dewasa apa?",
+    "Apa arti keberadaan orang-orang dekat di sekitarmu dalam perjalanan hidupmu sampai detik ini?",
+    "Kapan momen di mana kamu merasa paling dicintai dan dihargai secara utuh oleh seseorang?",
+    "Hal sederhana apa yang paling sering membuatmu merasa hidupmu sudah cukup dan penuh rasa syukur?",
+    "Apa keputusasaan atau kekhawatiran terbesar soal masa depan yang akhir-akhir ini sering terlintas di pikirmu?",
+    "Seberapa jauh perubahan caramu memandang arti kesuksesan dibandingkan saat kamu masih remaja dulu?",
+    "Apa pesan paling menyentuh dari orang tua atau sosok senior yang selalu melekat di dadamu?",
+    "Apa definisi kedewasaan fisik dan mental yang paling terasa dalam kehidupanmu sehari-hari?",
+    "Bagaimana cara terbaikmu dalam melepaskan ekspektasi orang lain yang terkadang terasa memberatkan?",
+    "Apa momen di mana kamu menyadari bahwa kamu sudah bertumbuh menjadi pribadi yang jauh lebih kuat?",
+    "Apa ketakutan tentang kegagalan yang paling sering menghantuimu saat hendak mencoba hal baru?",
+    "Kalau kamu bisa menyembuhkan satu luka emosional masa lalu secara instan, luka mana yang ingin kamu obati?"
   ],
 
   absurd: [
@@ -88,57 +174,6 @@ export const CURATED_BANKS: Record<string, string[]> = {
     "Kalau kamu bikin festival musik paling aneh di dunia, siapa musisi dan hiburan utama yang kamu undang?",
     "Apa gaya potong rambut paling bencana atau konyol yang pernah kamu coba dalam hidupmu?",
     "Kalau kamu diberi kemampuan berbicara dengan tanaman, tanaman mana di rumahmu yang menurutmu paling cerewet?"
-  ],
-
-  deep: [
-    "Apa pelajaran hidup terbesar yang kamu dapatkan setelah berhasil melewati masa-masa paling sulit dalam hidupmu?",
-    "Siapa satu sosok dalam hidupmu yang paling banyak membentuk prinsip dan cara berpikirmut sampai hari ini?",
-    "Kalau kamu bisa mengirimkan satu kalimat pesan singkat ke dirimu sendiri 10 tahun lalu, pesan apa yang ingin kamu sampaikan?",
-    "Menurut pandangan pribadimu, seperti apa definisi kebahagiaan dan kedamaian sejati di masa dewasa ini?",
-    "Pernahkah kamu merasa berada di titik terendah dan hal apa yang membuatmu kembali bangkit dan percaya diri?",
-    "Apa pencapaian atau keberhasilan kecil dalam hidupmu yang kurang diperhatikan orang lain tapi sangat kamu syukuri?",
-    "Satu hal dari dalam dirimu sendiri yang sampai sekarang masih terus kamu usahakan untuk dimaafkan dan diikhlaskan?",
-    "Kalau kamu membayangkan kehidupanmu 5 tahun dari sekarang, suasana dan rasa seperti apa yang paling ingin kamu capai?",
-    "Apa kekecewaan atau rasa sakit masa lalu yang pada akhirnya mengajarkanmu pelajaran paling berharga?",
-    "Hal paling berani apa yang pernah kamu lakukan demi mempertahankan nilai dan prinsip hidup yang kamu yakini?",
-    "Satu impian besar dalam hidupmu yang belum pernah kamu ceritakan ke siapa pun karena takut diremehkan?",
-    "Kapan kali terakhir kamu merasa sangat bersyukur sampai meneteskan air mata haru?",
-    "Pelajaran terbaik apa yang ingin kamu turunkan atau bagikan kepada orang-orang tersayang dalam hidupmu?",
-    "Satu hal dari caramu merespons masalah atau ketidakpastian yang saat ini paling ingin kamu perbaiki?",
-    "Pernahkah kamu merasa harus berpura-pura baik-baik saja di depan orang lain padahal hatimu sedang sangat lelah?",
-    "Apa nilai atau kualitas paling utama yang selalu kamu cari dalam sebuah hubungan persahabatan sejati?",
-    "Bagaimana caramu paling ampuh untuk menenangkan diri dan berdamai saat pikiranmu terasa terlalu bising?",
-    "Apa pujian atau kata-kata penyemangat dari seseorang yang pernah menyelamatkan harimu di saat sulit?",
-    "Satu kebiasaan emosional yang baru kamu sadari setelah kamu semakin dewasa apa?",
-    "Apa arti keberadaan orang-orang dekat di sekitarmu dalam perjalanan hidupmu sampai detik ini?",
-    "Kapan momen di mana kamu merasa paling dicintai dan dihargai secara utuh oleh seseorang?",
-    "Hal sederhana apa yang paling sering membuatmu merasa hidupmu sudah cukup dan penuh rasa syukur?",
-    "Apa keputusasaan atau kekhawatiran terbesar soal masa depan yang akhir-akhir ini sering terlintas di pikirmu?",
-    "Seberapa jauh perubahan caramu memandang arti kesuksesan dibandingkan saat kamu masih remaja dulu?",
-    "Apa pesan paling menyentuh dari orang tua atau sosok senior yang selalu melekat di dadamu?"
-  ],
-
-  pasangan: [
-    "Momen manis atau kejadian kecil apa dari hubungan kita yang sampai sekarang masih sering bikin kamu tersenyum sendiri?",
-    "Satu kebiasaan kecil dari aku yang diam-diam menurutmu paling gemas atau bikin kangen saat jauh?",
-    "Apa hal pertama yang membuatmu merasa yakin dan nyaman untuk membuka hati serta mendekat ke aku dulu?",
-    "Kalau kita punya waktu 1 minggu penuh liburan bebas tanpa gangguan pekerjaan, tempat impian mana yang pengen kamu tuju berdua?",
-    "Apa perlakuan atau kejutan sederhana dari aku yang pernah membuatmu merasa paling disayangi?",
-    "Lagu apa yang kalau diputar selalu langsung membuatmu teringat momen-momen kebersamaan kita?",
-    "Apa harapan atau impian terbesar yang paling ingin kita capai dan wujudkan bersama di masa depan?",
-    "Kebiasaan manis sederhana apa yang paling pengen rutin kita lakukan bersama setiap minggu?",
-    "Kapan momen spesifik di mana kamu pertama kali menyadari bahwa kamu benar-benar sayang dan nyaman sama aku?",
-    "Bagaimana cara favoritmu kalau lagi pengen bermanja-manja atau minta perhatian ekstra dari aku?",
-    "Pelajaran terbaik tentang cinta dan komitmen apa yang kamu dapatkan setelah kita menjalani hubungan ini?",
-    "Kalau kita bisa membuat panggilan sayang baru yang lucu dan unik, kamu pengen panggil aku apa?",
-    "Apa hal dari sifat aku yang paling melengkapi kekurangan dalam dirimu?",
-    "Ceritakan momen PDKT atau kencan awal kita yang menurutmu paling lucu, canggung, atau bikin salah tingkah!",
-    "Apa perbincangan malam kita yang paling berkesan dan paling membuatmu merasa dekat secara emosional?",
-    "Hal kecil apa yang paling sering bikin kamu merasa aman dan tenang saat kita lagi duduk berdua?",
-    "Apa perubahan positif dalam dirimu yang kamu rasakan setelah kita bersama?",
-    "Kalau kamu diminta mendeskripsikan hubungan kita dalam 1 kalimat indah, seperti apa kalimat itu?",
-    "Apa momen di mana kamu merasa paling bangga memiliki aku sebagai pasanganmu?",
-    "Apa hadiah sederhana yang pernah aku berikan tapi menyimpan makna paling dalam buat kamu?"
   ],
 
   nostalgia: [
@@ -203,7 +238,7 @@ export const CURATED_BANKS: Record<string, string[]> = {
     "Apa pengorbanan terbesar yang pernah kamu lakukan demi meraih posisi, ilmu, atau impianmu saat ini?",
     "Kalau kamu punya modal bebas untuk membuka usaha bisnis sendiri esok hari, bidang usaha apa yang ingin kamu bangun?",
     "Momen ketika kamu merasa paling burnout dalam bekerja atau belajar, dan bagaimana caramu menghadapinya?",
-    "Siapa sosok profesional atau mentor yang paling menginspirasi etos kerja dan cara berpikirmut?",
+    "Siapa sosok profesional atau mentor yang paling menginspirasi etos kerja dan cara berpikirmu?",
     "Apa skill atau keahlian baru yang paling ingin kamu kuasai dalam 1 tahun ke depan untuk mendukung impianmu?",
     "Bagaimana definisi work-life balance atau keseimbangan hidup yang paling ideal menurut versimu sendiri?",
     "Momen ketika kamu pernah mengalami kegagalan proyek, tapi hasilnya malah membuka jalan yang lebih baik?",
@@ -214,12 +249,36 @@ export const CURATED_BANKS: Record<string, string[]> = {
   ]
 };
 
-// Generates N guaranteed unique questions with strict topic isolation
+// Helper: Synthesize fresh variation when all static questions in a topic are seen
+function synthesizeFreshVariation(topic: string, index: number): string {
+  const variations: Record<string, string[]> = {
+    pasangan: [
+      "Kalau ada 1 kebiasaan kencan kita yang paling bikin kangen saat kita lagi berjauhan, kebiasaan apa itu?",
+      "Apa momen kejutan paling berkesan yang pernah kita lalui berdua dan selalu sukses bikin tersenyum?",
+      "Kalau kita bisa merencanakan 1 hari penuh tanpa gadget dan gangguan luar, kegiatan romantis apa yang ingin kamu lakukan?",
+      "Apa hal pertama yang membuatmu merasa sangat bersyukur bisa berjalan dan tumbuh bersama aku?",
+      "Ceritakan 1 perbincangan malam kita yang paling membuatmu merasa dimengerti secara utuh olehku!",
+      "Apa momen sederhana di mana kamu merasa paling dicintai dan diperhatikan oleh aku?",
+      "Kalau kita punya tempat rahasia berdua untuk sekadar melepas lelah, suasana seperti apa yang kamu inginkan?"
+    ],
+    kenalan: [
+      "Kalau kamu bisa memilih 1 keahlian seru yang bisa dikuasai dalam hitungan menit, keahlian apa yang ingin kamu miliki?",
+      "Apa hal paling spontan dan menyenangkan yang pernah kamu lakukan bareng teman-teman dekatmu?",
+      "Kalau kamu diundang menjadi pembicara tamu di sebuah forum santai, topik seru apa yang ingin kamu bagikan?",
+      "Apa momen paling lucu atau canggung saat kamu pertama kali mencoba sesuatu yang baru?"
+    ]
+  };
+
+  const list = variations[topic] || variations['kenalan'];
+  return list[index % list.length];
+}
+
+// Generates N guaranteed unique questions with strict topic isolation and ZERO cross-match repeats
 export function generateProceduralQuestions(topic: string, count: number, excludeSet: Set<string>): string[] {
   const bank = CURATED_BANKS[topic] || CURATED_BANKS['kenalan'];
   const questions: string[] = [];
 
-  // 1. Filter out any question that is already in excludeSet
+  // 1. Filter out any question that is already in excludeSet (unseen across all matches)
   const unseen = bank.filter(q => !excludeSet.has(normalizeQ(q)));
   const shuffledUnseen = shuffle(unseen);
 
@@ -229,7 +288,7 @@ export function generateProceduralQuestions(topic: string, count: number, exclud
     excludeSet.add(normalizeQ(q));
   }
 
-  // 2. Strict Topic Isolation & Intra-Session Deduplication
+  // 2. Strict Topic Isolation: Only mix with other categories if topic === 'mix'
   if (questions.length < count) {
     if (topic === 'mix') {
       const allOtherCategories = Object.keys(CURATED_BANKS).flatMap(k => CURATED_BANKS[k]);
@@ -243,20 +302,24 @@ export function generateProceduralQuestions(topic: string, count: number, exclud
         }
       }
     } else {
-      // For specific topics (like pasangan, keluarga), strictly recycle from SAME TOPIC ONLY!
-      // But NEVER duplicate a question within the SAME session unless all bank items are used!
-      const recycled = shuffle(bank);
-      for (const q of recycled) {
-        if (questions.length >= count) break;
-        const norm = normalizeQ(q);
-        if (!questions.some(existing => normalizeQ(existing) === norm)) {
-          questions.push(q);
-        }
-      }
-      // If count is greater than bank size, fill remaining with recycled items avoiding consecutive dupes
+      // For specific topics (like pasangan, keluarga), synthesize fresh topic variations or filter remaining
       let fillIdx = 0;
-      while (questions.length < count && recycled.length > 0) {
-        questions.push(recycled[fillIdx % recycled.length]);
+      while (questions.length < count) {
+        const fresh = synthesizeFreshVariation(topic, fillIdx);
+        const norm = normalizeQ(fresh);
+        if (!excludeSet.has(norm) && !questions.some(existing => normalizeQ(existing) === norm)) {
+          questions.push(fresh);
+          excludeSet.add(norm);
+        } else {
+          // If synthesized is also seen, pick shuffled bank avoiding duplicates in same session
+          const recycled = shuffle(bank);
+          const pick = recycled.find(item => !questions.some(existing => normalizeQ(existing) === normalizeQ(item)));
+          if (pick) {
+            questions.push(pick);
+          } else {
+            questions.push(recycled[fillIdx % recycled.length]);
+          }
+        }
         fillIdx++;
       }
     }

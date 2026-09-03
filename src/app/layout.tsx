@@ -11,7 +11,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "ObrolanSeru — Game Kartu & Truth or Dare",
+  title: "ObrolanSeru - Game Kartu & Truth or Dare",
   description: "Game kartu pertanyaan dan truth or dare seru bareng teman, pasangan, atau keluarga. Main offline atau online bareng!",
   keywords: ["game kartu", "truth or dare", "icebreaker", "deep talk", "kenalan"],
   icons: {

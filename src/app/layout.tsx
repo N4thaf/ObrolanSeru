@@ -14,12 +14,14 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   metadataBase: new URL("https://obrolanseru.com"),
   title: {
-    default: "ObrolanSeru - Game Kartu Obrolan, Truth or Dare & Deep Talk Online",
+    default: "ObrolanSeru - Game Kartu Obrolan & Pertanyaan Deep Talk Online",
     template: "%s | ObrolanSeru",
   },
-  description: "Mainkan ObrolanSeru gratis! Game kartu pertanyaan seru, Truth or Dare, icebreaker nongkrong, dan deep talk pasangan online. Tanpa perlu download atau install aplikasi!",
+  description: "Mainkan ObrolanSeru gratis! Platform game kartu obrolan, pertanyaan deep talk pasangan, Truth or Dare, dan icebreaker nongkrong online tanpa install.",
   keywords: [
+    "kartu obrolan",
     "game kartu obrolan",
+    "game kartu pertanyaan",
     "game truth or dare online indonesia",
     "game nongkrong gratis",
     "pertanyaan deep talk pasangan",

@@ -88,7 +88,7 @@ export const metadata: Metadata = {
   },
 };
 
-const jsonLd = {
+const webAppJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "ObrolanSeru",
@@ -103,6 +103,45 @@ const jsonLd = {
     "priceCurrency": "IDR"
   },
   "inLanguage": "id"
+};
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Apa itu ObrolanSeru?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ObrolanSeru adalah platform game kartu pertanyaan dan Truth or Dare interaktif online gratis di Indonesia. Dirancang untuk mencairkan suasana saat nongkrong, kumpul bareng teman, deep talk bareng pasangan, atau acara keluarga."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Apakah ObrolanSeru perlu di-download atau di-install?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Tidak perlu! ObrolanSeru 100% berbasis web. Kamu dan teman-temanmu bisa langsung bermain cukup dengan membuka obrolanseru.com di browser HP atau laptop tanpa perlu install aplikasi."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Apa saja pilihan topik kartu obrolan yang tersedia?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Tersedia berbagai topik menarik: Kenalan Dulu, Deep Talk, Khusus Pasangan, Absurd Abis, Nostalgia Masa Lalu, Obrolan Keluarga, What If, Karir & Mimpi, hingga Racikan AI Custom."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Apakah bisa bermain multiplayer online jarak jauh?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Bisa! ObrolanSeru menyediakan fitur Room Online Real-Time. Kamu bisa membuat kode room dan membagikan link room ke teman-temanmu untuk bermain bersama secara live."
+      }
+    }
+  ]
 };
 
 export default function RootLayout({
@@ -120,7 +159,11 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=10" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       </head>
       <body className="min-h-full flex flex-col">

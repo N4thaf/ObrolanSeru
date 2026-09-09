@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 
@@ -43,6 +44,18 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=10" />
       </head>
       <body className="min-h-full flex flex-col">
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-HN3Q461R7H"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-HN3Q461R7H');
+          `}
+        </Script>
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

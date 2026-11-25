@@ -12,7 +12,7 @@ declare global {
 }
 
 export function GoogleAuthButton() {
-  const { user, setUserProfile, logout } = useAuth();
+  const { user, setUserProfile, logout, isPremium } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const googleBtnRef = useRef<HTMLDivElement>(null);
@@ -132,9 +132,15 @@ export function GoogleAuthButton() {
               <div className="min-w-0">
                 <div className="font-black text-sm text-[#257180] truncate">{user.name}</div>
                 <div className="text-[11px] font-medium text-[#257180]/60 truncate">{user.email}</div>
-                <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-[#257180]/10 text-[#257180] text-[10px] font-extrabold">
-                  Akun Terhubung
-                </span>
+                {isPremium ? (
+                  <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full bg-[#FEF3C7] border border-[#FD8B51]/50 text-[#CB6040] text-[10px] font-black uppercase tracking-wider">
+                    👑 VIP Aktif
+                  </span>
+                ) : (
+                  <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-[#257180]/10 text-[#257180] text-[10px] font-extrabold">
+                    Akun Terhubung
+                  </span>
+                )}
               </div>
             </div>
 

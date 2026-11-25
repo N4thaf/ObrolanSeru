@@ -7,6 +7,7 @@ import { ArrowLeft, RotateCcw, Heart, Smile, Sparkles, Compass, Moon, Home as Ho
 import { sound } from '@/utils/sound';
 import { useAuth } from '@/context/AuthContext';
 import { LockedFeatureModal } from '@/app/components/LockedFeatureModal';
+import { MASTER_QUESTION_BANKS } from '@/utils/masterQuestionBank';
 
 const C = {
   teal: "#257180",
@@ -30,144 +31,7 @@ const TOPICS = [
   { id: "ai_custom", name: "Racikan AI",      desc: "Racik topik custom sesuai imajinasimu", icon: Wand2, free: false },
 ];
 
-export const QUESTION_BANKS: Record<string, string[]> = {
-  kenalan: [
-    "Kalau hidup kamu dijadikan film bioskop, judulnya apa dan siapa aktor yang meranakan kamu?",
-    "Siapa teman yang paling sering janji 'otw' padahal sebenarnya baru banget bangun tidur?",
-    "Hal konyol apa yang membuat kamu tertawa paling keras dalam sebulan terakhir ini?",
-    "Satu kebiasaan unik yang hanya kamu sendiri yang tahu dan tidak pernah dijelaskan ke orang lain?",
-    "Makanan apa yang paling kamu benci waktu kecil tapi sekarang malah jadi favorit?",
-    "Kalau besok kamu mendapat uang 1 miliar tanpa syarat, hal pertama yang dibeli apa?",
-    "Fakta paling random atau bakat rahasia tentang diri kamu yang belum pernah diceritakan?",
-    "Kalau bisa tukar nasib dan hidup 1 hari jadi orang lain di dunia ini, kamu pilih siapa?",
-    "Apa first impression kamu saat pertama kali ketemu orang-orang di meja/grup ini?",
-    "Aplikasi di HP kamu yang paling sering dibuka tapi sebenarnya kurang berguna apa?",
-    "Kalau kamu punya peliharaan hewan eksotis atau imajiner, kamu ingin pelihara apa?",
-    "Karakter fiksi dari anime, film, atau buku yang sifatnya paling mirip sama kamu siapa?",
-    "Apa superpower konyol yang paling ingin kamu punya hanya untuk memudahkan hidup sehari-hari?",
-    "Momen saat kamu merasa paling salah kostum atau canggung di suatu tempat acara kapan?",
-    "Ceritakan 1 tempat di kota ini yang punya kenangan paling berkesan buat kamu!",
-    "Minuman atau racikan kopi/teh favorit kamu kalau lagi nongkrong santai apa?",
-    "Kalau ada lomba tidur paling lama atau rebahan, berapa jam rekor kamu?",
-    "Apa hal pertama yang kamu perhatikan saat baru kenal orang baru?",
-    "Kalau kamu bikin acara podcast sendiri, topik apa yang bakalan kamu bahas berjam-jam?",
-    "Siapa penyanyi atau band favorit kamu yang lagu-lagunya tidak pernah bikin bosan?"
-  ],
-  absurd: [
-    "Kalau kedua tangan kamu bisa berbicara sendiri, kalimat pertama yang diucapkan apa?",
-    "Kalau terpaksa harus tinggal selamanya di dalam sebuah video game, game apa yang kamu pilih?",
-    "Pilih mana: bisa terbang tapi hanya setinggi 10 cm dari tanah, atau bisa teleportasi tapi hanya 1 meter?",
-    "Kalau kamu berubah menjadi varian makanan atau minuman, kamu jadi rasa apa dan kenapa?",
-    "Hal paling konyol yang pernah kamu percayai 100 persen saat masih berumur 7 tahun?",
-    "Kalau kucing & anjing bisa bicara bahasa Indonesia, apa hal pertama yang bakalan mereka protes?",
-    "Pilih mana: bisa mengerti bahasa semua hewan di bumi, atau bisa memainkan seluruh alat musik di dunia secara instan?",
-    "Kalau kamu jadi presiden selama 1 hari saja, peraturan aneh apa yang wajib dipatuhi semua orang?",
-    "Kalau alien datang ke bumi dan kamu harus kasih 1 makanan Indonesia untuk mewakili bumi, kamu kasih apa?",
-    "Pilih mana: harus jalan mundur sepanjang hari atau harus ngomong bernyanyi setiap kali bicara?",
-    "Kalau semua benda mati di kamar kamu bisa ngobrol saat kamu tidur, benda mana yang paling cerewet?",
-    "Apa konspirasi paling absurd yang pernah kamu denger tapi sempat membuat kamu kepikiran?",
-    "Kalau muka kamu tercetak di uang kertas Rp 100.000, ekspresi wajah seperti apa yang kamu pilih?",
-    "Pilih mana: tidak bisa makan manis selamanya atau tidak bisa makan pedas selamanya?",
-    "Kalau monster di bawah kasur itu beneran ada, kira-kira dia lagi ngapain pas kamu ketiduran?"
-  ],
-  deep: [
-    "Apa ketakutan terbesar dalam hidup kamu yang jarang banget diceritakan ke orang lain?",
-    "Siapa satu sosok dalam hidup kamu yang paling banyak membentuk cara berpikir kamu sampai hari ini?",
-    "Kalau bisa mengirim satu kalimat pesan ke diri kamu sendiri 10 tahun lalu, apa isinya?",
-    "Menurut pandangan kamu pribadi, definisi sukses yang benar-benar membuat kamu bahagia seperti apa?",
-    "Apa penyesalan terkecil atau terbesar yang pernah mengajarkan kamu pelajaran hidup paling berharga?",
-    "Apa hal paling berat yang pernah kamu lewati tahun ini tapi berhasil kamu lalui dengan tenang?",
-    "Kapan momen terakhir kali kamu merasa sangat bangga sama diri sendiri walau tanpa pujian orang lain?",
-    "Nasihat hidup terbaik apa yang pernah kamu terima saat kamu berada di titik terendah?",
-    "Apa arti sebuah persahabatan yang sejati menurut versi kamu setelah bertambah dewasa?",
-    "Hal apa dalam hidup kamu yang paling kamu syukuri saat kamu terbangun dari tidur pagi ini?",
-    "Bagaimana cara kamu menenangkan diri sendiri saat dunia di sekitar terasa terlalu bising?",
-    "Satu hal yang paling ingin kamu ubah dari cara kamu merespons masalah saat ini apa?",
-    "Apakah ada impian kecil kamu waktu kecil yang sekarang baru kamu sadari sudah terwujud?",
-    "Bagaimana kamu ingin dikenang oleh teman-teman dekat dan keluarga kamu kelak?"
-  ],
-  pasangan: [
-    "Momen manis atau kejadian kecil apa dari kita yang sampai sekarang masih sering membuat kamu tersenyum sendiri?",
-    "Satu kebiasaan kecil aku yang diam-diam menurut kamu lucu atau malah membuat kangen?",
-    "Apa hal pertama yang membuat kamu yakin untuk membuka hati dan mendekat ke aku dulu?",
-    "Kalau kita punya waktu 1 minggu liburan bebas tanpa gangguan kerjaan, tempat impian yang kamu pilih ke mana?",
-    "Apa hal ter-sweet atau hal paling menyentuh yang pernah aku lakukan buat kamu?",
-    "Lagu apa yang kalau diputar selalu mengingatkan kamu ke momen-momen awal kita kenalan?",
-    "Apa harapan terbesar kamu untuk perjalanan hubungan kita di masa depan?",
-    "Kebiasaan romantis sederhana apa yang paling ingin kita rutin lakukan setiap minggu?",
-    "Kapan pertama kali kamu menyadari bahwa kamu benar-benar sayang dan nyaman sama aku?",
-    "Bagaimana cara favorit kamu kalau lagi ingin bermanja-manja atau minta perhatian dari aku?",
-    "Pelajaran terbaik apa yang kamu dapatkan tentang cinta setelah kita bersama?",
-    "Kalau kita bisa bikin panggilan sayang baru yang lucu dan konyol, kamu mau panggil aku apa?"
-  ],
-  nostalgia: [
-    "Lagu jadul atau lagu masa sekolah apa yang kalau diputar langsung membuat kamu flashback ke masa lalu?",
-    "Tontonan kartun, anime, atau acara televisi hari Minggu favorit kamu saat masih sekolah dulu?",
-    "Jajanan atau makanan masa kecil apa yang paling kamu kangenin dan susah dicari sekarang?",
-    "Momen kelulusan atau acara sekolah masa lalu mana yang paling membekas di ingatan kamu?",
-    "Permainan tradisional atau game konsol zaman dulu apa yang pernah bikin kamu lupa waktu?",
-    "Gaya baju, potong rambut, atau foto zaman dulu kamu yang kalau dilihat lagi sekarang bikin ngakak apa?",
-    "Siapa guru atau sahabat zaman sekolah yang pernah memberikan kesan paling berharga buat kamu?",
-    "Mainan atau barang masa kecil apa yang pernah kamu pertahankan sampai rusak parah?",
-    "Pengalaman bolos atau kejahilan konyol apa yang pernah kamu lakukan waktu zaman sekolah/kuliah?",
-    "Apa memori liburan keluarga zaman kecil yang paling hangat dan tidak pernah kamu lupakan?"
-  ],
-  keluarga: [
-    "Tradisi unik atau kebiasaan lucu apa yang hanya ada dan dilakukan di dalam keluarga kamu?",
-    "Nasihat dari orang tua atau sesepuh yang dulu kamu sepelekan, tapi sekarang baru terasa benarnya?",
-    "Masakan atau hidangan buatan rumah apa yang paling dikangenin saat sedang jauh dari rumah?",
-    "Momen kebersamaan keluarga mana yang paling hangat dan bikin kamu merasa bersyukur?",
-    "Siapa anggota keluarga yang sifat atau kebiasaannya paling mirip sama kamu?",
-    "Ceritakan momen lucu atau konyol yang pernah terjadi saat acara kumpul keluarga besar!",
-    "Apa hal dari orang tua kamu yang paling ingin kamu tiru saat kamu membangun keluarga kelak?",
-    "Pernahkah kamu diam-diam menyiapkan kejutan sederhana buat keluarga dan bagaimana reaksinya?",
-    "Ungkapan atau kata-kata khas apa yang sering diucapkan orang tua kamu saat menasihati?"
-  ],
-  whatif: [
-    "Bagaimana jika kamu mendapat kesempatan mengulang hidup dari umur 10 tahun tapi ingatan tetap utuh?",
-    "Bagaimana jika selama 1 minggu penuh seluruh koneksi internet di seluruh dunia mati total?",
-    "Bagaimana jika semua manusia di bumi tiba-tiba tidak bisa berbohong dan selalu bicara jujur 100 percent?",
-    "Bagaimana jika kamu bangun besok pagi dan menemukan kamu bisa mengerti bahasa semua hewan?",
-    "Bagaimana jika kamu diberikan pintu kemana saja Doraemon, tempat pertama yang kamu kunjungi mana?",
-    "Bagaimana jika kamu terbangun dan menjadi satu-satunya manusia yang tersisa di kota ini selama 24 jam?",
-    "Bagaimana jika kamu bisa bertemu dengan diri kamu sendiri di usia 70 tahun, apa yang ingin kamu tanyakan?",
-    "Bagaimana jika setiap kali kamu memikirkan seseorang, bunga favorit mereka muncul di tangan kamu?"
-  ],
-  karir: [
-    "Apa cita-cita atau mimpi terbesar kamu yang belum sempat diwujudkan sampai sekarang?",
-    "Kalau uang bukan lagi masalah dan finansial kamu sudah terjamin 100%, pekerjaan atau karya apa yang akan kamu tekuni?",
-    "Pencapaian atau karya apa dalam karir/perkuliahan yang paling membuat kamu merasa puas dan bangga?",
-    "Nasihat karir atau pelajaran pekerjaan terbaik apa yang paling mengubah cara pandang kamu?",
-    "Apa pengorbanan terbesar yang pernah kamu lakukan demi meraih posisi atau impian kamu saat ini?",
-    "Kalau kamu punya modal bebas untuk buka bisnis sendiri esok hari, bidang usaha apa yang ingin kamu bangun?",
-    "Momen ketika kamu merasa paling burnout atau lelah dalam bekerja/kuliah, dan bagaimana kamu melewatinya?",
-    "Siapa sosok profesional atau pengusaha yang paling menginspirasi etos kerja dan cara berpikir kamu?",
-    "Apa skill atau keahlian baru yang paling ingin kamu kuasai dalam 1 tahun ke depan untuk mendukung karir kamu?",
-    "Bagaimana definisi keseimbangan hidup (*work-life balance*) yang ideal versi kamu pribadi?",
-    "Momen ketika kamu pernah gagal dalam suatu wawancara atau proyek, tapi hasilnya malah membuka jalan yang lebih baik?",
-    "Kalau kamu bisa memutar waktu ke hari pertama kamu mulai bekerja/kuliah, nasihat apa yang ingin kamu sampaikan ke diri sendiri?",
-    "Apa prinsip atau nilai kejujuran dalam bekerja yang tidak akan pernah kamu kompromikan demi uang?",
-    "Pernahkah kamu mengambil risiko besar dalam keputusan karir atau studi? Bagaimana hasilnya?",
-    "Apa proyek atau target kerja terbesar yang sedang kamu perjuangkan dan ingin kamu selesaikan tahun ini?",
-    "Lingkungan kerja atau budaya tim impian yang paling membuat kamu merasa bersemangat seperti apa?",
-    "Kalau kamu diundang berbicara di panggung seminar internasional, topik keahlian apa yang ingin kamu bawakan?",
-    "Gaji atau pendapatan pertama dalam hidup kamu dulu kamu pakai untuk membeli apa?",
-    "Apa pencapaian finansial atau tabungan terkecil yang pernah membuat kamu tersenyum lega?",
-    "Bagaimana cara kamu menghadapi rekan kerja atau atasan yang punya karakter sulit diajak kerja sama?",
-    "Apa impian terbesar kamu untuk masa pensiun atau masa tua kelak?"
-  ]
-};
-
-QUESTION_BANKS['mix'] = [
-  ...QUESTION_BANKS.kenalan,
-  ...QUESTION_BANKS.absurd,
-  ...QUESTION_BANKS.deep,
-  ...QUESTION_BANKS.pasangan,
-  ...QUESTION_BANKS.nostalgia,
-  ...QUESTION_BANKS.keluarga,
-  ...QUESTION_BANKS.whatif,
-  ...QUESTION_BANKS.karir,
-];
+const QUESTION_BANKS = MASTER_QUESTION_BANKS;
 
 function Header({ onBack, stepIndex, totalSteps }: { onBack: () => void; stepIndex: number; totalSteps: number }) {
   return (

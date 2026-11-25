@@ -218,6 +218,19 @@ export default function StorePage() {
           </p>
         </div>
 
+        {/* Symmetrical Clean Orange/Yellow VIP Status Active Box */}
+        {isPremium && (
+          <div className="bg-[#FEF3C7] border-2 border-[#FD8B51] rounded-2xl p-4 max-w-xl mx-auto flex items-center justify-center gap-3 text-center shadow-sm animate-pop-in">
+            <div className="w-8 h-8 rounded-xl bg-[#FD8B51] text-white flex items-center justify-center flex-shrink-0">
+              <Check className="w-5 h-5 stroke-[3]" />
+            </div>
+            <div className="text-left sm:text-center">
+              <div className="text-sm font-black text-[#CB6040]">Status VIP Aktif</div>
+              <div className="text-xs font-bold text-[#257180]/80">Seluruh topik &amp; fitur premium terbuka untuk akun kamu</div>
+            </div>
+          </div>
+        )}
+
         {successBanner && (
           <div className="bg-green-100 border-2 border-green-400 text-green-800 p-5 rounded-2xl max-w-2xl mx-auto text-xs sm:text-sm font-black text-center shadow-md animate-pop-in">
             {successBanner}

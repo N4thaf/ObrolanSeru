@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Copy, Check, Users, Play, Share2, Sparkles, RefreshCw, Crown, Lock } from "lucide-react";
+import { ArrowLeft, Copy, Check, Users, Play, Share2, Sparkles, RefreshCw, Crown, Lock, Edit3 } from "lucide-react";
 import { sound } from "@/utils/sound";
 import { BrandLogo } from "@/app/components/BrandLogo";
 import { useAuth } from "@/context/AuthContext";
@@ -23,7 +23,7 @@ export default function RoomPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { isPremium } = useAuth();
+  const { isPremium, user } = useAuth();
   const [lockedModalTitle, setLockedModalTitle] = useState<string | null>(null);
 
   const rawCode = (params.code as string) || "OS361";
@@ -34,9 +34,11 @@ export default function RoomPage() {
 
   const [copied, setCopied] = useState(false);
   const [myName, setMyName] = useState<string>("");
+  const [editingName, setEditingName] = useState(false);
+  const [tempName, setTempName] = useState("");
   const [room, setRoom] = useState<RoomState>({
     code,
-    host: isHostParam ? (nameParam || "Host") : "Host",
+    host: isHostParam ? (nameParam || user?.name || "Host") : "Host",
     mode: initialMode,
     topic: "kenalan",
     rounds: 3,
@@ -44,14 +46,17 @@ export default function RoomPage() {
     status: "lobby",
   });
 
-  // Initialize player & sync with /api/room & BroadcastChannel
+  // Initialize player & sync with /api/room
   useEffect(() => {
-    let savedName = nameParam;
+    let savedName: string = nameParam || user?.name || "";
     try {
-      if (!savedName) savedName = sessionStorage.getItem("my_name") || "Pemain";
+      if (!savedName) savedName = sessionStorage.getItem("my_name") || `Pemain ${Math.floor(10 + Math.random() * 90)}`;
+      sessionStorage.setItem("my_name", savedName);
     } catch (e) {}
+    if (!savedName) savedName = `Pemain ${Math.floor(10 + Math.random() * 90)}`;
 
     setMyName(savedName);
+    setTempName(savedName);
 
     // Sync player with API serverless store
     const syncRoomApi = async () => {
@@ -71,6 +76,8 @@ export default function RoomPage() {
           setRoom(data.room);
           if (data.room.status === 'playing') {
             sound.playChime();
+            const playersQuery = data.room.players.join(",");
+            router.push(`/play/game?mode=${data.room.mode}&topic=${data.room.topic}&rounds=${data.room.rounds}&players=${encodeURIComponent(playersQuery)}&roomCode=${code}&isHost=${isHostParam ? 'true' : 'false'}&myName=${encodeURIComponent(savedName)}&todType=jarakjauh`);
           }
         }
       } catch (e) {}
@@ -84,14 +91,13 @@ export default function RoomPage() {
         const res = await fetch(`/api/room?code=${code}`);
         const data = await res.json();
         if (data.success && data.room) {
-          setRoom(prev => {
-            if (prev.status !== 'playing' && data.room.status === 'playing') {
-              sound.playChime();
-              const playersQuery = data.room.players.join(",");
-              router.push(`/play/game?mode=${data.room.mode}&topic=${data.room.topic}&rounds=${data.room.rounds}&players=${encodeURIComponent(playersQuery)}&roomCode=${code}`);
-            }
-            return data.room;
-          });
+          if (data.room.status === 'playing') {
+            sound.playChime();
+            const playersQuery = data.room.players.join(",");
+            router.push(`/play/game?mode=${data.room.mode}&topic=${data.room.topic}&rounds=${data.room.rounds}&players=${encodeURIComponent(playersQuery)}&roomCode=${code}&isHost=${isHostParam ? 'true' : 'false'}&myName=${encodeURIComponent(savedName)}&todType=jarakjauh`);
+            return;
+          }
+          setRoom(data.room);
         }
       } catch (e) {}
     }, 1200);
@@ -99,11 +105,39 @@ export default function RoomPage() {
     return () => {
       clearInterval(interval);
     };
-  }, [code, isHostParam, nameParam, initialMode, router]);
+  }, [code, isHostParam, nameParam, initialMode, router, user]);
 
   const broadcastRoomUpdate = async (updatedRoom: RoomState) => {
     setRoom(updatedRoom);
     try {
+      await fetch('/api/room', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedRoom)
+      });
+    } catch (e) {}
+  };
+
+  const handleUpdateMyName = async () => {
+    const trimmed = tempName.trim();
+    if (!trimmed || trimmed === myName) {
+      setEditingName(false);
+      return;
+    }
+    sound.playClick();
+    const oldName = myName;
+    setMyName(trimmed);
+    setEditingName(false);
+    try {
+      sessionStorage.setItem("my_name", trimmed);
+      const updatedPlayers = room.players.map(p => p === oldName ? trimmed : p);
+      if (!updatedPlayers.includes(trimmed)) updatedPlayers.push(trimmed);
+      const updatedRoom: RoomState = {
+        ...room,
+        host: room.host === oldName ? trimmed : room.host,
+        players: updatedPlayers
+      };
+      setRoom(updatedRoom);
       await fetch('/api/room', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -152,9 +186,9 @@ export default function RoomPage() {
 
     setRoom(updated);
 
-    // Redirect to actual game board with room sync params
+    // Redirect to actual game board with room sync params (Host marked)
     const playersQuery = updated.players.join(",");
-    router.push(`/play/game?mode=${updated.mode}&topic=${updated.topic}&rounds=${updated.rounds}&players=${encodeURIComponent(playersQuery)}&roomCode=${code}`);
+    router.push(`/play/game?mode=${updated.mode}&topic=${updated.topic}&rounds=${updated.rounds}&players=${encodeURIComponent(playersQuery)}&roomCode=${code}&isHost=true&myName=${encodeURIComponent(myName)}&todType=jarakjauh`);
   };
 
   const isHost = room.host === myName || isHostParam;
@@ -189,6 +223,9 @@ export default function RoomPage() {
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FD8B51]/15 text-[#CB6040] text-xs font-black border border-[#FD8B51]/30">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Room Multi-Device Live</span>
+              <span className="text-[10px] bg-[#CB6040] text-white px-2 py-0.2 rounded-full uppercase">
+                {room.mode === 'tod' ? 'Truth or Dare' : 'Kartu Pertanyaan'}
+              </span>
             </div>
             
             <h1 className="text-3xl sm:text-4xl font-black text-[#257180] tracking-tight">
@@ -230,64 +267,104 @@ export default function RoomPage() {
             <div className="flex flex-wrap gap-2 pt-1">
               {room.players.map((p, idx) => (
                 <div key={idx} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FAF3E0] border border-[#257180]/20 text-xs font-black text-[#257180] shadow-sm">
-                  {p === room.host && <Crown className="w-3 h-3 text-[#FD8B51]" />}
+                  {p === room.host && <Crown className="w-3.5 h-3.5 text-[#FD8B51]" />}
                   <span>{p}</span>
                   {p === myName && <span className="text-[9px] text-[#CB6040] font-extrabold">(Kamu)</span>}
                 </div>
               ))}
+            </div>
+
+            {/* Change Name Box */}
+            <div className="pt-2 border-t border-[#257180]/10 flex items-center justify-between text-xs">
+              {editingName ? (
+                <div className="flex items-center gap-2 w-full">
+                  <input
+                    type="text"
+                    value={tempName}
+                    onChange={(e) => setTempName(e.target.value)}
+                    maxLength={15}
+                    placeholder="Nama kamu..."
+                    className="flex-1 px-3 py-1.5 rounded-xl bg-white border border-[#257180]/20 font-bold text-xs text-[#257180] focus:outline-none focus:border-[#FD8B51]"
+                    autoFocus
+                  />
+                  <button
+                    onClick={handleUpdateMyName}
+                    className="px-3 py-1.5 rounded-xl bg-[#257180] text-white font-extrabold text-xs hover:bg-[#1d5966] cursor-pointer">
+                    Simpan
+                  </button>
+                  <button
+                    onClick={() => { setTempName(myName); setEditingName(false); }}
+                    className="px-2 py-1.5 text-[#257180]/60 hover:text-[#257180] font-bold text-xs cursor-pointer">
+                    Batal
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => { setTempName(myName); setEditingName(true); }}
+                  className="flex items-center gap-1.5 text-[11px] font-bold text-[#CB6040] hover:underline cursor-pointer">
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Ubah Nama Kamu ({myName})</span>
+                </button>
+              )}
             </div>
           </div>
 
           {/* Host Game Settings & Start Button */}
           {isHost ? (
             <div className="space-y-4 pt-2">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-black text-[#257180] uppercase tracking-wider">Topik</label>
-                  <select
-                    value={room.topic}
-                    onChange={(e) => {
-                      const newTopic = e.target.value;
-                      const isFree = newTopic === "kenalan" || newTopic === "mix";
-                      if (!isFree && !isPremium) {
-                        const TOPIC_NAMES: Record<string, string> = {
-                          kenalan: "Kenalan Dulu", mix: "Acak Topik", absurd: "Absurd Abis",
-                          deep: "Deep Talk", pasangan: "Khusus Pasangan", keluarga: "Keluarga",
-                          nostalgia: "Nostalgia", whatif: "What If...?", karir: "Karir & Mimpi",
-                          ai_custom: "Racikan AI",
-                        };
-                        sound.playClick();
-                        setLockedModalTitle(TOPIC_NAMES[newTopic] || "Topik Premium");
-                        return;
-                      }
-                      broadcastRoomUpdate({ ...room, topic: newTopic });
-                    }}
-                    className="w-full px-3 py-2.5 rounded-xl bg-[#F2E5BF] border border-[#257180]/20 text-xs font-bold text-[#257180] focus:outline-none">
-                    <option value="kenalan">Kenalan Dulu</option>
-                    <option value="mix">Acak Topik</option>
-                    <option value="absurd">{!isPremium ? "🔒 Absurd Abis (Locked)" : "Absurd Abis"}</option>
-                    <option value="deep">{!isPremium ? "🔒 Deep Talk (Locked)" : "Deep Talk"}</option>
-                    <option value="pasangan">{!isPremium ? "🔒 Khusus Pasangan (Locked)" : "Khusus Pasangan"}</option>
-                    <option value="keluarga">{!isPremium ? "🔒 Keluarga (Locked)" : "Keluarga"}</option>
-                    <option value="nostalgia">{!isPremium ? "🔒 Nostalgia (Locked)" : "Nostalgia"}</option>
-                    <option value="whatif">{!isPremium ? "🔒 What If...? (Locked)" : "What If...?"}</option>
-                    <option value="karir">{!isPremium ? "🔒 Karir & Mimpi (Locked)" : "Karir & Mimpi"}</option>
-                    <option value="ai_custom">{!isPremium ? "🔒 Racikan AI (Locked)" : "Racikan AI"}</option>
-                  </select>
-                </div>
+              {room.mode === 'pertanyaan' ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-black text-[#257180] uppercase tracking-wider">Topik</label>
+                    <select
+                      value={room.topic}
+                      onChange={(e) => {
+                        const newTopic = e.target.value;
+                        const isFree = newTopic === "kenalan" || newTopic === "mix";
+                        if (!isFree && !isPremium) {
+                          const TOPIC_NAMES: Record<string, string> = {
+                            kenalan: "Kenalan Dulu", mix: "Acak Topik", absurd: "Absurd Abis",
+                            deep: "Deep Talk", pasangan: "Khusus Pasangan", keluarga: "Keluarga",
+                            nostalgia: "Nostalgia", whatif: "What If...?", karir: "Karir & Mimpi",
+                            ai_custom: "Racikan AI",
+                          };
+                          sound.playClick();
+                          setLockedModalTitle(TOPIC_NAMES[newTopic] || newTopic);
+                        } else {
+                          broadcastRoomUpdate({ ...room, topic: newTopic });
+                        }
+                      }}
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#F2E5BF] border border-[#257180]/20 text-xs font-bold text-[#257180] focus:outline-none">
+                      <option value="kenalan">Kenalan Dulu (Gratis)</option>
+                      <option value="mix">Acak Topik (Gratis)</option>
+                      <option value="absurd">{!isPremium ? "🔒 Absurd Abis (Locked)" : "Absurd Abis"}</option>
+                      <option value="deep">{!isPremium ? "🔒 Deep Talk (Locked)" : "Deep Talk"}</option>
+                      <option value="pasangan">{!isPremium ? "🔒 Khusus Pasangan (Locked)" : "Khusus Pasangan"}</option>
+                      <option value="keluarga">{!isPremium ? "🔒 Keluarga (Locked)" : "Keluarga"}</option>
+                      <option value="nostalgia">{!isPremium ? "🔒 Nostalgia (Locked)" : "Nostalgia"}</option>
+                      <option value="whatif">{!isPremium ? "🔒 What If...? (Locked)" : "What If...?"}</option>
+                      <option value="karir">{!isPremium ? "🔒 Karir & Mimpi (Locked)" : "Karir & Mimpi"}</option>
+                      <option value="ai_custom">{!isPremium ? "🔒 Racikan AI (Locked)" : "Racikan AI"}</option>
+                    </select>
+                  </div>
 
-                <div className="space-y-1">
-                  <label className="text-[11px] font-black text-[#257180] uppercase tracking-wider">Ronde</label>
-                  <select
-                    value={room.rounds}
-                    onChange={(e) => broadcastRoomUpdate({ ...room, rounds: parseInt(e.target.value, 10) })}
-                    className="w-full px-3 py-2.5 rounded-xl bg-[#F2E5BF] border border-[#257180]/20 text-xs font-bold text-[#257180] focus:outline-none">
-                    <option value={3}>3 Ronde</option>
-                    <option value={5}>5 Ronde</option>
-                    <option value={10}>10 Ronde</option>
-                  </select>
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-black text-[#257180] uppercase tracking-wider">Ronde</label>
+                    <select
+                      value={room.rounds}
+                      onChange={(e) => broadcastRoomUpdate({ ...room, rounds: parseInt(e.target.value, 10) })}
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#F2E5BF] border border-[#257180]/20 text-xs font-bold text-[#257180] focus:outline-none">
+                      <option value={3}>3 Ronde</option>
+                      <option value={5}>5 Ronde</option>
+                      <option value={10}>10 Ronde</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-[#F2E5BF] p-3.5 rounded-2xl border border-[#257180]/15 text-center text-xs font-black text-[#257180]">
+                  Mode: Truth or Dare Jarak Jauh (Online Remote)
+                </div>
+              )}
 
               <button
                 onClick={handleStartGame}

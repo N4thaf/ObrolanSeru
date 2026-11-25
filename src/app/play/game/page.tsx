@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { RotateCcw, CheckSquare, Volume2, VolumeX, Check, Wand2 } from 'lucide-react';
-import { QUESTION_BANKS } from '../offline/page';
+import { MASTER_QUESTION_BANKS as QUESTION_BANKS } from '@/utils/masterQuestionBank';
 import { sound } from '@/utils/sound';
 import { useAuth } from '@/context/AuthContext';
 import { generateProceduralQuestions } from '@/utils/proceduralQuestions';
@@ -37,55 +37,78 @@ const CARD_COLORS = [
 ];
 
 const TOD_TRUTH = [
-  "Siapa orang yang paling kamu sukai saat masa sekolah dulu?",
-  "Apa kebohongan terbesar yang pernah kamu ucapkan ke orang lain?",
-  "Pernahkah kamu pura-pura sakit untuk kabur dari janji bertemu?",
-  "Apa ketakutan terbesar dalam hidup kamu yang jarang orang lain tahu?",
-  "Siapa orang yang paling sering kamu cari tahu kabarnya diam-diam?",
-  "Ceritakan satu momen paling canggung dalam hidup kamu!",
-  "Hal paling konyol apa yang pernah kamu beli padahal tidak berguna?",
-  "Sifat siapa di grup ini yang paling sering membuat kamu gemas?",
-  "Pernahkah kamu diam-diam membaca chat orang lain tanpa izin?",
-  "Apa rahasia paling konyol yang belum pernah kamu ceritakan ke siapa pun?",
-  "Siapa teman pertama yang akan kamu hubungi saat kamu tertimpa masalah?",
-  "Apa hal paling memalukan yang pernah terjadi saat kamu berada di tempat umum?",
+  "Siapa orang yang paling kamu sukai atau taksir secara diam-diam saat masa sekolah dulu?",
+  "Apa kebohongan terbesar yang pernah kamu ucapkan ke orang lain dan belum pernah ketahuan?",
+  "Pernahkah kamu pura-pura sakit atau sibuk cuma demi kabur dari janji bertemu teman?",
+  "Apa ketakutan terbesar dalam hidup kamu yang jarang banget kamu ceritakan ke orang lain?",
+  "Siapa orang yang paling sering kamu cari tahu kabarnya atau stalk diam-diam di sosmed?",
+  "Ceritakan satu momen paling canggung atau tengsin yang pernah kamu alami dalam hidup!",
+  "Hal paling impulsif apa yang pernah kamu beli padahal sebenarnya tidak berguna?",
+  "Apa rahasia paling konyol yang belum pernah kamu ceritakan ke siapa pun sampai hari ini?",
+  "Siapa teman pertama yang akan kamu hubungi saat kamu tertimpa masalah berat?",
   "Pernahkah kamu menyukai mantan teman sendiri secara diam-diam?",
   "Apa alasan teraneh yang pernah kamu pakai untuk menolak ajakan nongkrong?",
   "Hal apa yang paling sering membuat kamu merasa iri secara tidak sengaja?",
-  "Apa kebiasaan buruk kamu saat sedang panik atau cemas?",
-  "Siapa orang di ruangan ini yang paling ingin kamu peluk saat ini?",
-  "Pernahkah kamu berpura-pura tahu suatu topik padahal tidak tahu sama sekali?",
+  "Apa kebiasaan buruk kamu saat sedang panik atau cemas sendirian?",
+  "Siapa orang di antara kita yang menurutmu paling berbeda antara di chat dan aslinya?",
+  "Pernahkah kamu berpura-pura tahu suatu topik obrolan padahal tidak paham sama sekali?",
   "Apa janji ke diri sendiri yang sampai sekarang paling sering kamu ingkari?",
-  "Kalau kamu bisa minta maaf ke satu orang dari masa lalu, ke siapa itu?"
+  "Kalau kamu bisa minta maaf ke satu orang dari masa lalumu tanpa gengsi, ke siapa itu?",
+  "Berapa jumlah uang paling sedikit yang pernah ada di rekeningmu saat kamu butuh banget?",
+  "Pernahkah kamu salah kirim pesan rahasia ke orang yang sedang kamu bicarakan?",
+  "Apa hal paling memalukan yang pernah kamu lakukan demi menarik perhatian gebetan?",
+  "Hal apa dari penampilanmu sendiri yang paling bikin kamu insecure?",
+  "Pernahkah kamu menangis sendirian di kamar mandi karena urusan kerjaan atau cinta?",
+  "Siapa sosok yang paling berjasa dalam hidupmu tapi belum pernah kamu ucapkan terima kasih secara langsung?",
+  "Apa makanan atau minuman aneh yang kamu suka tapi orang lain anggap menjijikkan?",
+  "Pernahkah kamu diam-diam membaca chat atau notifikasi di HP orang lain?",
+  "Apa hal paling konyol yang pernah kamu percayai sampai kamu menginjak usia remaja?",
+  "Kalau ada satu hari di mana kamu bebas berbuat apa saja tanpa ada konsekuensi, apa yang kamu lakukan?",
+  "Pernahkah kamu merasa kesepian banget padahal sedang berada di tengah keramaian?",
+  "Apa penyesalan terbesar yang paling sering terlintas di pikiranmu saat mau tidur?",
+  "Siapa orang di sini yang pertama kali kamu nilai salah saat pertama kali kenal?"
 ];
 
 const TOD_DARE_OFFLINE = [
-  "Tatap mata teman di sebelah kananmu selama 20 detik tanpa tersenyum!",
-  "Tunjukkan foto paling konyol di galeri HP kamu ke semua orang di meja!",
-  "Tiru gaya jalan atau gaya bicara salah satu orang di sini!",
-  "Perlihatkan wallpaper lockscreen HP kamu ke seluruh teman di sini!",
-  "Lakukan gerakan olahraga ringan 10 kali sambil menyebutkan nama makanan!",
+  "Tatap mata teman di sebelah kananmu selama 20 detik penuh tanpa tersenyum sedikit pun!",
+  "Tunjukkan foto paling konyol di galeri HP kamu ke semua teman di meja!",
+  "Tiru gaya jalan atau gaya bicara salah satu orang di sini dengan mirip!",
+  "Perlihatkan wallpaper lockscreen HP kamu ke seluruh teman di meja!",
+  "Lakukan gerakan olahraga ringan 10 kali sambil sebutkan 5 nama makanan!",
+  "Ucapkan pantun lucu secara spontan untuk orang di depan kamu!",
   "Tunjukkan 3 histori pencarian terakhir di aplikasi YouTube kamu ke teman!",
-  "Puji 3 kebaikan dari teman di sebelah kanan kamu dengan tulus!",
-  "Biarkan teman di sebelah kirimu memilih 1 foto di HP kamu untuk ditunjukkan!",
+  "Puji 3 kebaikan dari teman di sebelah kanan kamu dengan tulus dari hati!",
+  "Biarkan teman di sebelah kirimu memilih 1 foto di HP kamu untuk ditunjukkan ke semua!",
   "Posisikan wajah paling konyol dan tahan selama 15 detik di depan teman-teman!",
-  "Ucapkan terima kasih ke teman di sebelah kamu dengan gaya seperti di panggung penghargaan Oscar!",
+  "Ucapkan terima kasih ke teman di sebelahmu dengan gaya pidato Oscar penuh haru!",
   "Tiru suara hewan favorit kamu sampai teman-teman di sini tertawa!",
-  "Minum 1 teguk minuman dan tahan gaya seperti bintang iklan di TV!",
-  "Minta 1 suapan makanan teman kamu sekarang dengan gaya paling memohon!"
+  "Minum 1 teguk minuman dan tahan gaya seperti bintang iklan TV selama 10 detik!",
+  "Minta 1 suapan makanan teman kamu sekarang dengan gaya paling memohon!",
+  "Berikan jabat tangan paling formal layaknya pejabat negara ke semua orang di meja!",
+  "Katakan satu kalimat gombalan paling garing ke orang yang duduk di hadapanmu!",
+  "Tutup mata dan tebak tangan siapa yang sedang kamu pegang!",
+  "Bicara dengan logat atau aksen daerah lain selama 2 putaran ke depan!",
+  "Pijat pundak teman di sebelah kirimu selama 15 detik sambil menyanyikan lagu anak-anak!",
+  "Lakukan pose superhero terbaikmu dan tahan selama 10 detik tanpa bergerak!"
 ];
 
 const TOD_DARE_ONLINE = [
-  "Kirim pesan singkat ke kontak ke-5 di HP kamu: 'Aku mau bicara sesuatu penting.'",
-  "Perlihatkan foto paling konyol yang ada di galeri HP kamu lewat kamera / share screen!",
+  "Kirim pesan singkat ke kontak ke-5 di WhatsApp kamu: 'Aku mau bicara sesuatu penting banget.'",
+  "Perlihatkan foto paling konyol yang ada di galeri HP kamu lewat kamera atau share screen!",
   "Kirimkan voice note menyapa teman kamu di WhatsApp dengan suara paling menggemaskan!",
-  "Biarkan teman kamu memilih 1 foto di galeri HP kamu untuk diposting di story!",
+  "Ubah foto profil media sosial kamu jadi gambar karakter kartun favorit selama 30 menit!",
+  "Tuliskan status singkat yang lucu atau nyeleneh di WhatsApp Story kamu selama 10 menit!",
   "Tunjukkan histori pencarian terakhir di aplikasi YouTube atau Google kamu ke layar!",
   "Reagikan salah satu postingan foto teman di Instagram dengan komentar paling kocak!",
   "Tunjukkan wallpaper lockscreen HP kamu ke kamera seluruh teman di room!",
-  "Ganti nama profil WhatsApp / sosial media kamu jadi nama konyol selama 10 menit!",
-  "Kirimkan foto selfie wajah konyol kamu ke grup chat saat ini juga!",
-  "Buka aplikasi belanja online di HP kamu dan tunjukkan keranjang belanjaan kamu ke layar!"
+  "Ganti nama profil WhatsApp kamu jadi nama konyol selama 10 menit!",
+  "Kirimkan foto selfie wajah konyol kamu ke grup chat keluarga atau pertemanan sekarang!",
+  "Buka aplikasi belanja online di HP kamu dan tunjukkan keranjang belanjaan kamu ke layar!",
+  "Tunjukkan playlist lagu yang paling sering kamu dengarkan secara diam-diam!",
+  "Kirim emoji acak ke kontak WhatsApp teratas tanpa penjelasan apapun!",
+  "Buka galeri dan bacakan catatan (notes) paling lama yang ada di HP kamu!",
+  "Gunakan filter wajah paling aneh di kamera kamu selama 1 putaran penuh!",
+  "Kirim voice note bernyanyi 1 bait lagu dangdut ke teman dekatmu!"
 ];
 
 function shuffle<T>(arr: T[]): T[] {
@@ -125,11 +148,11 @@ function Navbar({
           <button onClick={() => { sound.playClick(); onReset(); }}
             className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-black text-[#257180] bg-[#F2E5BF] border border-[#257180]/20 hover:bg-[#ebdcae] active:scale-95 transition shadow-sm cursor-pointer">
             <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Reset</span>
+            <span className="hidden sm:inline">Keluar</span>
           </button>
         </div>
 
-        {/* Col 2: ABSOLUTELY CENTERED TITLE & TURN (100% Presisi Tengah) */}
+        {/* Col 2: ABSOLUTELY CENTERED TITLE & TURN */}
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center text-center pointer-events-none px-20 sm:px-28">
           <div className="font-black text-xs sm:text-sm text-[#257180] tracking-tight leading-tight truncate max-w-full">
             {title.replace(/\s*\(.*?\)\s*/g, '')}
@@ -165,11 +188,12 @@ function Navbar({
   );
 }
 
-/* ── Dynamic Scaled Physical Game Card Back (Sleek & Luxury) ─────────────── */
+/* ── Dynamic Scaled Physical Game Card Back ──────────────────────────────── */
 function GameCard({
-  index, onClick, dismissed, playerCount
+  index, onClick, dismissed, playerCount, playerName, isCurrentTurn, isMyCard
 }: {
   index: number; onClick: () => void; dismissed: boolean; playerCount: number;
+  playerName?: string; isCurrentTurn?: boolean; isMyCard?: boolean;
 }) {
   if (dismissed) return null;
 
@@ -177,27 +201,32 @@ function GameCard({
   const bg = CARD_COLORS[index % CARD_COLORS.length];
 
   return (
-    <div className="group cursor-pointer transition-all duration-300 hover:-translate-y-2.5 hover:scale-105 active:scale-95 flex flex-col items-center animate-pop-in"
+    <div className={`group cursor-pointer transition-all duration-300 hover:-translate-y-2.5 hover:scale-105 active:scale-95 flex flex-col items-center animate-pop-in ${isCurrentTurn ? 'scale-105' : 'opacity-90'}`}
       style={{ width: w }} onClick={onClick}>
       
       {/* Sleek Luxury Playing Card Back */}
-      <div className="w-full relative rounded-[24px] overflow-hidden shadow-xl shadow-orange-950/20 border-[2.5px] border-[#FAF3E0] flex flex-col items-center justify-between p-3"
+      <div className={`w-full relative rounded-[24px] overflow-hidden shadow-xl shadow-orange-950/20 border-[2.5px] ${isCurrentTurn ? 'border-[#FD8B51] ring-4 ring-[#FD8B51]/30' : 'border-[#FAF3E0]'} flex flex-col items-center justify-between p-3`}
         style={{ height: h, background: bg }}>
         
         {/* Single Clean Inner Linen Frame Line */}
         <div className="absolute inset-2.5 rounded-[16px] border border-[#FAF3E0]/35 pointer-events-none z-10" />
 
-        {/* Top-Left Corner Suit Emblem (Outside Inner Frame Line) */}
+        {/* Top-Left Corner Suit Emblem */}
         <div className="w-full flex justify-between text-[11px] font-black text-[#FAF3E0]/60 z-10 select-none px-1">
           <span>♥</span>
           <span>♠</span>
         </div>
 
         {/* Center Watermark & Big Clean '?' Symbol */}
-        <div className="relative z-10 my-auto flex items-center justify-center">
+        <div className="relative z-10 my-auto flex flex-col items-center justify-center gap-1">
           <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#FAF3E0]/15 flex items-center justify-center backdrop-blur-[1px]">
             <span className={`${symbolSize} font-black text-[#FAF3E0] drop-shadow-md select-none`}>?</span>
           </div>
+          {playerName && (
+            <span className="text-[10px] sm:text-[11px] font-black text-[#FAF3E0] tracking-wide px-2 py-0.5 rounded-full bg-black/25 backdrop-blur-xs max-w-[120px] truncate">
+              {playerName} {isMyCard ? '★' : ''}
+            </span>
+          )}
         </div>
 
         {/* Bottom-Right Corner Suit Emblem */}
@@ -209,8 +238,8 @@ function GameCard({
 
       {/* Action Button Pill */}
       <div className="mt-2.5">
-        <span className={`rounded-full font-black text-[#257180] bg-[#FAF3E0] border border-[#FD8B51]/30 shadow-md group-hover:bg-[#257180] group-hover:text-[#FAF3E0] transition-all ${fontBtn}`}>
-          Buka Kartu
+        <span className={`rounded-full font-black ${isCurrentTurn ? 'bg-[#FD8B51] text-white border-[#CB6040]' : 'bg-[#FAF3E0] text-[#257180] border-[#FD8B51]/30'} border shadow-md group-hover:bg-[#257180] group-hover:text-[#FAF3E0] transition-all ${fontBtn}`}>
+          {isMyCard ? "Buka Kartumu" : isCurrentTurn ? `Giliran ${playerName || 'Pemain'}` : `Buka Kartu`}
         </span>
       </div>
     </div>
@@ -219,13 +248,13 @@ function GameCard({
 
 /* ── All Cards Display & Spotlight 3D Flip Question Modal ────────────────── */
 function AllCardsDisplay({
-  playerNames, questions, onRoundComplete, round, totalRounds,
-  activePlayerIndex, setActivePlayerIndex, roomCode, topic
+  playerNames, questions, onRoundComplete, onBackToLobby, round, totalRounds,
+  activePlayerIndex, setActivePlayerIndex, roomCode, topic, myName
 }: {
   playerNames: string[]; questions: string[];
-  onRoundComplete: () => void; round: number; totalRounds: number;
+  onRoundComplete: () => void; onBackToLobby: () => void; round: number; totalRounds: number;
   activePlayerIndex: number; setActivePlayerIndex: React.Dispatch<React.SetStateAction<number>>;
-  roomCode?: string; topic?: string;
+  roomCode?: string; topic?: string; myName?: string;
 }) {
   const { syncSeenQuestions } = useAuth();
   const playerCount = playerNames.length;
@@ -234,56 +263,16 @@ function AllCardsDisplay({
   const [activeQuestionText, setActiveQuestionText] = useState<string>('');
   const [isClosingModal, setIsClosingModal] = useState(false);
 
-  // Timestamp guard & stable refs to prevent network race conditions from flickering local state
-  const lastActionTimeRef = useRef<number>(0);
-  const lastLocalOpenTimeRef = useRef<number>(0);
+  // Version-based synchronization refs to keep multi-device state strictly in sync
   const lastSyncedVersionRef = useRef<number>(0);
-  const activeModalIndexRef = useRef<number | null>(activeModalIndex);
-  const activeQuestionTextRef = useRef<string>(activeQuestionText);
-  const dismissedRef = useRef<boolean[]>(dismissed);
-  const activePlayerIndexRef = useRef<number>(activePlayerIndex);
-
-  useEffect(() => {
-    activeModalIndexRef.current = activeModalIndex;
-  }, [activeModalIndex]);
-
-  useEffect(() => {
-    activeQuestionTextRef.current = activeQuestionText;
-  }, [activeQuestionText]);
-
-  useEffect(() => {
-    dismissedRef.current = dismissed;
-  }, [dismissed]);
-
-  useEffect(() => {
-    activePlayerIndexRef.current = activePlayerIndex;
-  }, [activePlayerIndex]);
 
   const allDone = dismissed.every(Boolean);
 
-  // Reset round state
-  useEffect(() => {
-    const initialDismissed = new Array(playerCount).fill(false);
-    setDismissed(initialDismissed);
-    setActiveModalIndex(null);
-    setActiveQuestionText('');
-
-    if (roomCode) {
-      sendCardRoomSync({
-        activeModalIndex: null,
-        activeQuestionText: '',
-        dismissed: initialDismissed
-      });
-    }
-  }, [round, playerCount, roomCode]);
-
-  // Helper to send real-time card state to /api/room
+  // Helper to send real-time card state to /api/room with version tracking
   const sendCardRoomSync = async (patch: any) => {
     if (!roomCode) return;
-    const now = Date.now();
-    lastActionTimeRef.current = now;
     try {
-      await fetch('/api/room', {
+      const res = await fetch('/api/room', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -291,10 +280,14 @@ function AllCardsDisplay({
           gameState: patch
         })
       });
+      const data = await res.json();
+      if (data.success && data.room?.gameState?.version) {
+        lastSyncedVersionRef.current = data.room.gameState.version;
+      }
     } catch (e) {}
   };
 
-  // Poll room state in real-time (400ms) with strict version & timestamp protection (Zero flicker)
+  // Poll room state in real-time (350ms) using logical version ordering
   useEffect(() => {
     if (!roomCode) return;
     const interval = setInterval(async () => {
@@ -304,68 +297,50 @@ function AllCardsDisplay({
         if (data.success && data.room && data.room.gameState) {
           const gs = data.room.gameState;
           
-          // 1. Version Guard: Ignore stale or out-of-order server responses
-          if (gs.version && gs.version <= lastSyncedVersionRef.current) {
+          // Strict monotonic version check: skip already applied versions
+          if (typeof gs.version === 'number' && gs.version <= lastSyncedVersionRef.current) {
             return;
           }
+          lastSyncedVersionRef.current = gs.version;
 
-          // 2. Ignore stale server responses if a local user action occurred recently
-          if (gs.updatedAt && gs.updatedAt < lastActionTimeRef.current) {
-            return;
-          }
-
-          // 3. Local Open Guard: Do not let stale server nulls close a card just opened locally
-          if (gs.activeModalIndex === null && activeModalIndexRef.current !== null) {
-            if (Date.now() - lastLocalOpenTimeRef.current < 2000) {
-              return;
-            }
-          }
-
-          if (gs.version) {
-            lastSyncedVersionRef.current = gs.version;
-          }
-
-          // Sync active card modal index (open or close)
-          if (gs.activeModalIndex !== undefined && gs.activeModalIndex !== activeModalIndexRef.current) {
+          // Sync active card modal index
+          if (gs.activeModalIndex !== undefined) {
             setActiveModalIndex(gs.activeModalIndex);
             if (gs.activeModalIndex === null) {
               setIsClosingModal(false);
             }
           }
 
-          // Sync question text
-          if (gs.activeQuestionText && gs.activeQuestionText !== activeQuestionTextRef.current) {
+          // Sync question text (properly handles empty string on close)
+          if (typeof gs.activeQuestionText === 'string') {
             setActiveQuestionText(gs.activeQuestionText);
           }
 
           // Sync dismissed cards array across all devices
-          if (Array.isArray(gs.dismissed) && JSON.stringify(gs.dismissed) !== JSON.stringify(dismissedRef.current)) {
+          if (Array.isArray(gs.dismissed)) {
             setDismissed(gs.dismissed);
           }
 
           // Sync active turn player index
-          if (gs.activePlayerIndex !== undefined && gs.activePlayerIndex !== activePlayerIndexRef.current) {
+          if (typeof gs.activePlayerIndex === 'number') {
             setActivePlayerIndex(gs.activePlayerIndex);
           }
         }
       } catch (e) {}
-    }, 400);
+    }, 350);
 
     return () => clearInterval(interval);
-  }, [roomCode]);
+  }, [roomCode, setActivePlayerIndex]);
 
   const handleOpenCard = (index: number) => {
     if (dismissed[index]) return;
     sound.playFlip();
 
-    // Use question from questions array, with fallback to procedurally generated question (never static string)
+    // Use question from questions array, with fallback to procedurally generated question
     const proceduralFallback = generateProceduralQuestions(topic as string, 1, new Set())[0] || "Ceritakan satu pengalaman paling berkesan dalam hidup kamu!";
     const selectedQuestion = (questions && questions[index]) ? questions[index] : proceduralFallback;
-    const now = Date.now();
-    lastLocalOpenTimeRef.current = now;
-    lastActionTimeRef.current = now;
 
-    // ✅ IMMEDIATELY mark as seen the moment the card is opened bound to user email account!
+    // Immediately mark as seen the moment card is opened
     try {
       syncSeenQuestions([selectedQuestion]);
     } catch {}
@@ -377,10 +352,9 @@ function AllCardsDisplay({
       activeModalIndex: index,
       activeQuestionText: selectedQuestion,
       dismissed,
-      activePlayerIndex
+      activePlayerIndex: index
     });
   };
-
 
   const handleLanjut = () => {
     if (activeModalIndex === null) return;
@@ -394,7 +368,7 @@ function AllCardsDisplay({
 
     if (nextDismissed.every(Boolean)) setTimeout(() => sound.playChime(), 150);
 
-    const nextActivePlayer = (activePlayerIndex + 1) % playerCount;
+    const nextActivePlayer = (targetIdx + 1) % playerCount;
     setActivePlayerIndex(nextActivePlayer);
     setActiveModalIndex(null);
     setIsClosingModal(false);
@@ -408,20 +382,21 @@ function AllCardsDisplay({
     });
   };
 
-  const activeName = playerNames[activePlayerIndex] || `Pemain ${activePlayerIndex + 1}`;
-
   return (
     <div className="w-full flex flex-col items-center justify-center my-auto">
-      {/* Clean Organic Game Table Mat (Spacious & Consistent) */}
+      {/* Clean Organic Game Table Mat */}
       <div className={`w-full max-w-3xl bg-[#FAF3E0]/95 backdrop-blur-md rounded-[36px] p-6 sm:p-8 border-2 border-[#257180]/15 shadow-xl shadow-orange-950/10 flex flex-col items-center justify-center my-auto transition-all duration-300 ${allDone ? 'min-h-0 py-6' : 'min-h-[360px]'}`}>
         
-        {/* Table Cards Grid (Dynamically Scaled & Generous Spacing) */}
+        {/* Table Cards Grid */}
         {!allDone && (
           <div className={`flex flex-wrap justify-center items-center w-full my-auto ${playerCount > 5 ? 'gap-3.5 sm:gap-4' : 'gap-5 sm:gap-8'}`}>
             {Array.from({ length: playerCount }).map((_, i) => (
               <GameCard
                 key={i}
                 index={i}
+                playerName={playerNames[i]}
+                isCurrentTurn={i === activePlayerIndex}
+                isMyCard={Boolean(myName && playerNames[i]?.toLowerCase() === myName.toLowerCase())}
                 dismissed={dismissed[i]}
                 playerCount={playerCount}
                 onClick={() => handleOpenCard(i)}
@@ -430,12 +405,12 @@ function AllCardsDisplay({
           </div>
         )}
 
-        {/* Round Completion & Game Summary View (Enlarged Cards & Snug Fit) */}
+        {/* Round Completion & Game Summary View */}
         {allDone && (
           round < totalRounds ? (
             <div className="relative z-10 text-center space-y-5 animate-pop-in my-auto max-w-md w-full py-2 flex flex-col items-center">
               
-              {/* Decorative Prominent 3 Stacked Cards Graphic */}
+              {/* Decorative 3 Stacked Cards Graphic */}
               <div className="flex items-center justify-center -space-x-5 mb-2 mt-1">
                 <div className="w-18 h-26 rounded-2xl bg-[#257180] border-2 border-[#FAF3E0] shadow-lg -rotate-12 flex flex-col items-center justify-between p-2 select-none">
                   <span className="text-[10px] text-[#FAF3E0]/50 font-black self-start">♥</span>
@@ -479,7 +454,7 @@ function AllCardsDisplay({
           ) : (
             <div className="relative z-10 text-center space-y-5 animate-pop-in my-auto max-w-md w-full py-2 flex flex-col items-center">
               
-              {/* Decorative Prominent 3 Stacked Cards Graphic */}
+              {/* Decorative 3 Stacked Cards Graphic */}
               <div className="flex items-center justify-center -space-x-5 mb-2 mt-1">
                 <div className="w-18 h-26 rounded-2xl bg-[#257180] border-2 border-[#FAF3E0] shadow-lg -rotate-12 flex flex-col items-center justify-between p-2 select-none">
                   <span className="text-[10px] text-[#FAF3E0]/50 font-black self-start">♥</span>
@@ -525,10 +500,17 @@ function AllCardsDisplay({
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3.5 pt-1 w-full">
-                <Link href="/play/offline"
-                  className="flex-1 py-3.5 rounded-2xl font-black text-sm text-white bg-[#FD8B51] hover:bg-[#e0753c] text-center transition shadow-md">
-                  Main Lagi
-                </Link>
+                {roomCode ? (
+                  <button onClick={onBackToLobby}
+                    className="flex-1 py-3.5 rounded-2xl font-black text-sm text-white bg-[#FD8B51] hover:bg-[#e0753c] text-center transition shadow-md cursor-pointer">
+                    Kembali ke Room Lobby
+                  </button>
+                ) : (
+                  <Link href="/play/offline"
+                    className="flex-1 py-3.5 rounded-2xl font-black text-sm text-white bg-[#FD8B51] hover:bg-[#e0753c] text-center transition shadow-md">
+                    Main Lagi
+                  </Link>
+                )}
                 <Link href="/"
                   className="flex-1 py-3.5 rounded-2xl font-black text-sm text-[#257180] bg-[#FAF3E0] border border-[#257180]/20 hover:bg-[#f2e6cb] text-center transition shadow-sm">
                   Kembali ke Beranda
@@ -547,14 +529,14 @@ function AllCardsDisplay({
             {/* Header Card Badges */}
             <div className="w-full flex items-center justify-between z-10">
               <div className="px-3.5 py-1.5 rounded-full bg-[#257180] text-[#FAF3E0] text-[11px] font-extrabold tracking-wider uppercase shadow-sm">
-                Kartu Giliran #{activeModalIndex + 1}
+                Kartu #{activeModalIndex + 1}
               </div>
               <div className="px-3.5 py-1.5 rounded-full bg-[#FD8B51]/15 text-[#CB6040] text-[11px] font-extrabold shadow-sm">
                 Giliran: {playerNames[activeModalIndex] || `Pemain ${activeModalIndex + 1}`}
               </div>
             </div>
 
-            {/* Inner Luxury Card Content Frame (Textured Playing Card Face - NOT PLAIN) */}
+            {/* Inner Luxury Card Content Frame */}
             <div className="w-full flex-1 my-4 rounded-[28px] p-6 flex flex-col justify-between items-center shadow-inner relative overflow-hidden border-2 border-[#FD8B51]/35 select-none"
               style={{ background: "linear-gradient(150deg, #FAF3E0 0%, #F3E4C0 100%)" }}>
               
@@ -601,9 +583,9 @@ function AllCardsDisplay({
 }
 
 function SpinnerWheelFlow({
-  playerNames, todType, onFinish, roomCode
+  playerNames, todType, onFinish, roomCode, myName
 }: {
-  playerNames: string[]; todType: string; onFinish: () => void; roomCode?: string;
+  playerNames: string[]; todType: string; onFinish: () => void; roomCode?: string; myName?: string;
 }) {
   const playerCount = playerNames.length;
   const [spinning, setSpinning] = useState(false);
@@ -614,41 +596,44 @@ function SpinnerWheelFlow({
   const [todContent, setTodContent] = useState<string>('');
 
   const sliceColors = [C.gold, C.orange, C.rust, C.crimson, C.teal, C.gold];
-  
-  const VIEWBOX_SIZE = 400;
+  const sliceDeg = 360 / playerCount;
+  const wheelRadius = 180;
   const cx = 200;
   const cy = 200;
-  const wheelRadius = 170;
-  const sliceDeg = 360 / playerCount;
+  const VIEWBOX_SIZE = 400;
 
-  const lastActionRef = useRef<number>(0);
+  const lastSyncedVersionRef = useRef<number>(0);
 
-  // Poll room roulette state safely with local action guard (0 network race flicker)
+  // Poll room roulette state
   useEffect(() => {
     if (!roomCode) return;
     const interval = setInterval(async () => {
-      if (Date.now() - lastActionRef.current < 2500) return;
-
       try {
         const res = await fetch(`/api/room?code=${roomCode}`);
         const data = await res.json();
         if (data.success && data.room && data.room.gameState) {
           const gs = data.room.gameState;
+          if (typeof gs.version === 'number' && gs.version <= lastSyncedVersionRef.current) {
+            return;
+          }
+          lastSyncedVersionRef.current = gs.version;
+
           if (gs.rotation !== undefined) setRotation(gs.rotation);
           if (gs.todPhase !== undefined) setTodPhase(gs.todPhase);
           if (gs.landedIndex !== undefined) setLandedIndex(gs.landedIndex);
           if (gs.chosenType !== undefined) setChosenType(gs.chosenType);
           if (gs.todContent !== undefined) setTodContent(gs.todContent);
+          if (gs.spinning !== undefined) setSpinning(gs.spinning);
         }
       } catch (e) {}
-    }, 800);
+    }, 350);
     return () => clearInterval(interval);
   }, [roomCode]);
 
   const sendRouletteSync = async (nextGS: any) => {
     if (!roomCode) return;
     try {
-      await fetch('/api/room', {
+      const res = await fetch('/api/room', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -656,12 +641,15 @@ function SpinnerWheelFlow({
           gameState: nextGS
         })
       });
+      const data = await res.json();
+      if (data.success && data.room?.gameState?.version) {
+        lastSyncedVersionRef.current = data.room.gameState.version;
+      }
     } catch (e) {}
   };
 
   const spin = () => {
     if (spinning) return;
-    lastActionRef.current = Date.now();
     setLandedIndex(null);
     setSpinning(true);
     sound.playFlip();
@@ -674,32 +662,34 @@ function SpinnerWheelFlow({
     const newRot = baseRot + 1800 + delta;
     
     setRotation(newRot);
-    sendRouletteSync({ rotation: newRot, todPhase: 'spin', landedIndex: null });
+    sendRouletteSync({ rotation: newRot, todPhase: 'spin', landedIndex: null, spinning: true });
 
     setTimeout(() => {
       setSpinning(false);
       setLandedIndex(target);
       sound.playChime();
-      sendRouletteSync({ rotation: newRot, todPhase: 'spin', landedIndex: target });
+      sendRouletteSync({ rotation: newRot, todPhase: 'choice', landedIndex: target, spinning: false });
     }, 3800);
   };
 
   const handlePickChoice = async (type: 'truth'|'dare') => {
     sound.playFlip();
-    lastActionRef.current = Date.now();
     setChosenType(type);
 
     let seen: string[] = [];
     try {
-        const stored = sessionStorage.getItem('obrolan_seen_tod');
-        if (stored) seen = JSON.parse(stored);
+      const stored = sessionStorage.getItem('obrolan_seen_tod');
+      if (stored) seen = JSON.parse(stored);
     } catch (e) {}
+
+    const isRemote = todType === 'jarakjauh' || Boolean(roomCode);
+    const topicToFetch = type === 'truth' ? 'tod_truth' : (isRemote ? 'tod_dare_online' : 'tod_dare_offline');
 
     try {
       const res = await fetch('/api/generate-questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: type === 'truth' ? 'tod_truth' : (todType === 'jarakjauh' ? 'tod_dare_online' : 'tod_dare_offline'), count: 5, exclude: seen })
+        body: JSON.stringify({ topic: topicToFetch, count: 5, exclude: seen })
       });
       const data = await res.json();
       if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
@@ -718,7 +708,7 @@ function SpinnerWheelFlow({
 
     const fallbackBank = type === 'truth'
       ? TOD_TRUTH
-      : (todType === 'jarakjauh' ? TOD_DARE_ONLINE : TOD_DARE_OFFLINE);
+      : (isRemote ? TOD_DARE_ONLINE : TOD_DARE_OFFLINE);
 
     const unseenItems = fallbackBank.filter(q => !seen.includes(q));
     const poolToUse = unseenItems.length > 0 ? unseenItems : fallbackBank;
@@ -739,7 +729,8 @@ function SpinnerWheelFlow({
     setLandedIndex(null);
     setChosenType(null);
     setTodContent('');
-    sendRouletteSync({ todPhase: 'spin', landedIndex: null, chosenType: null, todContent: '' });
+    setSpinning(false);
+    sendRouletteSync({ todPhase: 'spin', landedIndex: null, chosenType: null, todContent: '', spinning: false });
   };
 
   const slices = Array.from({ length: playerCount }).map((_, i) => {
@@ -752,68 +743,53 @@ function SpinnerWheelFlow({
     const y2 = cy + wheelRadius * Math.sin(endAngle);
 
     const largeArc = sliceDeg > 180 ? 1 : 0;
+    const path = `M ${cx} ${cy} L ${x1} ${y1} A ${wheelRadius} ${wheelRadius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+
     const midAngle = (i * sliceDeg + sliceDeg / 2 - 90) * Math.PI / 180;
     const textRadius = wheelRadius * 0.65;
     const tx = cx + textRadius * Math.cos(midAngle);
     const ty = cy + textRadius * Math.sin(midAngle);
+
     const textAngle = i * sliceDeg + sliceDeg / 2;
 
     return {
-      path: `M ${cx} ${cy} L ${x1} ${y1} A ${wheelRadius} ${wheelRadius} 0 ${largeArc} 1 ${x2} ${y2} Z`,
-      tx, ty, textAngle,
-      color: sliceColors[i % sliceColors.length],
-      label: playerNames[i] || `Pemain ${i + 1}`,
+      path,
+      tx,
+      ty,
+      textAngle,
+      label: playerNames[i],
+      color: sliceColors[i % sliceColors.length]
     };
   });
-
-  const studCount = Math.max(12, playerCount * 2);
-  const studs = Array.from({ length: studCount }).map((_, idx) => {
-    const angle = (idx * (360 / studCount) - 90) * Math.PI / 180;
-    const studR = wheelRadius + 10;
-    return {
-      sx: cx + studR * Math.cos(angle),
-      sy: cy + studR * Math.sin(angle),
-    };
-  });
-
-  const selectedName = landedIndex !== null ? (playerNames[landedIndex] || `Pemain ${landedIndex + 1}`) : '';
 
   return (
-    <div className="flex flex-col items-center justify-center w-full my-auto">
+    <div className="w-full max-w-xl mx-auto flex flex-col items-center justify-center my-auto space-y-6">
       
-      {/* PHASE 1: Real-Life Roulette Wheel with Static Stand & Rotating Inner Wheel */}
+      {/* ── PHASE 1: SPINNING WHEEL ────────────────────────────────────── */}
       {todPhase === 'spin' && (
-        <div className="flex flex-col items-center gap-5 w-full my-auto animate-pop-in">
-          
-          {/* Wheel Assembly Container (Outer Frame & Stand STAY 100% STILL) */}
-          <div className="relative flex flex-col items-center justify-center w-full max-w-[290px] sm:max-w-[370px] mx-auto select-none pt-4 pb-1">
-            
-            {/* Top Downward Pointer Stopper Pin (Static 12 o'clock) */}
-            <div className="absolute top-0 z-30 flex flex-col items-center">
-              <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#FD8B51] border-2 border-[#FAF3E0] shadow-md -mb-1" />
-              <div style={{
-                width: 0, height: 0,
-                borderLeft: "13px solid transparent",
-                borderRight: "13px solid transparent",
-                borderTop: `25px solid ${C.teal}`,
-                filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.35))"
-              }} />
+        <div className="flex flex-col items-center space-y-6 animate-pop-in">
+          {/* Wheel Container Box */}
+          <div className="relative w-72 sm:w-84 aspect-square flex items-center justify-center select-none">
+            {/* Top Fixed Indicator Needle */}
+            <div className="absolute -top-3 z-30 flex flex-col items-center filter drop-shadow-lg">
+              <div className="w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[28px] border-t-[#CB6040]" />
+              <div className="w-4 h-4 rounded-full bg-[#FAF3E0] -mt-6 border-2 border-[#CB6040]" />
             </div>
 
-            {/* Vertical Pillar Stand Behind Wheel (Static) */}
+            {/* Stand Post */}
             <div className="absolute inset-y-3 w-7 bg-gradient-to-b from-[#257180] via-[#1d5966] to-[#257180] border-2 border-[#FAF3E0]/30 rounded-lg shadow-xl z-0" />
 
-            {/* Wheel SVG Frame (Outer Container Static, ONLY Inner Group Rotates) */}
+            {/* Wheel SVG Frame */}
             <div className="relative z-10 w-full aspect-square">
               <svg viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`} className="w-full h-full filter drop-shadow-2xl overflow-visible">
                 
-                {/* ONLY THIS INNER GROUP ROTATES ON POROS (200px, 200px) */}
+                {/* Rotates on Poros */}
                 <g style={{
                   transition: spinning ? "transform 3.8s cubic-bezier(0.12, 0.85, 0.15, 1)" : "none",
                   transform: `rotate(${rotation}deg)`,
                   transformOrigin: "200px 200px",
                 }}>
-                  {/* Outer Wooden/Metallic Rim */}
+                  {/* Outer Rim */}
                   <circle cx={cx} cy={cy} r={192} fill="#FAF3E0" stroke="#CB6040" strokeWidth={6} />
                   <circle cx={cx} cy={cy} r={185} fill="#FAF3E0" stroke="#FD8B51" strokeWidth={10} />
 
@@ -827,148 +803,87 @@ function SpinnerWheelFlow({
                     </g>
                   ))}
 
-                  {/* Outer Brass Rivet Studs */}
-                  {studs.map((st, idx) => (
-                    <circle key={idx} cx={st.sx} cy={st.sy} r={4.5} fill="#FAF3E0" stroke="#257180" strokeWidth={2} />
-                  ))}
-
-                  {/* Center Metallic Axle Hub Cap */}
-                  <circle cx={cx} cy={cy} r={34} fill="#FAF3E0" stroke="#FD8B51" strokeWidth={4} />
-                  <circle cx={cx} cy={cy} r={24} fill="#257180" />
-                  <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fill="#FAF3E0" fontSize={15} fontWeight="900">✦</text>
+                  {/* Inner Hub Rim */}
+                  <circle cx={cx} cy={cy} r={46} fill="#FAF3E0" stroke="#FD8B51" strokeWidth={4} />
+                  <circle cx={cx} cy={cy} r={34} fill="#257180" />
+                  <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fill="#FAF3E0" fontSize={16} fontWeight="900" fontFamily="Nunito, sans-serif">
+                    TOD
+                  </text>
                 </g>
               </svg>
             </div>
-
-            {/* Solid Heavy Base Stand at Bottom (Static) */}
-            <div className="relative z-20 w-40 sm:w-44 h-7 bg-gradient-to-r from-[#257180] via-[#1d5966] to-[#257180] rounded-t-2xl border-t-2 border-[#FAF3E0]/40 shadow-xl flex items-center justify-center -mt-3.5">
-              <div className="w-20 sm:w-24 h-1.5 bg-[#FD8B51] rounded-full opacity-80" />
-            </div>
           </div>
 
-          <button onClick={spin} disabled={spinning}
-            className={`px-10 py-4 rounded-2xl font-black text-base text-white shadow-xl transition cursor-pointer ${spinning ? 'opacity-50 scale-95 cursor-not-allowed' : 'hover:scale-[1.03] active:scale-95'}`}
+          {/* Action Spin Button */}
+          <button
+            onClick={spin}
+            disabled={spinning}
+            className={`px-10 py-4 rounded-2xl font-black text-lg text-white shadow-xl transition-all cursor-pointer ${spinning ? 'opacity-50 cursor-not-allowed scale-95' : 'hover:scale-105 active:scale-95'}`}
             style={{ background: "linear-gradient(135deg, #FD8B51 0%, #CB6040 100%)" }}>
-            {spinning ? 'Roda Sedang Berputar...' : 'Putar Roulette Wheel ✦'}
+            {spinning ? "Memutar Roda..." : "Putar Roda Sekarang 🎯"}
           </button>
-
-          {/* Winner Result Box */}
-          {landedIndex !== null && !spinning && (
-            <div className="bg-[#FAF3E0] p-6 rounded-[32px] border-2 border-[#FD8B51] shadow-2xl text-center space-y-4 max-w-sm w-full animate-pop-in">
-              <div className="space-y-1">
-                <span className="text-[11px] font-black text-[#257180] uppercase tracking-wider">TERPILIH KENA TANTANGAN</span>
-                <h3 className="text-3xl font-black text-[#CB6040]">{selectedName}</h3>
-              </div>
-
-              <button
-                onClick={() => setTodPhase('choice')}
-                className="w-full py-3.5 rounded-2xl font-black text-sm text-white shadow-md hover:scale-[1.02] active:scale-95 transition cursor-pointer"
-                style={{ background: "linear-gradient(135deg, #257180 0%, #1d5966 100%)" }}>
-                Pilih Tantangan (Truth / Dare) →
-              </button>
-            </div>
-          )}
         </div>
       )}
 
-      {/* PHASE 2: Choice between TRUTH or DARE (Clean Minimalist Warm Cards) */}
-      {todPhase === 'choice' && (
-        <div className="text-center space-y-6 animate-pop-in max-w-lg w-full px-4 my-auto">
+      {/* ── PHASE 2: CHOICE (TRUTH OR DARE) ────────────────────────────── */}
+      {todPhase === 'choice' && landedIndex !== null && (
+        <div className="bg-[#FAF3E0] rounded-[36px] p-7 sm:p-9 border-4 border-[#FD8B51] shadow-2xl flex flex-col items-center text-center space-y-6 max-w-sm w-full animate-pop-in">
           <div className="space-y-1">
-            <span className="text-xs font-bold text-[#257180]/60 uppercase tracking-widest">
-              GILIRAN TANTANGAN
+            <span className="text-xs font-black uppercase tracking-wider text-[#CB6040] bg-[#FD8B51]/15 px-3 py-1 rounded-full">
+              Pilihan Pemain
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#257180] tracking-tight">
-              {selectedName}, Pilih Mana?
+            <h2 className="text-3xl font-black text-[#257180] tracking-tight">
+              {playerNames[landedIndex]}!
             </h2>
+            <p className="text-xs font-bold text-[#257180]/70">
+              Roda berhenti di nama kamu. Sekarang pilih tantanganmu:
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:gap-6 pt-1">
-            {/* TRUTH Card */}
-            <button onClick={() => handlePickChoice('truth')}
-              className="relative h-80 sm:h-88 rounded-[28px] p-6 flex flex-col items-center justify-between border-2 border-[#FAF3E0]/40 shadow-xl hover:-translate-y-1.5 hover:shadow-2xl active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden group select-none"
-              style={{ background: "linear-gradient(160deg, #FD8B51 0%, #CB6040 100%)" }}>
-              
-              {/* Corner Suits Top */}
-              <div className="w-full flex justify-between text-[11px] font-bold text-[#FAF3E0]/40">
-                <span>♥</span><span>♠</span>
-              </div>
-
-              {/* Center Title */}
-              <div className="text-center my-auto space-y-1">
-                <div className="text-3xl sm:text-4xl font-black tracking-widest text-[#FAF3E0]">
-                  TRUTH
-                </div>
-                <div className="text-xs sm:text-sm font-semibold text-[#FAF3E0]/85">
-                  Jawab Jujur
-                </div>
-              </div>
-
-              {/* Corner Suits Bottom */}
-              <div className="w-full flex justify-between text-[11px] font-bold text-[#FAF3E0]/40">
-                <span>♦</span><span>♣</span>
-              </div>
+          <div className="grid grid-cols-2 gap-3.5 w-full">
+            <button
+              onClick={() => handlePickChoice('truth')}
+              className="py-5 px-3 rounded-2xl bg-[#257180] text-white font-black text-base shadow-lg hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center gap-1 cursor-pointer">
+              <span className="text-2xl">🤫</span>
+              <span>Truth</span>
+              <span className="text-[10px] font-bold text-white/70">Kejujuran</span>
             </button>
 
-            {/* DARE Card */}
-            <button onClick={() => handlePickChoice('dare')}
-              className="relative h-80 sm:h-88 rounded-[28px] p-6 flex flex-col items-center justify-between border-2 border-[#FAF3E0]/40 shadow-xl hover:-translate-y-1.5 hover:shadow-2xl active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden group select-none"
-              style={{ background: "linear-gradient(160deg, #CB6040 0%, #8A3720 100%)" }}>
-              
-              {/* Corner Suits Top */}
-              <div className="w-full flex justify-between text-[11px] font-bold text-[#FAF3E0]/40">
-                <span>♦</span><span>♣</span>
-              </div>
-
-              {/* Center Title */}
-              <div className="text-center my-auto space-y-1">
-                <div className="text-3xl sm:text-4xl font-black tracking-widest text-[#FAF3E0]">
-                  DARE
-                </div>
-                <div className="text-xs sm:text-sm font-semibold text-[#FAF3E0]/85">
-                  Lakukan Tantangan
-                </div>
-              </div>
-
-              {/* Corner Suits Bottom */}
-              <div className="w-full flex justify-between text-[11px] font-bold text-[#FAF3E0]/40">
-                <span>♥</span><span>♠</span>
-              </div>
+            <button
+              onClick={() => handlePickChoice('dare')}
+              className="py-5 px-3 rounded-2xl bg-[#CB6040] text-white font-black text-base shadow-lg hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center gap-1 cursor-pointer">
+              <span className="text-2xl">⚡</span>
+              <span>Dare</span>
+              <span className="text-[10px] font-bold text-white/70">Tantangan</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* PHASE 3: Reveal Truth / Dare Minimalist Card Modal */}
+      {/* ── PHASE 3: REVEAL CONTENT ────────────────────────────────────── */}
       {todPhase === 'reveal' && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-4 bg-[#257180]/60 backdrop-blur-md">
-          <div className="bg-[#FAF3E0] rounded-[36px] p-7 sm:p-9 w-[340px] sm:w-[390px] h-[490px] sm:h-[530px] border-2 border-[#FD8B51]/30 shadow-2xl flex flex-col justify-between items-center text-center animate-pop-in select-none">
-            
-            {/* Header Badges */}
-            <div className="w-full flex items-center justify-between">
-              <div className="px-3.5 py-1.5 rounded-full bg-[#FD8B51] text-white text-[11px] font-extrabold uppercase tracking-wider shadow-sm">
-                Tantangan {chosenType === 'truth' ? 'TRUTH' : 'DARE'}
-              </div>
-              <div className="px-3.5 py-1.5 rounded-full bg-[#257180]/15 text-[#257180] text-[11px] font-extrabold">
-                {selectedName}
-              </div>
-            </div>
-
-            {/* Inner Content Box */}
-            <div className="w-full flex-1 my-4 bg-[#F2E5BF]/80 rounded-[28px] border border-[#257180]/15 p-6 flex flex-col justify-center items-center shadow-inner relative overflow-hidden">
-              <p className="text-base sm:text-lg font-extrabold text-[#257180] leading-relaxed max-w-xs">
-                "{todContent}"
-              </p>
-            </div>
-
-            {/* Action Button */}
-            <button
-              onClick={handleNextSpin}
-              className="w-full py-4 rounded-2xl font-black text-sm text-white shadow-xl hover:scale-[1.02] active:scale-95 transition cursor-pointer"
-              style={{ background: "linear-gradient(135deg, #FD8B51 0%, #CB6040 100%)" }}>
-              Tantangan Selesai · Putar Lagi →
-            </button>
+        <div className="bg-[#FAF3E0] rounded-[36px] p-7 sm:p-9 border-4 border-[#FD8B51] shadow-2xl flex flex-col items-center text-center space-y-6 max-w-md w-full animate-pop-in">
+          <div className="w-full flex items-center justify-between border-b border-[#257180]/15 pb-3">
+            <span className={`px-3 py-1 rounded-full text-xs font-black text-white ${chosenType === 'truth' ? 'bg-[#257180]' : 'bg-[#CB6040]'}`}>
+              {chosenType === 'truth' ? '🤫 KARTU TRUTH' : '⚡ KARTU DARE'}
+            </span>
+            <span className="text-xs font-black text-[#257180]">
+              Untuk: {landedIndex !== null ? playerNames[landedIndex] : 'Pemain'}
+            </span>
           </div>
+
+          <div className="py-4 px-2">
+            <p className="text-lg sm:text-xl font-black text-[#257180] leading-relaxed">
+              "{todContent}"
+            </p>
+          </div>
+
+          <button
+            onClick={handleNextSpin}
+            className="w-full py-4 rounded-2xl font-black text-base text-white shadow-xl hover:scale-105 active:scale-95 transition cursor-pointer"
+            style={{ background: "linear-gradient(135deg, #FD8B51 0%, #CB6040 100%)" }}>
+            Lanjut Putaran Berikutnya →
+          </button>
         </div>
       )}
 
@@ -976,7 +891,7 @@ function SpinnerWheelFlow({
   );
 }
 
-/* ── Main Game Screen (Strictly Single Viewport Fit + Footer) ───────────────── */
+/* ── Main Game Screen ──────────────────────────────────────────────────────── */
 function OfflineGame() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -987,7 +902,9 @@ function OfflineGame() {
   const topic = searchParams.get('topic') || 'kenalan';
   const totalRounds = parseInt(searchParams.get('rounds') || '3', 10);
   const roomCode = searchParams.get('roomCode') || undefined;
-  
+  const isHost = searchParams.get('isHost') !== 'false';
+  const myName = searchParams.get('myName') || (typeof window !== 'undefined' ? sessionStorage.getItem('my_name') : '') || '';
+
   const rawPlayersParam = searchParams.get('players') || 'Pemain 1,Pemain 2';
   const playerNames = rawPlayersParam.split(',').map(s => s.trim()).filter(Boolean);
 
@@ -997,7 +914,15 @@ function OfflineGame() {
   const [allQuestions, setAllQuestions] = useState<string[]>([]);
   const [isQuestionsLoading, setIsQuestionsLoading] = useState<boolean>(mode === 'pertanyaan');
 
-  // Poll room questions & round state for room players
+  const roundQuestionsRef = useRef<string[]>(roundQuestions);
+  const allQuestionsRef = useRef<string[]>(allQuestions);
+  const currentRoundRef = useRef<number>(currentRound);
+
+  useEffect(() => { roundQuestionsRef.current = roundQuestions; }, [roundQuestions]);
+  useEffect(() => { allQuestionsRef.current = allQuestions; }, [allQuestions]);
+  useEffect(() => { currentRoundRef.current = currentRound; }, [currentRound]);
+
+  // Poll room questions & round state for room players (350ms)
   useEffect(() => {
     if (!roomCode) return;
     const interval = setInterval(async () => {
@@ -1006,27 +931,27 @@ function OfflineGame() {
         const data = await res.json();
         if (data.success && data.room && data.room.gameState) {
           const gs = data.room.gameState;
-          if (Array.isArray(gs.roundQuestions) && gs.roundQuestions.length > 0 && JSON.stringify(gs.roundQuestions) !== JSON.stringify(roundQuestions)) {
+          if (Array.isArray(gs.roundQuestions) && gs.roundQuestions.length > 0 && JSON.stringify(gs.roundQuestions) !== JSON.stringify(roundQuestionsRef.current)) {
             setRoundQuestions(gs.roundQuestions);
+            setIsQuestionsLoading(false);
           }
-          if (Array.isArray(gs.allQuestions) && gs.allQuestions.length > 0 && JSON.stringify(gs.allQuestions) !== JSON.stringify(allQuestions)) {
+          if (Array.isArray(gs.allQuestions) && gs.allQuestions.length > 0 && JSON.stringify(gs.allQuestions) !== JSON.stringify(allQuestionsRef.current)) {
             setAllQuestions(gs.allQuestions);
           }
-          if (gs.currentRound !== undefined && gs.currentRound !== currentRound) {
+          if (typeof gs.currentRound === 'number' && gs.currentRound !== currentRoundRef.current) {
             setCurrentRound(gs.currentRound);
           }
         }
       } catch (e) {}
-    }, 500);
+    }, 350);
     return () => clearInterval(interval);
-  }, [roomCode, currentRound, roundQuestions, allQuestions]);
+  }, [roomCode]);
 
   useEffect(() => {
     async function loadFreshAIQuestions() {
-      setIsQuestionsLoading(true);
-
-      // If playing in an online room, check if room already has questions broadcasted
-      if (roomCode) {
+      // Non-host in online room: wait for Host to generate and broadcast questions
+      if (roomCode && !isHost) {
+        setIsQuestionsLoading(true);
         try {
           const roomRes = await fetch(`/api/room?code=${roomCode}`);
           const roomData = await roomRes.json();
@@ -1038,7 +963,10 @@ function OfflineGame() {
             return;
           }
         } catch (e) {}
+        return;
       }
+
+      setIsQuestionsLoading(true);
 
       const BAD_PHRASES = [
         "diajak nongkrong sama",
@@ -1055,12 +983,12 @@ function OfflineGame() {
       const totalNeeded = totalRounds * playerNames.length;
       const seen: string[] = getMergedSeenQuestions();
       // Normalize: strip quotes, punctuation, extra spaces for fuzzy dedup
-      const normalizeQ = (s: string) => s.trim().toLowerCase().replace(/["'"'`”«»]/g, '').replace(/[?.!,;]/g, '').replace(/\s+/g, ' ');
+      const normalizeQ = (s: string) => s.trim().toLowerCase().replace(/["'"'`”«»]/g, '').replace(/[?.!,;:]/g, '').replace(/\s+/g, ' ');
       const seenSet = new Set(seen.map(s => normalizeQ(String(s))));
 
-      // ── Gemini cache helpers ─────────────────────────────────────────────
+      // Gemini cache helpers
       const CACHE_KEY = `obrolan_q_cache_${topic}`;
-      const CACHE_MAX = 500; // max questions stored per topic
+      const CACHE_MAX = 500;
 
       const readCache = (): string[] => {
         try {
@@ -1096,7 +1024,6 @@ function OfflineGame() {
           const pool: string[] = cleanPool(data.questions as string[]).filter(q => !seenSet.has(normalizeQ(q)));
           if (pool.length > 0) {
             selectedQuestions = shuffle(pool);
-            // 🔑 Always save fresh Gemini results to self-growing cache
             writeCache(data.questions as string[]);
           }
         }
@@ -1104,7 +1031,7 @@ function OfflineGame() {
         console.warn('Gemini API call failed, falling back to local cache:', e);
       }
 
-      // ── Fallback 1: Self-growing Gemini cache (grows with every session) ──
+      // Fallback 1: Local Gemini cache
       if (selectedQuestions.length < totalNeeded) {
         const cachedPool = cleanPool(readCache());
         const unseenCached = cachedPool.filter(q => !seenSet.has(normalizeQ(q)));
@@ -1114,11 +1041,11 @@ function OfflineGame() {
         }
       }
 
-      // ── Fallback 2: Static bank (ONLY unseen questions, ALWAYS SHUFFLED) ─
+      // Fallback 2: Static master bank (600+ Indonesian questions)
       if (selectedQuestions.length < totalNeeded) {
         const primaryBank = cleanPool(QUESTION_BANKS[topic] || QUESTION_BANKS['kenalan']);
         const allBanks = topic === 'mix'
-          ? cleanPool(Object.values(QUESTION_BANKS).flat())
+          ? cleanPool(Object.values(QUESTION_BANKS).flat() as string[])
           : primaryBank;
         
         // Filter strictly unseen static questions with fuzzy normalizeQ
@@ -1128,14 +1055,13 @@ function OfflineGame() {
         if (mergedStatic.length >= totalNeeded) {
           selectedQuestions = shuffle(mergedStatic).slice(0, totalNeeded);
         } else {
-          // If all unseen static questions are exhausted, generate 100% fresh procedural questions!
           const needed = totalNeeded - mergedStatic.length;
           const procedural = generateProceduralQuestions(topic, Math.max(needed, 10), seenSet);
           selectedQuestions = shuffle([...mergedStatic, ...procedural]).slice(0, totalNeeded);
         }
       }
 
-      // Helper: Strict fuzzy deduplication within the single session array
+      // Strict fuzzy deduplication within the single session array
       const makeFuzzyUnique = (arr: string[]): string[] => {
         const seenNorms = new Set<string>();
         const result: string[] = [];
@@ -1150,11 +1076,22 @@ function OfflineGame() {
         return result;
       };
 
-      // Always ensure final pool has 0 duplicates and is thoroughly shuffled
+      // Always ensure final pool has exactly totalNeeded unique questions
       let uniquePool = makeFuzzyUnique(selectedQuestions);
-      if (uniquePool.length < totalNeeded) {
-        const fillProcedural = generateProceduralQuestions(topic, totalNeeded - uniquePool.length, seenSet);
-        uniquePool = makeFuzzyUnique([...uniquePool, ...fillProcedural]);
+      const sessionDedupSet = new Set<string>([...seenSet, ...uniquePool.map(normalizeQ)]);
+
+      while (uniquePool.length < totalNeeded) {
+        const needed = totalNeeded - uniquePool.length;
+        const fillProcedural = generateProceduralQuestions(topic, needed + 5, sessionDedupSet);
+        if (fillProcedural.length === 0) break;
+        for (const q of fillProcedural) {
+          const norm = normalizeQ(q);
+          if (!sessionDedupSet.has(norm)) {
+            sessionDedupSet.add(norm);
+            uniquePool.push(q);
+          }
+          if (uniquePool.length >= totalNeeded) break;
+        }
       }
 
       selectedQuestions = shuffle(uniquePool).slice(0, totalNeeded);
@@ -1164,12 +1101,7 @@ function OfflineGame() {
       setRoundQuestions(firstRoundQs);
       setIsQuestionsLoading(false);
 
-      // Sync seen questions across devices and upload to Cloud Account
-      try {
-        await syncSeenQuestions(selectedQuestions);
-      } catch (e) {}
-
-      // Broadcast questions to room so ALL devices get 100% identical questions!
+      // Broadcast questions to room so ALL devices get 100% identical questions
       if (roomCode) {
         try {
           await fetch('/api/room', {
@@ -1180,7 +1112,11 @@ function OfflineGame() {
               gameState: {
                 allQuestions: selectedQuestions,
                 roundQuestions: firstRoundQs,
-                currentRound: 1
+                currentRound: 1,
+                activeModalIndex: null,
+                activeQuestionText: '',
+                dismissed: new Array(playerNames.length).fill(false),
+                activePlayerIndex: 0
               }
             })
           });
@@ -1189,7 +1125,7 @@ function OfflineGame() {
     }
 
     loadFreshAIQuestions();
-  }, [topic, totalRounds, playerNames.length, roomCode]);
+  }, [topic, totalRounds, playerNames.length, roomCode, isHost]);
 
   const handleNextRound = () => {
     const next = currentRound + 1;
@@ -1199,6 +1135,7 @@ function OfflineGame() {
     setRoundQuestions(nextRoundQs);
 
     if (roomCode) {
+      const resetDismissed = new Array(playerNames.length).fill(false);
       fetch('/api/room', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1206,15 +1143,57 @@ function OfflineGame() {
           code: roomCode,
           gameState: {
             currentRound: next,
-            roundQuestions: nextRoundQs
+            roundQuestions: nextRoundQs,
+            activeModalIndex: null,
+            activeQuestionText: '',
+            dismissed: resetDismissed,
+            activePlayerIndex: 0
           }
         })
       });
     }
   };
 
-  const handleReset = () => router.push('/play/offline');
-  const handleFinish = () => router.push('/play/offline');
+  const handleBackToLobby = async () => {
+    if (roomCode) {
+      try {
+        await fetch('/api/room', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: roomCode,
+            status: 'lobby',
+            gameState: {
+              currentRound: 1,
+              activeModalIndex: null,
+              activeQuestionText: '',
+              dismissed: new Array(playerNames.length).fill(false),
+              activePlayerIndex: 0
+            }
+          })
+        });
+      } catch (e) {}
+      router.push(`/play/room/${roomCode}?isHost=${isHost ? 'true' : 'false'}&myName=${encodeURIComponent(myName)}`);
+    } else {
+      router.push('/play/offline');
+    }
+  };
+
+  const handleReset = () => {
+    if (roomCode) {
+      handleBackToLobby();
+    } else {
+      router.push('/play/offline');
+    }
+  };
+
+  const handleFinish = () => {
+    if (roomCode) {
+      handleBackToLobby();
+    } else {
+      router.push('/play/offline');
+    }
+  };
 
   const TOPIC_TITLES: Record<string, string> = {
     kenalan: "Kenalan Dulu",
@@ -1230,7 +1209,7 @@ function OfflineGame() {
   };
 
   const navTitle = mode === 'tod'
-    ? `Truth or Dare (${todType === 'jarakjauh' ? 'Jarak Jauh' : 'Tatap Muka'})`
+    ? `Truth or Dare (${todType === 'jarakjauh' || roomCode ? 'Jarak Jauh' : 'Tatap Muka'})`
     : (TOPIC_TITLES[topic] || topic.charAt(0).toUpperCase() + topic.slice(1));
   const activeName = playerNames[activePlayerIndex] || `Pemain ${activePlayerIndex + 1}`;
 
@@ -1248,20 +1227,23 @@ function OfflineGame() {
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-2 relative z-10 w-full max-w-5xl mx-auto my-auto">
         {isQuestionsLoading && mode === 'pertanyaan' ? (
-          <div className="flex flex-col items-center justify-center my-auto py-16">
+          <div className="flex flex-col items-center justify-center my-auto py-16 gap-3">
             <div className="w-10 h-10 border-3 border-[#257180]/20 border-t-[#FD8B51] rounded-full animate-spin" />
+            <span className="text-xs font-black text-[#257180]/70">Menyiapkan kartu obrolan...</span>
           </div>
         ) : mode === 'pertanyaan' ? (
           <AllCardsDisplay
             playerNames={playerNames}
             questions={roundQuestions}
             onRoundComplete={handleNextRound}
+            onBackToLobby={handleBackToLobby}
             round={currentRound}
             totalRounds={totalRounds}
             activePlayerIndex={activePlayerIndex}
             setActivePlayerIndex={setActivePlayerIndex}
             roomCode={roomCode}
             topic={topic}
+            myName={myName}
           />
         ) : (
           <SpinnerWheelFlow
@@ -1269,6 +1251,7 @@ function OfflineGame() {
             todType={todType}
             onFinish={handleFinish}
             roomCode={roomCode}
+            myName={myName}
           />
         )}
       </main>
@@ -1281,11 +1264,11 @@ function OfflineGame() {
   );
 }
 
-export default function OfflineGamePage() {
+export default function GamePage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#F2E5BF]">
-        <div className="w-8 h-8 border-3 border-[#FD8B51] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#F2E5BF] flex items-center justify-center">
+        <div className="w-10 h-10 border-3 border-[#257180]/20 border-t-[#FD8B51] rounded-full animate-spin" />
       </div>
     }>
       <OfflineGame />
